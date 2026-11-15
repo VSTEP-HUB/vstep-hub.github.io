@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSTEP READING TEST</title>
+<style>
+:root{
+  --bg:#f4f1ea; --surface:#ffffff; --surface-2:#faf8f3; --ink:#1d2433; --muted:#5b6474; --line:#e3ddd0;
+  --accent:#1f4e79; --accent-ink:#ffffff; --accent-soft:#e6eef7;
+  --ok:#1e7b4a; --ok-soft:#e3f3ea; --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#a85f00; --warn-soft:#fff1d6;
+  --ref:#8a5a00; --ref-soft:#fff3d1; --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --surface:#1d2129; --surface-2:#191c23; --ink:#e8e6e1; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#8fb8e8; --accent-ink:#0f1620; --accent-soft:#1f2a3a;
+    --ok:#5cc28a; --ok-soft:#173022; --bad:#f08a80; --bad-soft:#3a1d1b; --warn:#f0b860; --warn-soft:#382a12;
+    --ref:#f0c46a; --ref-soft:#3a2f14; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --surface:#1d2129; --surface-2:#191c23; --ink:#e8e6e1; --muted:#9aa3b2; --line:#2e3440;
+  --accent:#8fb8e8; --accent-ink:#0f1620; --accent-soft:#1f2a3a;
+  --ok:#5cc28a; --ok-soft:#173022; --bad:#f08a80; --bad-soft:#3a1d1b; --warn:#f0b860; --warn-soft:#382a12;
+  --ref:#f0c46a; --ref-soft:#3a2f14; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.5;display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+button{font:inherit;cursor:pointer}
+.hidden{display:none !important}
+
+/* ---------- Header ---------- */
+.top{flex:0 0 auto;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:8px 16px;flex-wrap:wrap}
+.brand{font-weight:700;letter-spacing:.2px;white-space:nowrap}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:12px;letter-spacing:0}
+.tabs{display:flex;gap:4px;overflow-x:auto;flex:1 1 auto;scrollbar-width:none;min-width:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid transparent;background:transparent;color:var(--muted);padding:7px 12px;border-radius:999px;white-space:nowrap;font-size:14px;font-weight:600}
+.tab:hover{background:var(--surface-2);color:var(--ink)}
+.tab.active{background:var(--accent);color:var(--accent-ink)}
+.tab .cnt{font-weight:500;opacity:.8;margin-left:4px;font-size:12px}
+.timer{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums;font-weight:700;font-size:18px;padding:6px 14px;border-radius:10px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.timer svg{width:18px;height:18px}
+.timer.warn{background:var(--warn-soft);color:var(--warn)}
+.timer.danger{background:var(--bad-soft);color:var(--bad);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.6}}
+
+/* ---------- Main ---------- */
+main{flex:1 1 auto;min-height:0;position:relative}
+.view{position:absolute;inset:0;overflow:auto}
+.split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);overflow:hidden}
+.panel{overflow:auto;padding:24px 28px 40px;min-height:0}
+.passage-panel{background:var(--surface);border-right:1px solid var(--line)}
+.q-panel{background:var(--bg)}
+.mobile-switch{display:none}
+
+.p-label{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 6px}
+.passage h2{font-family:Georgia,"Times New Roman",serif;font-size:26px;line-height:1.25;margin:0 0 6px}
+.passage h3{font-family:Georgia,"Times New Roman",serif;font-size:20px;margin:18px 0 4px;font-style:italic;font-weight:600}
+.passage .hint{font-size:13px;color:var(--muted);margin:0 0 18px;padding:8px 12px;background:var(--surface-2);border-radius:8px;border:1px dashed var(--line)}
+.passage p{font-family:Georgia,"Times New Roman",serif;font-size:17.5px;line-height:1.8;margin:0 0 16px;max-width:68ch;text-align:justify;hyphens:auto}
+.passage p.p-label{font-family:"Segoe UI",system-ui,sans-serif;font-size:12px;line-height:1.4;margin:0 0 6px;text-align:left}
+.passage p.hint{font-family:"Segoe UI",system-ui,sans-serif;font-size:13px;line-height:1.5;margin:0 0 18px;text-align:left;max-width:none}
+.ref{background:var(--ref-soft);border-bottom:2px solid var(--ref);padding:0 2px;border-radius:3px;cursor:pointer}
+.ref::after{content:attr(data-q);font-family:"Segoe UI",system-ui,sans-serif;font-size:10px;font-weight:700;color:var(--ref);vertical-align:super;margin-left:2px}
+.ref.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{background:var(--ref);color:var(--surface)}100%{background:var(--ref-soft)}}
+.slot{display:inline-block;font-family:"Segoe UI",system-ui,sans-serif;font-size:13px;font-weight:700;color:var(--accent);border:1.5px solid var(--accent);border-radius:5px;padding:0 6px;margin:0 2px;line-height:1.5}
+
+/* ---------- Questions ---------- */
+.q-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 14px}
+.q-head h2{margin:0;font-size:18px}
+.q-head .muted{color:var(--muted);font-size:14px}
+.review-bar{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);margin:0 0 14px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 14px;box-shadow:var(--shadow);scroll-margin-top:16px}
+.q.focus{outline:2px solid var(--accent);outline-offset:2px}
+.q-top{display:flex;gap:12px;align-items:flex-start}
+.qnum{flex:0 0 auto;width:32px;height:32px;border-radius:9px;background:var(--accent-soft);color:var(--accent);font-weight:700;display:grid;place-items:center;font-size:14px}
+.q.answered .qnum{background:var(--accent);color:var(--accent-ink)}
+.qtext{margin:4px 0 0;font-weight:600;line-height:1.45}
+.quote{margin:10px 0 0 44px;padding:10px 14px;border-left:3px solid var(--accent);background:var(--surface-2);font-family:Georgia,serif;font-style:italic;border-radius:0 8px 8px 0}
+.find{margin:6px 0 0 44px;background:none;border:0;padding:0;color:var(--ref);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.opts{display:flex;flex-direction:column;gap:6px;margin:12px 0 0 44px}
+.opt{position:relative;display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover{border-color:var(--accent)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.letter{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--muted);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--muted);margin-top:1px}
+.opt input:checked + .letter{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opt input:focus-visible + .letter{outline:2px solid var(--accent);outline-offset:2px}
+.reviewing .opt{cursor:default}
+.reviewing .opt:hover{border-color:var(--line)}
+.opt.correct{border-color:var(--ok) !important;background:var(--ok-soft) !important}
+.opt.correct .letter{background:var(--ok) !important;border-color:var(--ok) !important;color:#fff !important}
+.opt.wrong{border-color:var(--bad) !important;background:var(--bad-soft) !important}
+.opt.wrong .letter{background:var(--bad) !important;border-color:var(--bad) !important;color:#fff !important}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;margin-left:8px;vertical-align:middle}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}
+.badge.bad{background:var(--bad-soft);color:var(--bad)}
+.badge.skip{background:var(--warn-soft);color:var(--warn)}
+.exp{margin:12px 0 0 44px;padding:12px 14px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);font-size:15px;line-height:1.6}
+.exp b.key{color:var(--ok)}
+.exp em{font-family:Georgia,serif}
+
+.nav-row{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+.btn{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 18px;border-radius:10px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.big{padding:14px 28px;font-size:17px;border-radius:12px}
+
+/* ---------- Start / Summary / Results ---------- */
+.center{max-width:760px;margin:0 auto;padding:32px 20px 60px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow);margin-bottom:18px}
+.card h1{font-family:Georgia,serif;font-size:32px;margin:0 0 6px;line-height:1.2}
+.card h2{margin:0 0 14px;font-size:20px}
+.lead{color:var(--muted);margin:0 0 20px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 22px}
+.fact{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.fact b{display:block;font-size:26px;color:var(--accent);font-variant-numeric:tabular-nums}
+.fact span{font-size:13px;color:var(--muted)}
+.rules{margin:0 0 24px;padding-left:20px;color:var(--ink)}
+.rules li{margin-bottom:6px}
+.parts-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 22px}
+.parts-list div{padding:10px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);font-size:14px}
+.parts-list b{color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 20px}
+.stat{border-radius:14px;padding:16px;text-align:center;border:1px solid var(--line)}
+.stat b{display:block;font-size:34px;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:13px;font-weight:600}
+.stat.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.stat.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.stat.skip{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.stat.info{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.grid40{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin:6px 0 18px}
+.cell{aspect-ratio:1;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);font-weight:700;font-size:14px;display:grid;place-items:center;padding:0}
+.cell:hover{border-color:var(--accent)}
+.cell.done{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.cell.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.cell.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.cell.skip{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.missing{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:12px 14px;margin:0 0 20px;font-size:15px}
+.missing.all{background:var(--ok-soft);color:var(--ok)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.score-hero{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:22px}
+.ring{width:132px;height:132px;flex:0 0 auto;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.1}
+.ring .num b{font-size:34px;font-variant-numeric:tabular-nums}
+.ring .num span{font-size:13px;color:var(--muted)}
+.score-meta p{margin:4px 0;color:var(--muted)}
+.score-meta .ten{font-size:22px;color:var(--ink);font-weight:700}
+.bars{display:flex;flex-direction:column;gap:10px;margin:0 0 6px}
+.bar-row{display:grid;grid-template-columns:90px 1fr 54px auto;align-items:center;gap:12px;font-size:14px}
+.bar{height:10px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:99px}
+.bar-row .link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13px;padding:0;text-decoration:underline;text-underline-offset:3px}
+.banner{border-radius:12px;padding:12px 14px;margin:0 0 16px;font-weight:600}
+.banner.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* ---------- Modal ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(10,15,25,.5);display:grid;place-items:center;padding:16px;z-index:50}
+.modal{background:var(--surface);border-radius:16px;padding:24px;max-width:440px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal h3{margin:0 0 8px;font-size:20px}
+.modal p{margin:0 0 20px;color:var(--muted)}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 860px){
+  .top{padding:8px 12px;gap:8px}
+  .brand small{display:none}
+  .tabs{order:3;flex-basis:100%}
+  .tab{padding:6px 10px;font-size:13px}
+  .timer{margin-left:auto;font-size:16px;padding:5px 12px}
+  .split{display:flex;flex-direction:column}
+  .mobile-switch{display:flex;gap:6px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--line);flex:0 0 auto}
+  .mobile-switch button{flex:1;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);border-radius:9px;padding:8px;font-weight:600;font-size:14px}
+  .mobile-switch button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .panel{flex:1 1 auto;padding:18px 16px 32px;border-right:0}
+  .split[data-show="passage"] .q-panel{display:none}
+  .split[data-show="questions"] .passage-panel{display:none}
+  .passage p{font-size:17px;text-align:left}
+  .opts,.exp,.find,.quote{margin-left:0}
+  .q{padding:14px}
+  .facts,.stats{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .fact b{font-size:22px}
+  .stat b{font-size:26px}
+  .parts-list{grid-template-columns:1fr}
+  .grid40{grid-template-columns:repeat(8,1fr)}
+  .card{padding:20px 16px}
+  .card h1{font-size:26px}
+  .bar-row{grid-template-columns:70px 1fr 44px;row-gap:2px}
+  .bar-row .link{grid-column:1/-1;justify-self:start}
+  .center{padding:16px 16px 40px}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="brand">VSTEP READING TEST<small>4 bài đọc · 40 câu · 60 phút</small></div>
+  <nav class="tabs" id="tabs" aria-label="Các phần"></nav>
+  <div class="timer hidden" id="timer" aria-live="off">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+    <span id="timerText">60:00</span>
+  </div>
+</header>
+
+<main>
+  <!-- Start -->
+  <section class="view" id="startView">
+    <div class="center">
+      <div class="card">
+        <p class="p-label">Reading Comprehension</p>
+        <h1>VSTEP READING TEST</h1>
+        <p class="lead">Đọc 4 bài đọc và chọn đáp án đúng nhất (A, B, C hoặc D) cho mỗi câu hỏi.</p>
+        <div class="facts">
+          <div class="fact"><b>4</b><span>bài đọc</span></div>
+          <div class="fact"><b>40</b><span>câu hỏi</span></div>
+          <div class="fact"><b>60'</b><span>thời gian làm bài</span></div>
+        </div>
+        <div class="parts-list">
+          <div><b>Phần 1</b> · The Rise of Remote Work · Câu 1–10</div>
+          <div><b>Phần 2</b> · First-time Renters in New York · Câu 11–20</div>
+          <div><b>Phần 3</b> · Greenland and Global Warming · Câu 21–30</div>
+          <div><b>Phần 4</b> · The Origin of Life · Câu 31–40</div>
+        </div>
+        <ul class="rules">
+          <li>Đồng hồ <b>60 phút</b> tính chung cho cả 4 bài và bắt đầu chạy khi bạn bấm “Bắt đầu làm bài”.</li>
+          <li>Bạn có thể chuyển qua lại giữa các phần bất cứ lúc nào.</li>
+          <li>Từ/cụm từ được hỏi đã được <span class="ref" data-q="#" style="cursor:default">gạch chân</span> trong bài đọc, kèm số câu hỏi.</li>
+          <li>Hết giờ, bài sẽ được <b>tự động nộp</b>. Sau khi nộp, bạn sẽ thấy điểm và giải thích đáp án.</li>
+        </ul>
+        <div class="actions">
+          <button class="btn primary big" id="startBtn">Bắt đầu làm bài</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Part (passage + questions) -->
+  <section class="view split hidden" id="partView" data-show="passage">
+    <div class="mobile-switch" id="mswitch">
+      <button data-show="passage" class="on">Bài đọc</button>
+      <button data-show="questions">Câu hỏi <span id="mcnt"></span></button>
+    </div>
+    <article class="panel passage-panel passage" id="passagePanel"></article>
+    <section class="panel q-panel" id="qPanel"></section>
+  </section>
+
+  <!-- Summary -->
+  <section class="view hidden" id="summaryView"></section>
+
+  <!-- Results -->
+  <section class="view hidden" id="resultsView"></section>
+</main>
+
+<div class="modal-bg hidden" id="modal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h3 id="mTitle"></h3>
+    <p id="mText"></p>
+    <div class="actions">
+      <button class="btn" id="mCancel">Quay lại</button>
+      <button class="btn primary" id="mOk">Đồng ý</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DỮ LIỆU BÀI ĐỌC
+   ========================================================= */
+const PARTS = [
+{ id:1, label:"Passage 1", title:"The Rise of Remote Work", from:1, to:10, html:`
+<p>The traditional office environment, once the standard for most professionals, is undergoing a dramatic transformation due to the rise of <span class="ref" data-q="2">remote</span> work. Driven by technological advancements, particularly high-speed internet and collaborative software, this shift allows employees to perform their duties outside of a conventional workplace. This change has profound implications for both businesses and the workforce.</p>
+<p>For companies, remote work offers several distinct advantages. The most immediate is the potential for significant cost savings on office space, utilities, and maintenance. <span class="ref" data-q="4">Furthermore</span>, it expands the talent pool, enabling businesses to hire the best candidates regardless of their geographical location. Studies also suggest that remote employees are often more productive, partly due to reduced commute stress and the ability to tailor their work environment to their personal needs.</p>
+<p>However, the transition is not without its challenges. Maintaining a strong company culture can be difficult when team members rarely interact face-to-face. Managers must adapt their leadership styles to monitor performance rather than physical presence. Security is also a major concern, as confidential company data is accessed over various home networks, requiring <span class="ref" data-q="6">robust</span> cybersecurity protocols.</p>
+<p>For employees, the benefits include greater flexibility, a better work-life balance, and savings on travel and professional wardrobe. Yet, <span class="ref" data-q="10">they</span> also face potential pitfalls. Isolation and the <span class="ref" data-q="7">blurring of lines</span> between personal and professional life are common issues. Employees must be self-disciplined and skilled in time management to succeed in a remote setting. As remote work continues to grow, both employers and employees must find innovative ways to navigate this new professional landscape.</p>
+`},
+{ id:2, label:"Passage 2", title:"", from:11, to:20, html:`
+<p>Spring is the season when newly minted college graduates flock to New York City to start their careers. They begin the search for their dream apartment, brokers say, with the same single-minded determination that earned them their degrees and landed them their jobs in the first place. But that determination only goes so far when it comes to Manhattan real estate. <span class="slot">A</span></p>
+<p>“Almost every single person I’ve worked with thinks there’s a golden nugget of an apartment waiting right for them,” said Paul Hunt, an agent at Citi Habitats who specializes in rentals. “They all want to be in the Village, and they all want the ‘Sex and the City’ apartment.”</p>
+<p>The first shock for a first-time renter will probably be the prices. Consider that the average monthly rent for a one-bedroom in the Village is more than $3,100 and that the average for a studio is over $2,200. Of that the average rent for a one-bedroom in a doorman building anywhere in Manhattan is close to $3,500. <span class="slot">B</span></p>
+<p>Mr. Hunt said that when he shows <span class="ref" data-q="13">prospective</span> renters what their budget really can buy, they are sometimes so appalled that “they think I’m trying to fool them or something, and they run away and I don’t hear from them again.”</p>
+<p>Alternatively, the renter checks his or her expectations and grudgingly decide to raise the price limit, or look in other neighborhoods or get a roommate. “When expectations are very high, the process can be very frustrating,” Mr. Hunt said.</p>
+<p>The thousands of new graduates who will be driving the engine of the city’s rental market from now until September will quickly learn that renting in New York is not like renting anywhere else. <span class="slot">C</span></p>
+<p>The second shock is likely to be how small a Manhattan apartment can be. It is not uncommon in New York, for example, to shop for a junior one-bedroom only to find out it is really a studio that already has or can have a wall put up to create a bedroom.</p>
+<p><span class="slot">D</span> To start with, landlords want only tenants who earn at least 40 times the monthly rent, which means an $80,000 annual salary for a $2,000 apartment. According to census data, more than 25,000 graduates aged 22 to 28 moved to the city in 2006, and their median salary was about $35,600.</p>
+<p><span class="ref" data-q="19">Those</span> who don’t make 40 times their monthly rent need a guarantor, usually a parent, who must make at least 80 times the monthly rent. In addition to a security deposit, some landlords also want the first and last month’s rent. Tack on a broker’s fee and a prospective renter for that $2,000 apartment is out of pocket nearly $10,000 just to get the keys to the place.</p>
+`},
+{ id:3, label:"Passage 3", title:"", from:21, to:30, html:`
+<p>‘Ladies and gentlemen’, the captain’s voice crackled over the plane’s public address system. “If you look out of the window on the right side of the aircraft,” he said, “you will have a clear view of Greenland. <span class="ref" data-q="21">In my 15 years of flying, I have not seen a scene like this.</span>” I opened the window shade, and I understood what had so startled the pilot. Instead of the habitual snowy landscape and frozen glaciers, a wide swathe of black water was visible as it flowed into the Atlantic. It was late spring, but the giant icebox that is Greenland was already melting.</p>
+<p>The fleeting image that I saw from 30,000 feet in early May is consistent with massive amounts of climate data gathered from across the planet. It is now clear that on average, the global surface temperature has increased by about one degree Celsius since 1900 and has been the cause of extreme climate events across the planet.</p>
+<p>At times, warming climate combined with soot in the air thrown by wild fire has accelerated the melting. Warm weather is leading ice sheets to break up and turning glaciers into flowing streams. In May, NASA scientists concluded that the rapidly melting glacial region of Antarctica has passed “the point of no return”, threatening to increase sea levels by as much as 13 feet within the next few centuries. <span class="slot">A</span> The fact that the melting is taking place slowly and its effect may not be felt for a few decades seems to <span class="ref" data-q="23">offer comfort</span> to those who want to continue their lifestyle relying on fossil fuels. Unwilling to believe in global warming or make the sacrifices needed to face the challenge, politicians have been finding excuses to do nothing. <span class="slot">B</span></p>
+<p>American President Barack Obama, not hobbled by the need to fight elections, has now broken ranks with <span class="ref" data-q="25">such politicians</span>. Unable to pass legislation in the face of Republican (and sometimes Democratic) opposition, he instructed the Environmental Protection Agency to announce regulatory policies to curb emissions from power plants in the United States by 30 per cent by 2030. He hopes that regulations would influence the US states to adopt aggressive market interventions to address global warming. Of course, execution of the policy still lies in the hands of many state governors who would find ways to resist, saying that regulations would raise the cost to the economy and cause unemployment among coal workers. As President Obama told Thomas Friedman of the New York Times: “One of the hardest things in politics is getting a democracy to deal with something now where the payoff is long term or the price of inaction is decades away.” <span class="slot">C</span></p>
+<p>The price of inaction could be raised – if the coming global summit on climate in Paris could do what other summits have failed to do: agree on a fixed target for greenhouse gas emissions and a rigorous system for monitoring. China has hinted at capping coal burning in the next 15 years, adding weight in favour of action. <span class="slot">D</span> Meanwhile, melting in Greenland and the Antarctica will continue as the sun <span class="ref" data-q="28">scorches</span> the fields and rising water threatens the coastal areas.</p>
+`},
+{ id:4, label:"Passage 4", title:"", from:31, to:40, html:`
+<p>The earliest evidence for life on Earth comes from fossilized mats of cyanobacteria called stromatolites in Australia that are about 3.4 billion years old. Ancient as their origins are, these bacteria, which are still around today, are already biologically complex—<span class="ref" data-q="31">they</span> have cell walls protecting their protein-producing DNA, so scientists think life must have begun much earlier, perhaps as early as 3.8 billion years ago. But despite knowing approximately when life first appeared on Earth, scientists are still far from answering how it appeared.</p>
+<p>Today, there are several competing theories for how life arose on Earth. Some question whether life began on Earth at all, asserting instead that it came from a distant world or the heart of a fallen comet or asteroid. Some even say life might have arisen here more than once.</p>
+<p>Most scientists agree that life went through a period when RNA was the head-honcho molecule, guiding life through its nascent stages. According to this “RNA World” hypothesis, RNA was the crux molecule for primitive life and only <span class="ref" data-q="33">took a backseat</span> when DNA and proteins—which perform their jobs much more efficiently than RNA—developed.</p>
+<p>RNA is very similar to DNA, and today carries out numerous important functions in each of our cells, including acting as a transitional-molecule between DNA and protein synthesis, and functioning as an on-and-off switch for some genes.</p>
+<p>But the RNA World hypothesis doesn’t explain how RNA itself first arose. Like DNA, RNA is a complex molecule made of repeating units of thousands of smaller molecules called nucleotides that link together in very specific, patterned ways. While there are scientists who think RNA could have arisen spontaneously on Earth, others say the odds of such a thing happening are astronomical.</p>
+<p>“The appearance of such a molecule, given the way chemistry functions, is incredibly improbable. It would be a once-in-a-universe long shot,” said Robert Shapiro, a chemist at New York University. “<span class="ref" data-q="35">To adopt this, you have to believe we were incredibly lucky.</span>”</p>
+<p>But “astronomical” is a relative term. In his book, <i>The God Delusion</i>, biologist Richard Dawkins entertains another possibility, inspired by work in astronomy and physics. Suppose, Dawkins says, the universe contains a billion planets, a conservative estimate, he says, then the chances that life will arise on one of them is not really so remarkable. Furthermore, if, as some physicists say, our universe is just one of many, and each universe contained a billion planets, then it’s nearly a certainty that life will arise on at least one of them.</p>
+<p>Shapiro doesn’t think it’s necessary to invoke multiple universes or life-laden comets crashing into ancient Earth. Instead, he thinks life started with molecules that were smaller and less complex than RNA, which performed simple chemical reactions that eventually led to a self-sustaining system involving the formation of more complex molecules. “If you fall back to a simpler theory, the odds aren’t astronomical anymore,” Shapiro concluded.</p>
+`}
+];
+
+/* =========================================================
+   CÂU HỎI · ĐÁP ÁN · GIẢI THÍCH
+   ========================================================= */
+const QS = [
+// ---------- PASSAGE 1 ----------
+{n:1, q:`What is the main reason for the rise of remote work mentioned in paragraph 1?`,
+ o:[`Decreased costs of office rent`,`Technological advancements`,`An increase in global travel`,`A demand for more vacation time`], a:"B",
+ e:`Đoạn 1: <em>“Driven by technological advancements, particularly high-speed internet and collaborative software, this shift…”</em> → nguyên nhân là tiến bộ công nghệ. A (giảm chi phí thuê văn phòng) là <i>lợi ích</i> cho công ty ở đoạn 2, không phải nguyên nhân.`},
+{n:2, q:`The word "remote" in line 2 is closest in meaning to ________.`,
+ o:[`close`,`far away`,`temporary`,`flexible`], a:"B",
+ e:`<em>Remote work</em> là làm việc “<em>outside of a conventional workplace</em>” – ở xa nơi làm việc thông thường → remote = <b>far away</b>. “Flexible” là một lợi ích của làm việc từ xa chứ không phải nghĩa của từ; “close” trái nghĩa.`},
+{n:3, q:`Which of the following is <u>not</u> listed as a direct advantage for companies?`,
+ o:[`Expanding the talent pool`,`Lowering operational costs`,`Increasing employee productivity`,`Improving company culture`], a:"D",
+ e:`Đoạn 2 nêu lợi ích cho công ty: tiết kiệm chi phí (B), mở rộng nguồn nhân tài (A), nhân viên năng suất hơn (C). Văn hoá công ty lại là <i>thách thức</i> ở đoạn 3: <em>“Maintaining a strong company culture can be difficult…”</em>`},
+{n:4, q:`The word "Furthermore" in line 9 can best be replaced by ________.`,
+ o:[`Similarly`,`Therefore`,`In addition`,`Conversely`], a:"C",
+ e:`<em>Furthermore</em> = hơn nữa, ngoài ra (thêm một ý cùng chiều) → <b>In addition</b>. Similarly = tương tự; Therefore = vì vậy (chỉ kết quả); Conversely = ngược lại.`},
+{n:5, q:`What is a main challenge for managers in a remote work model?`,
+ o:[`Recruiting new staff`,`Monitoring physical presence`,`Developing new software`,`Adapting to new leadership styles`], a:"D",
+ e:`<em>“Managers must adapt their leadership styles to monitor performance rather than physical presence.”</em> B là bẫy: bài nói quản lý theo hiệu suất <i>thay vì</i> sự có mặt.`},
+{n:6, q:`The word "robust" in line 16 is closest in meaning to ________.`,
+ o:[`simple`,`strong`,`optional`,`expensive`], a:"B",
+ e:`<em>robust cybersecurity protocols</em> = các quy trình an ninh mạng vững chắc, mạnh mẽ (vì dữ liệu mật được truy cập qua nhiều mạng gia đình) → <b>strong</b>.`},
+{n:7, q:`The phrase "blurring of lines" in line 20 refers to ________.`,
+ o:[`difficulty in seeing the computer screen`,`the separation between work and life becoming less clear`,`the inability to draw clearly on a whiteboard`,`the distinction between different job roles`], a:"B",
+ e:`<em>“the blurring of lines between personal and professional life”</em> – ranh giới giữa đời sống cá nhân và công việc bị mờ đi, không còn rõ ràng → B. Các đáp án khác hiểu “lines” theo nghĩa đen.`},
+{n:8, q:`Which of the following is a potential pitfall for employees in remote work?`,
+ o:[`Reduced commute time`,`Better work-life balance`,`Isolation`,`Cost savings`], a:"C",
+ e:`<em>“Yet, they also face potential pitfalls. Isolation and the blurring of lines… are common issues.”</em> A, B, D đều là <i>lợi ích</i>.`},
+{n:9, q:`The main purpose of this passage is to ________.`,
+ o:[`encourage all companies to adopt remote work immediately.`,`describe the history of the traditional office.`,`discuss the benefits and challenges of the growing trend of remote work.`,`predict the future of work in the next decade.`], a:"C",
+ e:`Bài trình bày lợi ích (đoạn 2, 4) và thách thức (đoạn 3, 4) của xu hướng làm việc từ xa đang tăng. Bài không kêu gọi áp dụng ngay (A), không kể lịch sử văn phòng (B), không dự đoán thập kỷ tới (D).`},
+{n:10, q:`The word "they" in line 19 refers to ________.`,
+ o:[`the benefits`,`employees`,`savings`,`pitfalls`], a:"B",
+ e:`<em>“For employees, the benefits include… Yet, they also face potential pitfalls.”</em> Đối tượng “đối mặt với rủi ro” chỉ có thể là người lao động → they = <b>employees</b>.`},
+
+// ---------- PASSAGE 2 ----------
+{n:11, q:`Which of the following would be the best title for this article?`,
+ o:[`Best Guide to Finding an Apartment in New York City`,`New York City – Haven for First-time Renters`,`Surprises Await First-time Renters in New York City`,`Sure You Can Afford it in New York City?`], a:"C",
+ e:`Bài được xây dựng quanh những “cú sốc” mà người thuê nhà lần đầu gặp phải: <em>“The first shock… the prices”</em>, <em>“The second shock… how small”</em>, rồi các yêu cầu khắt khe của chủ nhà → <b>những bất ngờ</b>. A sai (bài không hướng dẫn tìm nhà); B sai (New York không phải “thiên đường” cho người thuê); D chỉ bao quát chuyện giá cả, bỏ sót chuyện diện tích.`},
+{n:12, q:`On average, how much do tenants have to pay for a studio in New York City?`,
+ o:[`About $2,000`,`More than $2,000`,`More than $3,100`,`Less than $3,500`], a:"B",
+ e:`<em>“…the average for a studio is over $2,200.”</em> → hơn $2,000. C ($3,100) là giá căn một phòng ngủ ở Village; D ($3,500) là giá căn một phòng ngủ có người gác cửa – không phải con số dành cho studio.`},
+{n:13, q:`Which of the following words can best replace the word 'prospective' in line 16?`,
+ o:[`Apparent`,`Prosperous`,`Potential`,`Upcoming`], a:"C",
+ e:`<em>prospective renters</em> = những người <i>có thể sẽ</i> thuê nhà → <b>potential</b>. “Prosperous” (thịnh vượng) là bẫy vì viết gần giống; “upcoming” (sắp diễn ra) dùng cho sự kiện.`},
+{n:14, q:`Which of the following is NOT listed by Mr. Hunt as a reaction of prospective renters when he informs them of the prices?`,
+ o:[`They think the broker is meaning to deceive them.`,`They decide to move to another city.`,`They decide to look for a place in a different neighborhood.`,`They find someone to share the accommodation with.`], a:"B",
+ e:`Các phản ứng được nêu: nghĩ môi giới lừa mình (A – <em>“they think I’m trying to fool them”</em>), tìm khu khác (C – <em>“look in other neighborhoods”</em>), ở ghép (D – <em>“get a roommate”</em>). Chuyển sang thành phố khác <b>không</b> được nhắc tới.`},
+{n:15, q:`According to Mr. Hunt, what would make the process of finding an apartment challenging?`,
+ o:[`Renters do not trust the brokers.`,`Renters over-expect about places they can rent.`,`Landlords expect tenants to have secured income.`,`Renters want to bargain with landlords.`], a:"B",
+ e:`Ông Hunt nói: <em>“When expectations are very high, the process can be very frustrating.”</em> → người thuê kỳ vọng quá cao. C có trong bài nhưng không phải lời của ông Hunt về điều khiến quá trình khó khăn.`},
+{n:16, q:`Which of the following would best describe the attitude of renters who decide to raise their price limit after being informed of the price?`,
+ o:[`Willing`,`Hopeful`,`Reluctant`,`Frustrated`], a:"C",
+ e:`<em>“…the renter checks his or her expectations and <b>grudgingly</b> decide to raise the price limit”</em> – grudgingly = miễn cưỡng → <b>reluctant</b>. “Willing” trái nghĩa; “frustrated” nói về quá trình tìm nhà nói chung chứ không phải thái độ khi quyết định tăng ngân sách.`},
+{n:17, q:`In which space (marked A, B, C and D in the passage) will the following sentence fit?`,
+ quote:`Aside from the realities of price and space, the requirements set by New York landlords are also bound to help turn a bright-eyed first-time renter’s outlook grim.`,
+ o:[`A`,`B`,`C`,`D`], a:"D",
+ e:`Câu cần chèn vừa <i>tổng kết</i> hai cú sốc trước đó (giá cả – “price” và diện tích – “space”), vừa <i>giới thiệu</i> ý mới: yêu cầu của chủ nhà. Ngay sau vị trí [D] là <em>“To start with, landlords want only tenants who earn at least 40 times the monthly rent…”</em> – bắt đầu liệt kê các yêu cầu → [D].`},
+{n:18, q:`Why did the writer mention the income of college graduates in 2006?`,
+ o:[`To demonstrate that graduates can earn a decent salary if they work in New York City`,`To indicate that less than 50% of the surveyed graduates could afford apartments in New York City`,`To suggest that New York City is not a place for graduates`,`To prove that to guarantee a place in New York City is financially out of reach for an average graduate`], a:"D",
+ e:`Chủ nhà đòi thu nhập gấp 40 lần tiền thuê (tức $80,000/năm cho căn $2,000), trong khi thu nhập trung vị của sinh viên mới ra trường chỉ khoảng $35,600 → một sinh viên tốt nghiệp bình thường <b>không đủ khả năng tài chính</b> để đáp ứng yêu cầu. B chỉ là một suy luận phụ về con số, không phải mục đích tác giả; C quá cực đoan.`},
+{n:19, q:`What does the word 'Those' in line 36 refer to?`,
+ o:[`Landlords`,`Graduates`,`Guarantors`,`Parents`], a:"B",
+ e:`Câu trước nói về các sinh viên tốt nghiệp và mức lương của họ. <em>“Those who don’t make 40 times their monthly rent need a guarantor, usually a parent”</em> → những người cần người bảo lãnh là <b>graduates</b> (người đi thuê). Không thể là guarantors/parents vì chính họ là người được nhờ bảo lãnh.`},
+{n:20, q:`Which of the following sentences would best complete the last paragraph?`,
+ o:[`On top of that, every owner also has their own requirements, so just because you qualified here doesn’t mean you’ll qualify there.`,`So you had better accept that you’ll never have what you want no matter how hard you work.`,`So the key to finding that first apartment is to learn as much as possible about the market before arriving in the city and to keep an open mind.`,`You have to be flexible and you have to come to the city armed with information and financial paperwork.`], a:"A",
+ e:`Đoạn cuối đang <i>liệt kê các yêu cầu và chi phí</i>: người bảo lãnh, tiền đặt cọc, tiền tháng đầu và tháng cuối, phí môi giới. A (“<em>On top of that…</em>” – thêm vào đó) nối tiếp đúng mạch liệt kê yêu cầu. C và D là lời khuyên mang tính kết luận, không khớp với nội dung đoạn này; B tiêu cực, không có căn cứ trong bài.`},
+
+// ---------- PASSAGE 3 ----------
+{n:21, q:`In paragraph 1, what does the pilot mean by saying, 'In my 15 years of flying, I have not seen a scene like this'?`,
+ o:[`This scene is very unusual.`,`The pilot is not an attentive person.`,`The scene makes flying worthy.`,`This scene is very magnificent.`], a:"A",
+ e:`15 năm bay mà chưa từng thấy → cảnh tượng rất <b>bất thường</b>. Tác giả giải thích ngay sau: <em>“Instead of the habitual snowy landscape and frozen glaciers, a wide swathe of black water was visible”</em>. D sai: đây là cảnh băng tan đáng lo, không phải cảnh “tráng lệ”.`},
+{n:22, q:`What is the author's purpose when recounting the scene he saw from the plane?`,
+ o:[`To introduce the idea of global warming.`,`To give specific detail to support his point that global warming needs public awareness.`,`To express his opinion towards research on global surface temperature.`,`To contrast with what the pilot is saying.`], a:"A",
+ e:`Cảnh Greenland tan băng là phần mở bài dẫn vào chủ đề chính. Đoạn 2: <em>“The fleeting image… is consistent with massive amounts of climate data”</em> → nóng lên toàn cầu. B sai vì bài không bàn về “nhận thức cộng đồng”; D sai vì cảnh này khớp chứ không trái với lời phi công.`},
+{n:23, q:`What is 'offer comfort' in lines 20-21 closest in meaning to?`,
+ o:[`Warm up`,`Reassure`,`Discourage`,`Assist`], a:"B",
+ e:`<em>“The fact that the melting is taking place slowly… seems to offer comfort to those who want to continue their lifestyle relying on fossil fuels.”</em> → việc băng tan chậm khiến họ <b>yên tâm</b> = reassure.`},
+{n:24, q:`What is the main idea of paragraph 3?`,
+ o:[`Hot weather combined with wild fire soot has been melting glaciers.`,`There has been enough evidence that global warming is an urgent issue.`,`Global warming is evident but some are not willing to deal with this.`,`The earliest effects of melting glaciers can only been seen in centuries.`], a:"C",
+ e:`Đoạn 3 vừa đưa bằng chứng băng tan (NASA: <em>“the point of no return”</em>), vừa chỉ ra rằng nhiều người, nhất là chính trị gia, <em>“unwilling to believe in global warming or make the sacrifices… finding excuses to do nothing”</em> → C bao quát cả hai ý. A chỉ là chi tiết của câu đầu; D sai thông tin (bài nói “a few decades”).`},
+{n:25, q:`Who does 'such politicians' in line 25 refer to?`,
+ o:[`Those who have protested against Obama's views.`,`Those who are not at the same rank as Obama.`,`Those who take no actions against global warming.`,`Those who do not believe in global warming.`], a:"C",
+ e:`“Such politicians” chỉ các chính trị gia ở câu ngay trước: <em>“politicians have been finding excuses to do nothing”</em> → những người <b>không hành động</b>. D chưa đủ, vì nhóm này gồm cả người không tin <i>và</i> người tin nhưng không muốn hy sinh (<em>“Unwilling to believe… or make the sacrifices”</em>).`},
+{n:26, q:`In which space (marked A, B, C and D in the passage) will the following sentence fit?`,
+ quote:`India, the world's third largest user of coal, may have to take measures on its own or face isolation.`,
+ o:[`A`,`B`,`C`,`D`], a:"D",
+ e:`Câu về Ấn Độ (“nước dùng than lớn thứ ba”) phải đứng sau câu về Trung Quốc: <em>“China has hinted at capping coal burning in the next 15 years, adding weight in favour of action.”</em> Khi các nước dùng than lớn khác hành động, Ấn Độ sẽ phải tự hành động hoặc bị cô lập → [D].`},
+{n:27, q:`According to paragraph 4, the author's attitude toward Obama's actions can be best described as`,
+ o:[`skeptical`,`appreciative`,`sympathetic`,`supportive`], a:"B",
+ e:`Tác giả đánh giá cao việc Obama <em>“has now broken ranks with such politicians”</em> – khác với những chính trị gia chỉ tìm cớ không làm gì, ông đã chỉ đạo EPA cắt giảm 30% khí thải trước 2030 dù không thông qua được luật. Câu <em>“Of course, execution… still lies in the hands of many state governors”</em> chỉ nêu khó khăn thực tế, không thể hiện sự nghi ngờ (A) → <b>appreciative</b>.`},
+{n:28, q:`What can the word 'scorches' in line 42 be best replaced by?`,
+ o:[`shines`,`warms up`,`burns`,`heats up`], a:"C",
+ e:`<em>“as the sun scorches the fields”</em> – scorch = thiêu đốt, làm cháy sém → <b>burns</b>. “Warms up / heats up” quá nhẹ, không diễn tả được mức độ khắc nghiệt.`},
+{n:29, q:`Which of the following best describes the tone of the author in this passage?`,
+ o:[`skeptical`,`concerned`,`indifferent`,`pessimistic`], a:"B",
+ e:`Tác giả dẫn chứng băng tan, “point of no return”, nước biển dâng đe dọa vùng ven biển, và phê phán sự thiếu hành động → giọng <b>lo ngại</b>. Không phải bi quan hoàn toàn (D) vì tác giả vẫn đặt hy vọng vào hội nghị Paris và động thái của Trung Quốc.`},
+{n:30, q:`Which of the following could best describe the message that the author wants to pass to readers?`,
+ o:[`Fossil fuel should be replaced in the future.`,`Solutions to global warming need political support.`,`Rapid glacial melt has reached an irreversible point.`,`Politicians play a key role in resolving global issues.`], a:"B",
+ e:`Phần lớn bài nói về vai trò chính trị: chính trị gia né tránh, Obama hành động, hy vọng hội nghị Paris đặt mục tiêu khí thải → giải pháp cho nóng lên toàn cầu <b>cần sự ủng hộ chính trị</b>. C chỉ là một chi tiết; D quá rộng (“global issues”); A không được nêu trực tiếp.`},
+
+// ---------- PASSAGE 4 ----------
+{n:31, q:`The word 'they' in line 4 refers to`,
+ o:[`mats`,`origins`,`bacteria`,`DNA`], a:"C",
+ e:`<em>“these bacteria, which are still around today, are already biologically complex—they have cell walls protecting their protein-producing DNA”</em> → they = <b>bacteria</b> (vi khuẩn có thành tế bào).`},
+{n:32, q:`According to the passage, what is RNA?`,
+ o:[`A protein`,`A molecule`,`A nucleotide`,`A cell`], a:"B",
+ e:`<em>“RNA was the crux molecule”</em>, <em>“RNA is a complex molecule made of… nucleotides”</em> → RNA là một <b>phân tử</b>. C sai: nucleotide là các phân tử nhỏ cấu tạo nên RNA.`},
+{n:33, q:`The phrase 'took a backseat' in line 16 is closest in meaning to`,
+ o:[`enjoyed more dominance`,`turned to be useless`,`stepped back to its place`,`became less important`], a:"D",
+ e:`RNA <em>“only took a backseat when DNA and proteins—which perform their jobs much more efficiently than RNA—developed”</em> → khi có DNA và protein hiệu quả hơn, RNA lùi xuống vai trò thứ yếu = <b>became less important</b>. B sai vì RNA vẫn đảm nhiệm nhiều chức năng ngày nay (đoạn 4).`},
+{n:34, q:`According to the passage, what is NOT true about RNA?`,
+ o:[`It is the crux of a widely accepted theory on the origin of life.`,`It is believed to be most important for early life.`,`Like DNA, it executes many duties in human cells.`,`There is still disagreement over how RNA first appeared.`], a:"C",
+ e:`Bài chỉ nói <em>“RNA is very similar to DNA, and today carries out numerous important functions in each of our cells”</em> – RNA giống DNA về cấu tạo, còn việc đảm nhiệm nhiều chức năng là của RNA; bài <b>không</b> nói DNA cũng làm như vậy, nên “Like DNA” là chi tiết không có căn cứ. A đúng (<em>“Most scientists agree… RNA was the crux molecule”</em>); B đúng (<em>“head-honcho molecule”</em>); D đúng (có người cho là tự phát, có người cho là gần như không thể).`},
+{n:35, q:`What does Robert Shapiro mean when he says, 'To adopt this, you have to believe we were incredibly lucky'?`,
+ o:[`Supporters of RNA world hypothesis must think that humans were extremely blessed.`,`Humans were incredibly lucky because the RNA was the first form of life on Earth.`,`He believes it is near impossible that RNA accidentally arose on Earth.`,`Humans were unlucky because the RNA world hypothesis is highly improbable.`], a:"C",
+ e:`Ngay trước đó Shapiro nói: <em>“The appearance of such a molecule… is incredibly improbable. It would be a once-in-a-universe long shot.”</em> Câu “phải tin rằng chúng ta cực kỳ may mắn” mang ý mỉa mai → ông cho rằng việc RNA tự nhiên xuất hiện gần như <b>không thể</b>.`},
+{n:36, q:`Which of the following statements would Dawkins most probably support?`,
+ o:[`As there are a countless number of planets, it is surprising that life arose on Earth only.`,`Life may exist on planets other than Earth and in universes other than ours.`,`There are many universes like ours, which contain an incredible number of planets.`,`Given the colossal number of planets, the appearance of life on one of them was not unusual.`], a:"D",
+ e:`<em>“Suppose… the universe contains a billion planets…, then the chances that life will arise on one of them is not really so remarkable.”</em> → D. C là ý của “some physicists” mà Dawkins dẫn lại; B và A không được Dawkins khẳng định.`},
+{n:37, q:`According to the passage, which is most likely supported by Robert Shapiro?`,
+ o:[`Life on Earth first came from outer space.`,`It is highly possible that DNA was present in earliest stages of life.`,`Earliest life might not have arisen in the form of complex molecules.`,`Life has arisen more than once on Earth.`], a:"C",
+ e:`<em>“he thinks life started with molecules that were smaller and less complex than RNA”</em> → C. A sai: ông <em>“doesn’t think it’s necessary to invoke… life-laden comets crashing into ancient Earth”</em>.`},
+{n:38, q:`Which of the following is NOT mentioned as a hypothesis of life origin?`,
+ o:[`Life was formed elsewhere and then came to Earth.`,`Life was brought to Earth with crashing comets.`,`RNA played a central role in the early form of life.`,`DNA is more efficient than RNA for primitive life.`], a:"D",
+ e:`A (<em>“came from a distant world”</em>), B (<em>“the heart of a fallen comet or asteroid”</em>), C (giả thuyết “RNA World”) đều là giả thuyết được nêu. Việc DNA làm việc hiệu quả hơn RNA chỉ là một nhận định phụ, <b>không phải</b> giả thuyết về nguồn gốc sự sống.`},
+{n:39, q:`Which of following conclusions can be drawn from this passage?`,
+ o:[`Among many hypotheses for life origin on Earth, RNA remains the most important one.`,`Many theories of the origin of life have been proposed but no fully accepted theory exists.`,`Trying to explain what happened billions of years ago is an extremely difficult but possible task.`,`The answer to the question of how life appeared would have important implications for the likelihood of finding life elsewhere in the universe.`], a:"B",
+ e:`<em>“scientists are still far from answering how it appeared”</em>, <em>“there are several competing theories”</em>; các ý kiến về RNA, của Dawkins và Shapiro đều còn tranh luận → chưa có lý thuyết nào được chấp nhận hoàn toàn. D không được bàn tới trong bài.`},
+{n:40, q:`Which of the following best describes the organization of this passage?`,
+ o:[`A general presentation followed by a detailed discussion of both sides of an issue.`,`A list of possible answers to a question followed by a discussion of their strengths and weaknesses.`,`A general statement of an issue followed by a discussion of possible answers.`,`A discussion of different aspects wrapped up by an answer to the question.`], a:"C",
+ e:`Đoạn 1 nêu vấn đề: biết sự sống xuất hiện <i>khi nào</i> nhưng chưa biết <i>bằng cách nào</i>. Các đoạn sau bàn các câu trả lời có thể: từ ngoài vũ trụ, RNA World, lập luận của Dawkins, giả thuyết của Shapiro → C. A sai vì không chỉ có “hai phía”; D sai vì bài không kết thúc bằng một câu trả lời chắc chắn.`}
+];
+
+/* =========================================================
+   TRẠNG THÁI
+   ========================================================= */
+const TOTAL = QS.length, DURATION = 60*60*1000, STORE = "reading-test-1-v1";
+const QMAP = {}; QS.forEach(q => QMAP[q.n] = q);
+const partOf = n => PARTS.find(p => n >= p.from && n <= p.to).id;
+
+let S = load() || fresh();
+let view = "start", curPart = 1, onlyWrong = false, tick = null;
+
+function fresh(){ return {answers:{}, endTime:null, submitted:false, submittedAt:null, auto:false}; }
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE)); }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch(e){} }
+
+const $ = id => document.getElementById(id);
+const answeredCount = (from=1,to=TOTAL) => { let c=0; for(let i=from;i<=to;i++) if(S.answers[i]) c++; return c; };
+
+/* =========================================================
+   TABS
+   ========================================================= */
+function renderTabs(){
+  if(view === "start"){ $("tabs").innerHTML = ""; return; }
+  let h = PARTS.map(p => {
+    const c = S.submitted ? scorePart(p).ok : answeredCount(p.from,p.to);
+    const active = (view==="part" && curPart===p.id) ? " active" : "";
+    return `<button class="tab${active}" data-part="${p.id}">Phần ${p.id}<span class="cnt">${c}/10${S.submitted?" đúng":""}</span></button>`;
+  }).join("");
+  if(S.submitted) h += `<button class="tab${view==="results"?" active":""}" data-go="results">Kết quả</button>`;
+  else h += `<button class="tab${view==="summary"?" active":""}" data-go="summary">Kiểm tra &amp; Nộp bài</button>`;
+  $("tabs").innerHTML = h;
+}
+$("tabs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.part) showPart(+b.dataset.part);
+  else if(b.dataset.go === "summary") showSummary();
+  else if(b.dataset.go === "results") showResults();
+});
+
+function show(id){
+  ["startView","partView","summaryView","resultsView"].forEach(v => $(v).classList.toggle("hidden", v!==id));
+}
+
+/* =========================================================
+   PART VIEW
+   ========================================================= */
+function showPart(p, focusQ){
+  view = "part"; curPart = p; show("partView");
+  const P = PARTS[p-1];
+  $("passagePanel").innerHTML =
+    `<p class="p-label">${P.label} · Questions ${P.from}–${P.to}</p>` +
+    (P.title ? `<h2>${P.title}</h2>` : `<h2>${P.label}</h2>`) +
+    `<p class="hint">Từ/cụm từ được hỏi được gạch chân, số nhỏ bên cạnh là số câu hỏi. Bấm vào để xem câu hỏi tương ứng.</p>` +
+    P.html;
+  $("passagePanel").scrollTop = 0;
+  renderQuestions();
+  renderTabs(); updateMobileCount();
+  if(focusQ){ setMobile("questions"); setTimeout(()=>focusQuestion(focusQ), 30); }
+}
+
+function renderQuestions(){
+  const P = PARTS[curPart-1], review = S.submitted;
+  let h = `<div class="q-head"><h2>Questions ${P.from}–${P.to}</h2>` +
+          (review ? "" : `<span class="muted" id="partCount">Đã làm ${answeredCount(P.from,P.to)}/10</span>`) + `</div>`;
+  if(review){
+    h += `<label class="review-bar"><input type="checkbox" id="onlyWrong" ${onlyWrong?"checked":""}> Chỉ hiện câu sai và câu chưa làm</label>`;
+  }
+  for(let n=P.from;n<=P.to;n++){
+    const q = QMAP[n], mine = S.answers[n];
+    const hasRef = P.html.includes(`data-q="${n}"`);
+    let badge = "", cls = "q" + (mine ? " answered" : "");
+    if(review){
+      if(!mine){ badge = `<span class="badge skip">Chưa làm</span>`; }
+      else if(mine === q.a){ badge = `<span class="badge ok">Đúng</span>`; }
+      else { badge = `<span class="badge bad">Sai</span>`; }
+      if(onlyWrong && mine === q.a) cls += " hidden";
+    }
+    h += `<div class="${cls}" id="q${n}"><div class="q-top"><div class="qnum">${n}</div><p class="qtext">${q.q}${badge}</p></div>`;
+    if(q.quote) h += `<div class="quote">${q.quote}</div>`;
+    if(hasRef) h += `<button class="find" data-find="${n}">Tìm trong bài đọc</button>`;
+    h += `<div class="opts${review?" reviewing":""}" role="radiogroup" aria-label="Câu ${n}">`;
+    ["A","B","C","D"].forEach((L,i) => {
+      let oc = "opt";
+      if(review){ if(L===q.a) oc += " correct"; else if(L===mine) oc += " wrong"; }
+      h += `<label class="${oc}"><input type="radio" name="q${n}" value="${L}" ${mine===L?"checked":""} ${review?"disabled":""}><span class="letter">${L}</span><span>${q.o[i]}</span></label>`;
+    });
+    h += `</div>`;
+    if(review){
+      h += `<div class="exp"><b class="key">Đáp án: ${q.a}.</b> ${mine && mine!==q.a ? `Bạn chọn ${mine}. ` : (!mine ? "Bạn chưa chọn đáp án. " : "")}${q.e}</div>`;
+    }
+    h += `</div>`;
+  }
+  h += `<div class="nav-row">`;
+  h += curPart>1 ? `<button class="btn" data-nav="prev">← Phần ${curPart-1}</button>` : `<span></span>`;
+  if(curPart<4) h += `<button class="btn primary" data-nav="next">Phần ${curPart+1} →</button>`;
+  else h += review ? `<button class="btn primary" data-nav="results">Xem kết quả →</button>`
+                   : `<button class="btn primary" data-nav="summary">Kiểm tra &amp; Nộp bài →</button>`;
+  h += `</div>`;
+  $("qPanel").innerHTML = h;
+  $("qPanel").scrollTop = 0;
+}
+
+$("qPanel").addEventListener("change", e => {
+  if(e.target.id === "onlyWrong"){ onlyWrong = e.target.checked; renderQuestions(); return; }
+  if(e.target.type !== "radio" || S.submitted) return;
+  const n = +e.target.name.slice(1);
+  S.answers[n] = e.target.value; save();
+  $("q"+n).classList.add("answered");
+  const P = PARTS[curPart-1];
+  const pc = $("partCount"); if(pc) pc.textContent = `Đã làm ${answeredCount(P.from,P.to)}/10`;
+  renderTabs(); updateMobileCount();
+});
+$("qPanel").addEventListener("click", e => {
+  const f = e.target.closest("[data-find]");
+  if(f){
+    setMobile("passage");
+    const r = $("passagePanel").querySelector(`.ref[data-q="${f.dataset.find}"]`);
+    if(r){ r.scrollIntoView({behavior:"smooth",block:"center"}); r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash"); }
+    return;
+  }
+  const nav = e.target.closest("[data-nav]"); if(!nav) return;
+  const d = nav.dataset.nav;
+  if(d==="prev") showPart(curPart-1);
+  else if(d==="next") showPart(curPart+1);
+  else if(d==="summary") showSummary();
+  else if(d==="results") showResults();
+});
+$("passagePanel").addEventListener("click", e => {
+  const r = e.target.closest(".ref"); if(!r) return;
+  setMobile("questions"); focusQuestion(+r.dataset.q);
+});
+
+function focusQuestion(n){
+  const el = $("q"+n); if(!el) return;
+  el.classList.remove("hidden");
+  el.scrollIntoView({behavior:"smooth",block:"start"});
+  el.classList.add("focus"); setTimeout(()=>el.classList.remove("focus"), 1600);
+}
+
+/* Mobile switch */
+function setMobile(which){
+  $("partView").dataset.show = which;
+  $("mswitch").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.show===which));
+}
+$("mswitch").addEventListener("click", e => { const b = e.target.closest("button"); if(b) setMobile(b.dataset.show); });
+function updateMobileCount(){
+  const P = PARTS[curPart-1];
+  $("mcnt").textContent = S.submitted ? `(${scorePart(P).ok}/10 đúng)` : `(${answeredCount(P.from,P.to)}/10)`;
+}
+
+/* =========================================================
+   SUMMARY (trước khi nộp)
+   ========================================================= */
+function showSummary(){
+  view = "summary"; show("summaryView"); renderTabs();
+  const done = answeredCount(), left = TOTAL - done;
+  const missing = QS.filter(q => !S.answers[q.n]).map(q => q.n);
+  let cells = QS.map(q => `<button class="cell${S.answers[q.n]?" done":""}" data-q="${q.n}" title="Câu ${q.n}">${q.n}</button>`).join("");
+  let perPart = PARTS.map(p => `<div><b>Phần ${p.id}</b> · đã làm ${answeredCount(p.from,p.to)}/10</div>`).join("");
+  $("summaryView").innerHTML = `
+  <div class="center">
+    <div class="card">
+      <h2>Kiểm tra bài làm trước khi nộp</h2>
+      <div class="stats">
+        <div class="stat info"><b>${done}</b><span>câu đã hoàn thành</span></div>
+        <div class="stat skip"><b>${left}</b><span>câu chưa hoàn thành</span></div>
+        <div class="stat info"><b id="sumTime">--:--</b><span>thời gian còn lại</span></div>
+      </div>
+      ${left ? `<div class="missing">Bạn còn <b>${left}</b> câu chưa làm: ${missing.map(n=>`<a href="#" data-q="${n}" style="color:inherit;font-weight:700">${n}</a>`).join(", ")}. Bấm vào số câu để quay lại làm.</div>`
+             : `<div class="missing all">Bạn đã hoàn thành tất cả 40 câu. Bạn có thể xem lại hoặc nộp bài ngay.</div>`}
+      <div class="legend"><span><i style="background:var(--accent)"></i>Đã làm</span><span><i style="border:1.5px solid var(--line);background:var(--surface)"></i>Chưa làm</span></div>
+      <div class="grid40" id="grid">${cells}</div>
+      <div class="parts-list">${perPart}</div>
+      <div class="actions">
+        <button class="btn" id="backBtn">← Quay lại Phần 4</button>
+        <button class="btn primary big" id="submitBtn">Nộp bài</button>
+      </div>
+    </div>
+  </div>`;
+  updateTimer();
+  $("summaryView").scrollTop = 0;
+  $("summaryView").querySelectorAll("[data-q]").forEach(el => el.addEventListener("click", ev => {
+    ev.preventDefault(); const n = +el.dataset.q; showPart(partOf(n), n);
+  }));
+  $("backBtn").onclick = () => showPart(4);
+  $("submitBtn").onclick = () => {
+    const l = TOTAL - answeredCount();
+    confirmBox(
+      "Nộp bài?",
+      l ? `Bạn còn ${l} câu chưa hoàn thành. Sau khi nộp sẽ không thể sửa đáp án. Bạn có chắc muốn nộp bài?`
+        : "Bạn đã làm đủ 40 câu. Sau khi nộp sẽ không thể sửa đáp án.",
+      "Nộp bài", () => submit(false)
+    );
+  };
+}
+
+/* =========================================================
+   NỘP BÀI & KẾT QUẢ
+   ========================================================= */
+function submit(auto){
+  if(S.submitted) return;
+  S.submitted = true; S.auto = auto; S.submittedAt = Math.min(Date.now(), S.endTime || Date.now());
+  save(); stopTimer(); $("timer").classList.add("hidden");
+  onlyWrong = false; closeModal(); showResults();
+}
+
+function scorePart(p){
+  let ok=0, bad=0, skip=0;
+  for(let n=p.from;n<=p.to;n++){ const m=S.answers[n]; if(!m) skip++; else if(m===QMAP[n].a) ok++; else bad++; }
+  return {ok,bad,skip};
+}
+
+function showResults(){
+  view = "results"; show("resultsView"); renderTabs();
+  let ok=0,bad=0,skip=0;
+  PARTS.forEach(p => { const s=scorePart(p); ok+=s.ok; bad+=s.bad; skip+=s.skip; });
+  const pct = Math.round(ok/TOTAL*100), ten = (ok/TOTAL*10).toFixed(2).replace(/\.?0+$/,"");
+  const used = S.endTime ? Math.max(0, S.submittedAt - (S.endTime - DURATION)) : 0;
+  const um = Math.floor(used/60000), us = Math.floor(used%60000/1000);
+  const C = 2*Math.PI*54, dash = C*ok/TOTAL;
+  const cells = QS.map(q => { const m=S.answers[q.n]; const c = !m ? "skip" : (m===q.a ? "ok" : "bad");
+    return `<button class="cell ${c}" data-q="${q.n}" title="Câu ${q.n}">${q.n}</button>`; }).join("");
+  const bars = PARTS.map(p => { const s=scorePart(p);
+    return `<div class="bar-row"><b>Phần ${p.id}</b><div class="bar"><i style="width:${s.ok*10}%"></i></div><span>${s.ok}/10</span><button class="link" data-part="${p.id}">Xem đáp án</button></div>`; }).join("");
+  $("resultsView").innerHTML = `
+  <div class="center">
+    ${S.auto ? `<div class="banner warn">Hết giờ – bài làm đã được nộp tự động.</div>` : ""}
+    <div class="card">
+      <h2>Kết quả bài làm</h2>
+      <div class="score-hero">
+        <div class="ring">
+          <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--line)" stroke-width="10"/>
+          <circle cx="60" cy="60" r="54" fill="none" stroke="var(--ok)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${dash} ${C}"/></svg>
+          <div class="num"><div><b>${ok}</b><span>/40 câu đúng</span></div></div>
+        </div>
+        <div class="score-meta">
+          <p class="ten">Điểm hệ 10: ${ten}</p>
+          <p>Tỉ lệ đúng: ${pct}%</p>
+          <p>Thời gian làm bài: ${um} phút ${us} giây</p>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat ok"><b>${ok}</b><span>Đúng</span></div>
+        <div class="stat bad"><b>${bad}</b><span>Sai</span></div>
+        <div class="stat skip"><b>${skip}</b><span>Chưa làm</span></div>
+      </div>
+      <div class="bars">${bars}</div>
+    </div>
+    <div class="card">
+      <h2>Bảng câu trả lời</h2>
+      <div class="legend"><span><i style="background:var(--ok)"></i>Đúng</span><span><i style="background:var(--bad)"></i>Sai</span><span><i style="background:var(--warn-soft);border:1.5px solid var(--warn)"></i>Chưa làm</span></div>
+      <div class="grid40">${cells}</div>
+      <p style="color:var(--muted);font-size:14px;margin:0 0 18px">Bấm vào số câu để xem đáp án đúng và giải thích chi tiết.</p>
+      <div class="actions">
+        <button class="btn" id="retryBtn">Làm lại từ đầu</button>
+        <button class="btn primary" data-part="1">Xem giải thích đáp án →</button>
+      </div>
+    </div>
+  </div>`;
+  $("resultsView").scrollTop = 0;
+  $("resultsView").querySelectorAll("[data-part]").forEach(b => b.onclick = () => showPart(+b.dataset.part));
+  $("resultsView").querySelectorAll(".cell").forEach(b => b.onclick = () => { const n=+b.dataset.q; showPart(partOf(n), n); });
+  $("retryBtn").onclick = () => confirmBox("Làm lại từ đầu?", "Toàn bộ đáp án và kết quả hiện tại sẽ bị xoá.", "Làm lại", () => {
+    S = fresh(); save(); closeModal(); onlyWrong=false; view="start"; show("startView"); renderTabs(); setStartBtn();
+  });
+}
+
+/* =========================================================
+   ĐỒNG HỒ
+   ========================================================= */
+function fmt(ms){ ms=Math.max(0,ms); const t=Math.ceil(ms/1000), m=Math.floor(t/60), s=t%60; return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0"); }
+function updateTimer(){
+  if(!S.endTime || S.submitted) return;
+  const left = S.endTime - Date.now();
+  $("timerText").textContent = fmt(left);
+  const st = $("sumTime"); if(st) st.textContent = fmt(left);
+  $("timer").classList.toggle("warn", left <= 10*60000 && left > 5*60000);
+  $("timer").classList.toggle("danger", left <= 5*60000);
+  if(left <= 0) submit(true);
+}
+function startTimer(){ $("timer").classList.remove("hidden"); updateTimer(); stopTimer(); tick = setInterval(updateTimer, 250); }
+function stopTimer(){ if(tick){ clearInterval(tick); tick=null; } }
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+let modalOk = null;
+function confirmBox(title, text, okLabel, onOk){
+  $("mTitle").textContent = title; $("mText").textContent = text; $("mOk").textContent = okLabel;
+  modalOk = onOk; $("modal").classList.remove("hidden"); $("mOk").focus();
+}
+function closeModal(){ $("modal").classList.add("hidden"); modalOk = null; }
+$("mCancel").onclick = closeModal;
+$("mOk").onclick = () => { if(modalOk) modalOk(); };
+$("modal").addEventListener("click", e => { if(e.target.id==="modal") closeModal(); });
+document.addEventListener("keydown", e => { if(e.key==="Escape" && !$("modal").classList.contains("hidden")) closeModal(); });
+
+/* =========================================================
+   KHỞI ĐỘNG
+   ========================================================= */
+function setStartBtn(){
+  const b = $("startBtn");
+  if(S.endTime && !S.submitted) b.textContent = `Tiếp tục làm bài (còn ${fmt(S.endTime-Date.now())})`;
+  else b.textContent = "Bắt đầu làm bài";
+}
+$("startBtn").onclick = () => {
+  if(!S.endTime){ S.endTime = Date.now() + DURATION; save(); }
+  startTimer(); setMobile("passage"); showPart(1);
+};
+
+(function init(){
+  if(S.submitted){ showResults(); return; }
+  if(S.endTime && Date.now() >= S.endTime){ submit(true); return; }
+  if(S.endTime){ startTimer(); }
+  setStartBtn(); renderTabs();
+})();
+</script>
+</body>
+</html>
