@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vstep – Làm bài</title>
+<link rel="stylesheet" href="kieu.css">
+<style>body { overflow: hidden; }</style>
+</head>
+<body>
+<div class="thanh-tren">
+  <div class="khung">
+    <a class="nut" href="./">← Danh sách</a>
+    <h2 id="tenBai">Đang mở bài…</h2>
+    <span class="dem-nho" id="demBai"></span>
+    <a class="nut" id="moRieng" href="#" target="_blank" rel="noopener">Toàn màn hình</a>
+  </div>
+</div>
+<iframe class="bai" id="khungBai" title="Bài tập"></iframe>
+
+<script src="chung.js"></script>
+<script>
+(function () {
+  var tenFile = new URLSearchParams(location.search).get("bai") || "";
+  var tieuDe = document.getElementById("tenBai");
+
+  // Chỉ cho mở file .html nằm trong thư mục bài tập
+  if (!tenFile || !/\.html?$/i.test(tenFile) || /[\/\\]|\.\./.test(tenFile)) {
+    tieuDe.textContent = "Không tìm thấy bài.";
+    return;
+  }
+
+  var duongDan = duongDanBai(tenFile);
+  document.getElementById("khungBai").src = duongDan;
+  document.getElementById("moRieng").href = duongDan;
+
+  layTieuDe(tenFile).then(function (t) {
+    tieuDe.textContent = t;
+    document.title = t + " – Vstep";
+  });
+
+  // Đếm lượt làm bài: tổng và riêng từng bài
+  demTang("lam-bai-tong");
+  demTang(khoaBai(tenFile)).then(function (n) {
+    if (n !== null) document.getElementById("demBai").textContent = "Lượt làm: " + dinhDangSo(n);
+  });
+})();
+</script>
+</body>
+</html>

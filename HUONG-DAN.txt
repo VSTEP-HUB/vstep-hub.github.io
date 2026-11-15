@@ -1,0 +1,62 @@
+HƯỚNG DẪN WEBSITE VSTEP-HUB (MIỄN PHÍ HOÀN TOÀN)
+=================================================
+Địa chỉ web:  https://vstep-hub.pages.dev
+- GitHub (tài khoản VSTEP-HUB): nơi chứa file bài tập
+- Cloudflare Pages: đưa web lên mạng với địa chỉ .pages.dev
+
+---------------------------------------------------------------
+PHẦN 1 – LÀM MỘT LẦN
+---------------------------------------------------------------
+A. Trên GitHub
+1. Bấm "+" → New repository → tên: vstep-hub.github.io → Public
+   → Create repository.
+2. Bấm "uploading an existing file", kéo thả TẤT CẢ những gì trong
+   thư mục vstep (index.html, lam-bai.html, chung.js, kieu.css,
+   tao-danh-sach.js, thư mục baitap) → Commit changes.
+
+B. Trên Cloudflare
+1. Vào https://dash.cloudflare.com/sign-up → tạo tài khoản miễn phí
+   (chỉ cần email, không cần thẻ).
+2. Vào "Workers & Pages" → Create → chọn Pages
+   → "Connect to Git" (Import an existing Git repository)
+   → chọn GitHub → cho phép Cloudflare truy cập kho
+     vstep-hub.github.io.
+3. Cài đặt:
+   - Project name:            vstep-hub
+   - Production branch:       main
+   - Framework preset:        None
+   - Build command:           node tao-danh-sach.js
+   - Build output directory:  /
+4. Bấm "Save and Deploy". Chờ 1–2 phút → web chạy ở
+   https://vstep-hub.pages.dev
+   (Nếu tên vstep-hub đã có người dùng, Cloudflare sẽ đặt tên hơi
+   khác, ví dụ vstep-hub-abc.pages.dev.)
+
+---------------------------------------------------------------
+PHẦN 2 – THÊM BÀI MỚI (1 phút)
+---------------------------------------------------------------
+1. Vào kho vstep-hub.github.io trên GitHub → thư mục baitap
+2. Add file → Upload files → kéo thả file .html → Commit changes
+3. Cloudflare tự cập nhật, 1–2 phút sau bài hiện trên trang chủ.
+
+Mẹo:
+- Tên bài trên trang chủ lấy từ thẻ <title> trong file bài.
+- Bài sắp theo tên file: đặt 01-..., 02-... để đúng thứ tự.
+- Tên file nên không dấu, không khoảng trắng.
+- Xoá bài: mở file trong baitap → dấu "..." → Delete file.
+- Sửa bài: tải bản mới CÙNG tên file lên để ghi đè.
+
+---------------------------------------------------------------
+BỘ ĐẾM VÀ KẾT QUẢ LÀM BÀI
+---------------------------------------------------------------
+- Web KHÔNG gửi kết quả làm bài lên hệ thống. Kết quả (nếu file bài
+  có lưu) chỉ nằm trong trình duyệt của sinh viên.
+- Nếu file bài lưu kết quả bằng localStorage, mỗi bài nên dùng tên
+  khoá RIÊNG (ví dụ "ketqua-bai01"), vì mọi bài trên cùng một web
+  dùng chung bộ nhớ trình duyệt; trùng tên khoá thì bài này sẽ ghi đè
+  kết quả bài kia.
+- Lượt truy cập: mỗi lần mở web (một phiên trình duyệt) = 1 lượt.
+- Lượt làm bài: mỗi lần mở một bài = 1 lượt (tổng và từng bài).
+- Dùng dịch vụ miễn phí Abacus, chỉ lưu con số, không lưu thông tin
+  sinh viên. Số chỉ để tham khảo; nếu dịch vụ tạm lỗi sẽ hiện "—",
+  bài tập vẫn chạy bình thường.

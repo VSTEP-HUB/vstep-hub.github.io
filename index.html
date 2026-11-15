@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vstep – Bài tập</title>
+<link rel="stylesheet" href="kieu.css">
+</head>
+<body>
+<header class="dau">
+  <div class="khung">
+    <div class="logo">V</div>
+    <div>
+      <h1>Vstep</h1>
+      <p>Chọn một bài bên dưới để bắt đầu làm</p>
+    </div>
+  </div>
+</header>
+
+<main class="khung">
+  <section class="thong-ke" aria-label="Thống kê">
+    <div class="o-so"><b id="soTruyCap">…</b><span>Lượt truy cập</span></div>
+    <div class="o-so"><b id="soLamBai">…</b><span>Lượt làm bài</span></div>
+    <div class="o-so"><b id="soBai">…</b><span>Bài tập</span></div>
+  </section>
+
+  <p class="luu-y"><b>Lưu ý:</b> Kết quả làm bài chỉ được lưu trên máy (trình duyệt) bạn đang dùng, không gửi lên hệ thống. Đổi máy, dùng chế độ ẩn danh hoặc xoá dữ liệu trình duyệt thì kết quả cũ sẽ không còn.</p>
+
+  <input id="oTim" class="tim" type="search" placeholder="Tìm bài…" aria-label="Tìm bài">
+  <ul id="dsBai" class="ds-bai"></ul>
+  <p id="thongBao" class="thong-bao">Đang tải danh sách bài…</p>
+</main>
+
+<footer>Vstep</footer>
+
+<script src="chung.js"></script>
+<script>
+(function () {
+  // 1) Đếm lượt truy cập: mỗi lần mở web (mỗi phiên trình duyệt) tính 1 lượt
+  var o = document.getElementById("soTruyCap");
+  if (!docTam("sessionStorage", "vstep-da-dem")) {
+    demTang("truy-cap").then(function (n) {
+      if (n !== null) luuTam("sessionStorage", "vstep-da-dem", "1");
+      o.textContent = dinhDangSo(n);
+    });
+  } else {
+    docSoDem("truy-cap").then(function (n) { o.textContent = dinhDangSo(n); });
+  }
+
+  // 2) Tổng lượt làm bài
+  docSoDem("lam-bai-tong").then(function (n) {
+    document.getElementById("soLamBai").textContent = dinhDangSo(n);
+  });
+
+  // 3) Danh sách bài
+  var ul = document.getElementById("dsBai");
+  var tb = document.getElementById("thongBao");
+
+  layDanhSachBai().then(function (ds) {
+    ds.sort(function (a, b) { return a.file.localeCompare(b.file, "vi", { numeric: true }); });
+    document.getElementById("soBai").textContent = ds.length;
+    if (!ds.length) { tb.textContent = "Chưa có bài tập nào."; return; }
+    tb.style.display = "none";
+
+    ds.forEach(function (muc, i) {
+      var tenFile = muc.file;
+      var li = document.createElement("li");
+      li.dataset.tim = vietTat(tenFile);
+      var a = document.createElement("a");
+      a.href = "lam-bai.html?bai=" + encodeURIComponent(tenFile);
+      a.innerHTML =
+        '<span class="so-tt">' + (i + 1) + '</span>' +
+        '<span class="ten-bai"><strong></strong><small>Đã làm: <span class="dl">…</span> lượt</small></span>' +
+        '<span class="nut-lam">Làm bài</span>';
+      a.querySelector("strong").textContent = tenTuFile(tenFile);
+      li.appendChild(a);
+      ul.appendChild(li);
+
+      var datTen = function (t) {
+        a.querySelector("strong").textContent = t;
+        li.dataset.tim += " " + vietTat(t);
+      };
+      if (muc.title) {
+        var tam = document.createElement("textarea");
+        tam.innerHTML = muc.title;
+        datTen(tam.value);
+      } else {
+        layTieuDe(tenFile).then(datTen);
+      }
+      docSoDem(khoaBai(tenFile)).then(function (n) {
+        a.querySelector(".dl").textContent = dinhDangSo(n);
+      });
+    });
+  });
+
+  // 4) Ô tìm bài
+  document.getElementById("oTim").addEventListener("input", function () {
+    var q = vietTat(this.value);
+    Array.prototype.forEach.call(ul.children, function (li) {
+      li.style.display = !q || li.dataset.tim.indexOf(q) !== -1 ? "" : "none";
+    });
+  });
+})();
+</script>
+</body>
+</html>
