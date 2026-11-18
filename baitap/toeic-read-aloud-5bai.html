@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TOEIC Read Aloud – 5 bài</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#1d2433;--mute:#667085;--line:#e3e7ef;--pri:#1f5fbf;--pri2:#e8f0fc;--hd:#1d4f9c;--ok:#157a4f;--okbg:#e6f6ee;--warn:#b45309;--warnbg:#fff4e5;--rec:#d92d20;--recbg:#fdecea;--st:#b42318;--pz:#1f5fbf;--ar:#7a3fc4}
+@media (prefers-color-scheme:dark){:root{--bg:#11151d;--card:#1a202b;--ink:#e8ecf3;--mute:#9aa4b5;--line:#2c3443;--pri:#6aa3ff;--pri2:#1c2a42;--hd:#16335f;--ok:#4cc38a;--okbg:#14302a;--warn:#fbbf24;--warnbg:#33270f;--rec:#f97066;--recbg:#3a1a18;--st:#ff8a80;--pz:#7fb2ff;--ar:#c79bff}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:var(--hd);color:#fff;padding:20px 16px 0}
+header .wrap{max-width:980px;margin:auto}
+header h1{margin:0;font-size:1.45rem;letter-spacing:.2px}
+header p{margin:4px 0 14px;opacity:.85;font-size:.95rem}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{border:0;background:transparent;color:#fff;opacity:.75;padding:10px 14px;font-size:.95rem;border-radius:10px 10px 0 0;cursor:pointer;font-weight:600}
+nav button.on{background:var(--bg);color:var(--ink);opacity:1}
+main{max-width:980px;margin:auto;padding:18px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.item{cursor:pointer;transition:transform .12s,border-color .12s;position:relative}
+.item:hover{transform:translateY(-2px);border-color:var(--pri)}
+.item .no{font-size:.8rem;color:var(--mute);font-weight:700}
+.item h3{margin:2px 0 6px;font-size:1.02rem}
+.item .meta{font-size:.82rem;color:var(--mute)}
+.badge{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--pri2);color:var(--pri)}
+.badge.ok{background:var(--okbg);color:var(--ok)}
+.hidden{display:none!important}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:10px;font-size:.95rem;cursor:pointer;font-weight:600}
+.btn:hover{border-color:var(--pri)}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.rec{background:var(--rec);border-color:var(--rec);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.top{justify-content:space-between;margin-bottom:12px}
+.qtitle{font-size:1.15rem;font-weight:700;margin:0}
+.sub{color:var(--mute);font-size:.88rem}
+.text{font-size:1.28rem;line-height:2;padding:20px;border-radius:12px;background:var(--bg);border:1px solid var(--line);margin:14px 0;font-family:Georgia,"Times New Roman",serif}
+.text b.st{color:var(--st);font-weight:700}
+.text .pz{color:var(--pz);font-weight:700;font-family:system-ui,sans-serif}
+.text .ar{color:var(--ar);font-weight:700;font-family:system-ui,sans-serif;font-size:1.05em}
+.legend{font-size:.85rem;color:var(--mute);display:flex;gap:14px;flex-wrap:wrap}
+.legend b{color:var(--st)}.legend .pz{color:var(--pz);font-weight:700}.legend .ar{color:var(--ar);font-weight:700}
+.stage{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:14px;border-radius:12px;border:1px dashed var(--line)}
+.ring{position:relative;width:120px;height:120px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums}
+.phase{font-weight:800;font-size:1.05rem}
+.phase.prep{color:var(--pri)}.phase.speak{color:var(--rec)}.phase.done{color:var(--ok)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--rec);margin-right:6px;animation:bl 1s infinite}
+@keyframes bl{50%{opacity:.2}}
+.note{padding:10px 12px;border-radius:10px;font-size:.9rem;margin-top:10px}
+.note.warn{background:var(--warnbg);color:var(--warn)}
+.note.ok{background:var(--okbg);color:var(--ok)}
+.result{margin-top:16px;display:grid;gap:14px}
+.result h4{margin:0 0 8px;font-size:1rem}
+audio{width:100%;max-width:520px}
+.check label{display:flex;gap:8px;align-items:flex-start;padding:4px 0;font-size:.95rem;cursor:pointer}
+select{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.92rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.two{grid-template-columns:1fr}.text{font-size:1.12rem;padding:14px}.ring{width:96px;height:96px}.ring svg{width:96px;height:96px}.ring .num{font-size:1.6rem}}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg)}
+.tips h3{margin:20px 0 6px;font-size:1.05rem;color:var(--pri)}
+.tips h3:first-child{margin-top:0}
+.tips ul{margin:4px 0;padding-left:20px}
+.tips li{margin:3px 0}
+.ex{font-family:Georgia,serif;background:var(--bg);padding:2px 6px;border-radius:6px}
+.direc{text-align:center;padding:30px 18px}
+.direc h2{margin:0 0 10px}
+.direc p{max-width:620px;margin:8px auto;color:var(--mute)}
+.progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:6px}
+.progress div{height:100%;background:var(--ok);width:0;transition:width .3s}
+.tbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;background:var(--hd);color:#fff;font-weight:800;letter-spacing:.6px;margin-bottom:12px}
+.tbar.prep{background:var(--pri)}.tbar.speak{background:var(--rec)}
+.tbar .t{font-variant-numeric:tabular-nums;font-size:1.25rem;background:rgba(255,255,255,.18);padding:2px 12px;border-radius:8px}
+.settings{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:.9rem;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line);margin:10px 0}
+.settings label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.settings select:disabled{opacity:.5}
+.direc .settings{justify-content:center;max-width:620px;margin:14px auto}
+footer{text-align:center;color:var(--mute);font-size:.8rem;padding:10px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>TOEIC Speaking · Read Aloud · 5 bài mới</h1>
+    <p>Luyện Question 1–2: đọc to một đoạn văn · 45 giây chuẩn bị · 45 giây đọc</p>
+    <nav>
+      <button data-tab="practice" class="on">Luyện từng bài</button>
+      <button data-tab="exam">Thi thử (Q1–Q2)</button>
+      <button data-tab="tips">Mẹo &amp; tiêu chí chấm</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- PRACTICE LIST -->
+  <section id="tab-practice">
+    <div class="row top">
+      <div>
+        <div class="sub">Đã luyện <b id="doneCount">0</b> / <span id="totalCount">0</span> bài</div>
+        <div class="progress" style="width:220px"><div id="doneBar"></div></div>
+      </div>
+      <button class="btn" id="resetBtn">Xoá tiến độ</button>
+    </div>
+    <div class="grid" id="list"></div>
+  </section>
+
+  <!-- EXAM INTRO -->
+  <section id="tab-exam" class="hidden">
+    <div class="card direc">
+      <h2>Thi thử giống bài thi thật</h2>
+      <p>Máy chọn ngẫu nhiên 2 đoạn văn (Question 1 và Question 2). Mỗi câu có 45 giây chuẩn bị và 45 giây đọc, tự động chuyển câu. Không có gợi ý trọng âm, ngắt nghỉ.</p>
+      <p>Hãy cho phép trình duyệt dùng micro để ghi âm. Sau khi thi xong, em nghe lại bài của mình, nghe đọc mẫu và tự chấm.</p>
+      <div class="settings">
+        <label>⏳ Chuẩn bị <select class="prepSel"><option value="15">15 giây</option><option value="30">30 giây</option><option value="45" selected>45 giây</option><option value="60">60 giây</option><option value="90">90 giây</option></select></label>
+        <label>🎙 Đọc <select class="speakSel"><option value="45" selected>45 giây</option><option value="60">60 giây</option><option value="90">90 giây</option></select></label>
+        <label><input type="checkbox" class="cueChk" checked> Lời nhắc giọng nói</label>
+      </div>
+      <p class="sub">Bài thi thật: 45 giây chuẩn bị, 45 giây đọc.</p>
+      <p style="margin-top:18px"><button class="btn pri" id="examStart">Bắt đầu thi thử</button></p>
+    </div>
+  </section>
+
+  <!-- TIPS -->
+  <section id="tab-tips" class="hidden">
+    <div class="card tips">
+      <h3>1. Phần Read Aloud gồm những gì?</h3>
+      <ul>
+        <li>Câu 1 và câu 2 của bài thi TOEIC Speaking: đọc to một đoạn văn ngắn (thông báo, quảng cáo, bản tin, lời giới thiệu, tin nhắn thoại…).</li>
+        <li>Mỗi câu: <b>45 giây chuẩn bị</b>, sau đó <b>45 giây đọc</b>.</li>
+        <li>Chấm theo thang <b>0–3</b> cho hai tiêu chí: <b>phát âm</b> và <b>ngữ điệu &amp; trọng âm</b>.</li>
+      </ul>
+
+      <h3>2. Dùng 45 giây chuẩn bị thế nào?</h3>
+      <ul>
+        <li>Đọc nhẩm (hoặc thì thầm) cả đoạn một lượt — đừng chỉ nhìn.</li>
+        <li>Tìm trước: <b>tên riêng</b>, <b>con số / giờ giấc</b>, <b>danh sách</b> và <b>câu hỏi</b>.</li>
+        <li>Xác định chỗ ngắt nghỉ: dấu chấm, dấu phẩy và giữa các cụm nghĩa (trước <i>who, which, when, because, if</i>…).</li>
+      </ul>
+
+      <h3>3. Ngữ điệu</h3>
+      <ul>
+        <li>Danh sách: lên giọng ở từng mục, xuống giọng ở mục cuối — <span class="ex">bread ↗, dairy products ↗, or frozen desserts ↘</span></li>
+        <li>Câu hỏi Yes/No: lên giọng cuối câu — <span class="ex">Are you looking for a healthier lifestyle? ↗</span></li>
+        <li>Câu hỏi Wh- và câu trần thuật: xuống giọng cuối câu ↘.</li>
+        <li>Tránh đọc đều đều từng từ một; đọc theo <b>cụm từ</b>.</li>
+      </ul>
+
+      <h3>4. Trọng âm câu</h3>
+      <ul>
+        <li>Nhấn mạnh <b>từ nội dung</b>: danh từ, động từ chính, tính từ, trạng từ, con số, tên riêng.</li>
+        <li>Đọc nhẹ, lướt <b>từ chức năng</b>: <i>a, the, of, to, at, and, is, are…</i></li>
+        <li>Từ mang thông tin mới hoặc tương phản được nhấn mạnh nhất — <span class="ex">from platform SIX instead of platform TWO</span></li>
+      </ul>
+
+      <h3>5. Lỗi phát âm hay gặp ở người Việt</h3>
+      <ul>
+        <li><b>Bỏ âm cuối</b>: <span class="ex">shops, tickets, closed, changed</span> — phải nghe được /s/, /z/, /t/, /d/.</li>
+        <li>Đuôi <b>-s/-es</b>: /s/ <span class="ex">shops</span> · /z/ <span class="ex">registers</span> · /ɪz/ <span class="ex">purchases</span></li>
+        <li>Đuôi <b>-ed</b>: /t/ <span class="ex">checked, replaced</span> · /d/ <span class="ex">changed, delayed, welcomed</span> · /ɪd/ (chỉ sau t, d) <span class="ex">located, extended</span></li>
+        <li>Âm /θ/ và /ð/: <span class="ex">thank, through, the, there</span> — đặt đầu lưỡi giữa hai hàm răng.</li>
+        <li>Phân biệt số: <span class="ex">fifteen</span> (nhấn cuối) và <span class="ex">fifty</span> (nhấn đầu).</li>
+      </ul>
+
+      <h3>6. Tốc độ</h3>
+      <ul>
+        <li>Đoạn văn khoảng 50–70 từ, 45 giây là đủ. Không cần đọc nhanh — đọc rõ, tự nhiên, ổn định.</li>
+        <li>Nếu đọc sai một từ, sửa lại nhanh rồi đọc tiếp, đừng dừng lâu.</li>
+      </ul>
+
+      <h3>7. Bảng tự chấm (tham khảo)</h3>
+      <table>
+        <tr><th style="width:60px">Điểm</th><th>Phát âm</th><th>Ngữ điệu &amp; trọng âm</th></tr>
+        <tr><td><b>3</b></td><td>Rất dễ hiểu; chỉ vài lỗi nhỏ không ảnh hưởng.</td><td>Ngữ điệu, trọng âm, ngắt nghỉ phù hợp, tự nhiên.</td></tr>
+        <tr><td><b>2</b></td><td>Nhìn chung dễ hiểu nhưng có một số lỗi.</td><td>Nhìn chung phù hợp nhưng có một số chỗ chưa đúng.</td></tr>
+        <tr><td><b>1</b></td><td>Chỉ hiểu được từng phần; nhiều lỗi.</td><td>Thường xuyên chưa phù hợp, khó theo dõi.</td></tr>
+        <tr><td><b>0</b></td><td colspan="2">Không trả lời, hoặc nội dung không liên quan đến đoạn văn.</td></tr>
+      </table>
+      <p class="sub" style="margin-top:8px">Bảng trên là mô tả tóm tắt để học sinh tự đánh giá, không thay thế điểm chấm chính thức.</p>
+    </div>
+  </section>
+
+  <!-- PLAYER -->
+  <section id="player" class="hidden">
+    <div class="card">
+      <div class="row top">
+        <div>
+          <p class="qtitle" id="pTitle"></p>
+          <div class="sub" id="pMeta"></div>
+        </div>
+        <button class="btn" id="backBtn">← Danh sách</button>
+      </div>
+
+      <div class="row" id="hintRow">
+        <label class="row" style="gap:6px;cursor:pointer"><input type="checkbox" id="hintChk" checked> Hiện gợi ý</label>
+        <div class="legend" id="legend"><span><b>đỏ đậm</b> = nhấn mạnh</span><span><span class="pz">/</span> = ngắt nghỉ</span><span><span class="ar">↗ ↘</span> = lên / xuống giọng</span></div>
+      </div>
+
+      <div class="settings" id="setRow">
+        <label>⏳ Chuẩn bị <select class="prepSel"><option value="15">15 giây</option><option value="30">30 giây</option><option value="45" selected>45 giây</option><option value="60">60 giây</option><option value="90">90 giây</option></select></label>
+        <label>🎙 Đọc <select class="speakSel"><option value="45" selected>45 giây</option><option value="60">60 giây</option><option value="90">90 giây</option></select></label>
+        <label><input type="checkbox" class="cueChk" checked> Lời nhắc giọng nói</label>
+      </div>
+
+      <div class="tbar" id="tbar"><span id="tbLabel">PREPARATION TIME</span><span class="t" id="tbTime">00:45</span></div>
+
+      <div class="text" id="pText"></div>
+
+      <div class="stage">
+        <div class="ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="10"/>
+            <circle id="ringBar" cx="60" cy="60" r="52" fill="none" stroke="var(--pri)" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0"/>
+          </svg>
+          <div class="num" id="ringNum">45</div>
+        </div>
+        <div style="flex:1;min-width:220px">
+          <div class="phase" id="phase">Sẵn sàng</div>
+          <div class="sub" id="phaseSub">Bấm “Bắt đầu”: 45 giây chuẩn bị, sau tiếng bíp đọc to trong 45 giây.</div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn pri" id="startBtn">▶ Bắt đầu</button>
+            <button class="btn hidden" id="skipBtn">Bỏ qua chuẩn bị → Đọc ngay</button>
+            <button class="btn rec hidden" id="stopBtn">■ Dừng ghi âm</button>
+          </div>
+        </div>
+      </div>
+      <div class="note warn hidden" id="micNote"></div>
+
+      <div class="result hidden" id="result">
+        <div>
+          <h4>🎧 Bài đọc của em</h4>
+          <audio id="myAudio" controls></audio>
+          <div class="row" style="margin-top:6px"><a class="btn" id="dlLink" download>⬇ Tải bản ghi</a><button class="btn" id="againBtn">↻ Đọc lại</button></div>
+        </div>
+        <div>
+          <h4>🔊 Nghe đọc mẫu (giọng máy)</h4>
+          <div class="row">
+            <button class="btn" id="ttsPlay">▶ Nghe mẫu</button>
+            <button class="btn" id="ttsStop">■ Dừng</button>
+            <select id="ttsRate"><option value="0.8">Chậm</option><option value="0.92" selected>Vừa</option><option value="1.05">Tự nhiên</option></select>
+            <select id="ttsVoice"></select>
+          </div>
+          <div class="sub" style="margin-top:4px">Giọng đọc phụ thuộc vào máy tính/điện thoại; một số máy không có giọng tiếng Anh khi offline.</div>
+        </div>
+        <div class="two">
+          <div class="check">
+            <h4>✅ Tự kiểm tra</h4>
+            <label><input type="checkbox"> Đọc hết đoạn trong 45 giây</label>
+            <label><input type="checkbox"> Ngắt nghỉ ở dấu câu và theo cụm nghĩa</label>
+            <label><input type="checkbox"> Lên giọng ở các mục trong danh sách, xuống ở mục cuối</label>
+            <label><input type="checkbox"> Nghe rõ âm cuối (-s, -ed, -t, -d)</label>
+            <label><input type="checkbox"> Đọc đúng tên riêng và con số</label>
+            <label><input type="checkbox"> Nhấn mạnh từ nội dung, không đọc đều đều</label>
+          </div>
+          <div>
+            <h4>📝 Tự chấm (0–3)</h4>
+            <div class="row" style="margin-bottom:8px"><span style="width:150px">Phát âm</span><select id="scP"><option value="">–</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
+            <div class="row" style="margin-bottom:8px"><span style="width:150px">Ngữ điệu &amp; trọng âm</span><select id="scI"><option value="">–</option><option>3</option><option>2</option><option>1</option><option>0</option></select></div>
+            <button class="btn pri" id="saveBtn">Lưu kết quả</button>
+            <div class="note ok hidden" id="savedNote">Đã lưu.</div>
+            <div class="sub" style="margin-top:8px">Xem mô tả từng mức điểm ở mục “Mẹo &amp; tiêu chí chấm”.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXAM REVIEW -->
+  <section id="review" class="hidden"></section>
+</main>
+<footer>Chạy offline · Bản ghi âm chỉ nằm trên máy của em, không gửi đi đâu.</footer>
+
+<script>
+/* ===== DỮ LIỆU: *từ* = nhấn mạnh, " / " = ngắt nghỉ, ↗ ↘ = ngữ điệu ===== */
+const P=[
+{t:"Thông báo khách sạn",c:"Hotel announcement",a:"Good morning, guests of the *Grand Palm Hotel*. / We would like to inform you / that the *outdoor swimming pool* will be closed today / for *cleaning*. / It will *reopen* tomorrow at *eight a.m.* / In the meantime, / guests are welcome to use our *fitness center*, ↗ / *sauna*, ↗ / and *indoor pool* ↘ / on the *second floor*. / If you need any help, / please contact the *front desk*. / We hope you *enjoy* your stay."},
+{t:"Quảng cáo nhà hàng mới",c:"Advertisement",a:"Are you looking for a place / to enjoy a *delicious dinner*? ↗ / Then visit *Golden Spoon*, / the newest restaurant on *Maple Street*. / Our chefs prepare *fresh seafood*, ↗ / *grilled steak*, ↗ / and *homemade pasta* ↘ / every day. / During our *opening week*, / every customer will receive a *free dessert*. / We are open from *eleven a.m.* to *ten p.m.* / Call today / to *reserve* your table."},
+{t:"Tin nhắn nhắc lịch khám răng",c:"Telephone message",a:"Hello, this is *Sarah* from *Bright Smile Dental Clinic*. / I'm calling to *remind* you / about your appointment with *Doctor Lee* / tomorrow at *two-fifteen p.m.* / Please arrive *ten minutes* early / to complete a short form. / Remember to bring your *insurance card*, ↗ / a *photo ID*, ↗ / and a list of any *medicines* you take. ↘ / If you need to *change* the time, / please *call us back* / as soon as possible."},
+{t:"Bản tin giao thông buổi sáng",c:"Traffic report",a:"This is *Kevin Brown* / with your *morning traffic* report. / Traffic is *moving slowly* on *Highway Nine* / because of an *accident* near the *river bridge*. / Drivers should expect *delays* of about *twenty minutes*. / If you are traveling *downtown*, / we suggest taking *Park Avenue*, ↗ / *Lincoln Road*, ↗ / or the *subway* instead. ↘ / The weather is *clear* and *dry*, / so other roads are in *good condition*. / Drive *safely*, / and have a *great day*."},
+{t:"Tham quan nhà máy",c:"Tour introduction",a:"Welcome to the *Northstar Furniture* factory. / I'm *Tom*, / the *production manager*, / and I'll be showing you around this morning. / First, / we'll visit the *design* department, ↗ / then the *assembly* area, ↗ / and finally the *packaging* center. ↘ / For your *safety*, / please wear your *helmet* / and stay *behind* the yellow lines at all times. / Do you have any *questions* before we begin? ↗ / Great. / Please *follow* me."}
+];
+
+/* ===== TIỆN ÍCH ===== */
+const $=s=>document.querySelector(s);
+const CIRC=2*Math.PI*52;
+let PREP=45, SPEAK=45, CUE=true;
+let store={};try{store=JSON.parse(localStorage.getItem('toeic_ra5_v1')||'{}')}catch(e){store={}}
+/* Cài đặt thời gian */
+try{const st=JSON.parse(localStorage.getItem('toeic_ra_set')||'{}');if(st.p)PREP=st.p;if(st.s)SPEAK=st.s;if(st.c===false)CUE=false}catch(e){}
+function syncSettings(){
+  document.querySelectorAll('.prepSel').forEach(s=>s.value=PREP);
+  document.querySelectorAll('.speakSel').forEach(s=>s.value=SPEAK);
+  document.querySelectorAll('.cueChk').forEach(c=>c.checked=CUE);
+  try{localStorage.setItem('toeic_ra_set',JSON.stringify({p:PREP,s:SPEAK,c:CUE}))}catch(e){}
+}
+function lockSettings(on){document.querySelectorAll('#setRow select,#setRow input').forEach(x=>x.disabled=on)}
+function fmt(sec){sec=Math.max(0,Math.ceil(sec));return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
+function setBar(cls,label,sec){const b=$('#tbar');b.className='tbar '+cls;$('#tbLabel').textContent=label;$('#tbTime').textContent=fmt(sec)}
+function save(){try{localStorage.setItem('toeic_ra5_v1',JSON.stringify(store))}catch(e){}}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function plain(a){return a.replace(/\*/g,'').replace(/\s*\/\s*/g,' ').replace(/\s*[↗↘]/g,'').replace(/\s+/g,' ').trim()}
+function rich(a){return esc(a).replace(/\*([^*]+)\*/g,'<b class="st">$1</b>').replace(/\s\/\s/g,' <span class="pz">/</span> ').replace(/([↗↘])/g,'<span class="ar">$1</span>')}
+function words(a){return plain(a).split(' ').length}
+
+/* ===== TABS ===== */
+let mode='practice';
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  if(busy() && !confirm('Đang làm bài. Thoát ra?'))return;
+  abortAll();
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  ['practice','exam','tips'].forEach(t=>$('#tab-'+t).classList.toggle('hidden',t!==b.dataset.tab));
+  $('#player').classList.add('hidden');$('#review').classList.add('hidden');
+});
+
+/* ===== DANH SÁCH ===== */
+function renderList(){
+  const L=$('#list');L.innerHTML='';
+  let done=0;
+  P.forEach((p,i)=>{
+    const s=store[i];if(s)done++;
+    const d=document.createElement('div');d.className='card item';
+    d.innerHTML=`<div class="no">Bài ${i+1}</div><h3>${esc(p.t)}</h3><div class="meta">${esc(p.c)} · ${words(p.a)} từ</div>
+      <div style="margin-top:8px">${s?`<span class="badge ok">✓ Đã luyện${s.p!==''?` · P ${s.p} / I ${s.i}`:''}</span>`:'<span class="badge">Chưa luyện</span>'}</div>`;
+    d.onclick=()=>openPractice(i);L.appendChild(d);
+  });
+  $('#doneCount').textContent=done;$('#totalCount').textContent=P.length;
+  $('#doneBar').style.width=(done/P.length*100)+'%';
+}
+$('#resetBtn').onclick=()=>{if(confirm('Xoá toàn bộ tiến độ đã lưu?')){store={};save();renderList()}};
+
+/* ===== ÂM THANH ===== */
+let ac=null;
+function beep(f=880,d=.35){try{const C=window.AudioContext||window.webkitAudioContext;ac=ac||new C();if(ac.state==='suspended')ac.resume();
+  const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;o.connect(g);g.connect(ac.destination);
+  g.gain.setValueAtTime(.25,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+
+let stream=null;
+async function getMic(){
+  if(stream)return stream;
+  if(!navigator.mediaDevices||!window.MediaRecorder)return null;
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){stream=null}
+  return stream;
+}
+
+/* ===== GIỌNG MẪU ===== */
+let voices=[];
+function loadVoices(){
+  if(!('speechSynthesis' in window))return;
+  voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+  const sel=$('#ttsVoice');sel.innerHTML='';
+  voices.forEach((v,i)=>{const o=document.createElement('option');o.value=i;o.textContent=v.name+' ('+v.lang+')';sel.appendChild(o)});
+  const us=voices.findIndex(v=>/en-US/i.test(v.lang));if(us>=0)sel.value=us;
+  if(!voices.length){const o=document.createElement('option');o.textContent='Không tìm thấy giọng tiếng Anh';sel.appendChild(o)}
+}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function speak(text,rate){
+  if(!('speechSynthesis' in window)){alert('Trình duyệt không hỗ trợ đọc mẫu.');return}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=+rate;
+  const v=voices[+$('#ttsVoice').value];if(v)u.voice=v;
+  speechSynthesis.speak(u);
+}
+function stopSpeak(){if('speechSynthesis' in window)speechSynthesis.cancel()}
+/* Lời nhắc giọng nói như bài thi thật; gọi cb khi đọc xong */
+function cue(text,cb){
+  let done=false;const go=()=>{if(!done){done=true;cb()}};
+  if(!CUE||!('speechSynthesis' in window)){go();return}
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.95;
+    const v=voices[+$('#ttsVoice').value];if(v)u.voice=v;
+    u.onend=go;u.onerror=go;speechSynthesis.speak(u);setTimeout(go,4000)}catch(e){go()}
+}
+
+/* ===== BỘ CHẠY BÀI ===== */
+let cur=null,phase='idle',tick=null,rec=null,chunks=[],lastUrl=null,examQ=[],examIdx=0,examRes=[],nextT=null,runId=0;
+function busy(){return phase==='prep'||phase==='speak'}
+function setRing(left,total,color){
+  $('#ringNum').textContent=Math.max(0,Math.ceil(left));
+  $('#tbTime').textContent=fmt(left);
+  const bar=$('#ringBar');bar.setAttribute('stroke',color);
+  bar.setAttribute('stroke-dashoffset',CIRC*(1-Math.max(0,left)/total));
+}
+function countdown(sec,color,onEnd){
+  clearInterval(tick);const end=Date.now()+sec*1000;setRing(sec,sec,color);
+  tick=setInterval(()=>{const left=(end-Date.now())/1000;setRing(left,sec,color);if(left<=0){clearInterval(tick);onEnd()}},200);
+}
+function setPhase(cls,title,sub){const p=$('#phase');p.className='phase '+cls;p.innerHTML=title;$('#phaseSub').textContent=sub}
+function showText(){
+  const hint=mode==='practice'&&$('#hintChk').checked;
+  $('#pText').innerHTML=hint?rich(cur.a):esc(plain(cur.a));
+  $('#legend').style.visibility=hint?'visible':'hidden';
+}
+
+function loadPassage(i){
+  cur=P[i];cur.idx=i;phase='idle';clearInterval(tick);
+  $('#pTitle').textContent=mode==='exam'?`Question ${examIdx+1} of 2`:`Bài ${i+1}: ${cur.t}`;
+  $('#pMeta').textContent=mode==='exam'?'Read a Text Aloud':`${cur.c} · ${words(cur.a)} từ`;
+  $('#hintRow').classList.toggle('hidden',mode==='exam');
+  $('#backBtn').textContent=mode==='exam'?'✕ Thoát thi thử':'← Danh sách';
+  showText();
+  $('#result').classList.add('hidden');$('#micNote').classList.add('hidden');$('#savedNote').classList.add('hidden');
+  document.querySelectorAll('.check input').forEach(c=>c.checked=false);
+  $('#scP').value='';$('#scI').value='';
+  setRing(PREP,PREP,'var(--pri)');setBar('','PREPARATION TIME',PREP);lockSettings(false);
+  $('#setRow').classList.toggle('hidden',mode==='exam');
+  setPhase('','Sẵn sàng',`Bấm “Bắt đầu”: ${PREP} giây chuẩn bị, sau tiếng bíp đọc to trong ${SPEAK} giây.`);
+  $('#startBtn').classList.remove('hidden');$('#skipBtn').classList.add('hidden');$('#stopBtn').classList.add('hidden');
+}
+
+function openPractice(i){
+  mode='practice';$('#tab-practice').classList.add('hidden');$('#player').classList.remove('hidden');
+  loadPassage(i);window.scrollTo(0,0);
+}
+
+async function startTask(){
+  stopSpeak();
+  const s=await getMic();
+  if(!s){const n=$('#micNote');n.textContent='Không truy cập được micro (chưa cho phép, hoặc trình duyệt không hỗ trợ). Em vẫn luyện được theo đồng hồ nhưng sẽ không có bản ghi để nghe lại.';n.classList.remove('hidden')}
+  phase='prep';lockSettings(true);const id=++runId;
+  $('#startBtn').classList.add('hidden');$('#skipBtn').classList.remove('hidden');$('#stopBtn').classList.add('hidden');
+  setBar('prep','PREPARATION TIME',PREP);setRing(PREP,PREP,'var(--pri)');
+  setPhase('prep','Begin preparing now','Chuẩn bị: đọc nhẩm, tìm tên riêng, con số, danh sách và chỗ ngắt nghỉ.');
+  cue('Begin preparing now.',()=>{
+    if(id!==runId||phase!=='prep')return;
+    beep(880);countdown(PREP,'var(--pri)',startSpeak);
+  });
+}
+function startSpeak(){
+  if(phase!=='prep')return;
+  clearInterval(tick);phase='speak';const id=++runId;
+  $('#skipBtn').classList.add('hidden');$('#stopBtn').classList.remove('hidden');
+  setBar('speak','RESPONSE TIME',SPEAK);setRing(SPEAK,SPEAK,'var(--rec)');
+  setPhase('speak','Begin reading aloud now','Nghe tiếng bíp rồi đọc to.');
+  chunks=[];rec=null;
+  cue('Begin reading aloud now.',()=>{
+    if(id!==runId||phase!=='speak')return;
+    beep(1250,.5);
+    setPhase('speak','<span class="dot"></span>Đang ghi âm – đọc to','Đọc rõ ràng, tự nhiên, theo cụm từ.');
+    if(stream){try{rec=new MediaRecorder(stream);rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};rec.start()}catch(e){rec=null}}
+    countdown(SPEAK,'var(--rec)',finishSpeak);
+  });
+}
+function finishSpeak(){
+  if(phase!=='speak')return;
+  clearInterval(tick);phase='done';runId++;stopSpeak();beep(660,.3);lockSettings(false);
+  setBar('','TIME IS UP',0);
+  $('#stopBtn').classList.add('hidden');
+  setPhase('done','Hết giờ ✓','');
+  const finish=url=>{
+    if(mode==='exam'){examRes.push({idx:cur.idx,url});examNext();}
+    else showResult(url);
+  };
+  if(rec&&rec.state!=='inactive'){
+    rec.onstop=()=>{const blob=new Blob(chunks,{type:rec.mimeType||'audio/webm'});finish(URL.createObjectURL(blob))};
+    rec.stop();
+  } else finish(null);
+}
+function ext(){const m=(rec&&rec.mimeType)||'';return m.includes('mp4')?'m4a':m.includes('ogg')?'ogg':'webm'}
+function showResult(url){
+  $('#phaseSub').textContent='Nghe lại bài của em, so sánh với đọc mẫu rồi tự chấm.';
+  const a=$('#myAudio'),dl=$('#dlLink');
+  if(url){a.src=url;a.parentElement.classList.remove('hidden');dl.href=url;dl.download=`read-aloud-bai-${cur.idx+1}.${ext()}`;dl.classList.remove('hidden')}
+  else{a.removeAttribute('src');dl.classList.add('hidden')}
+  $('#myAudio').classList.toggle('hidden',!url);
+  $('#result').classList.remove('hidden');
+  if(mode==='practice'&&!$('#hintChk').checked){$('#hintChk').checked=true;showText()}
+  $('#result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function abortAll(){
+  clearInterval(tick);clearTimeout(nextT);stopSpeak();runId++;lockSettings(false);
+  if(rec&&rec.state!=='inactive'){rec.onstop=null;try{rec.stop()}catch(e){}}
+  phase='idle';
+}
+
+document.querySelectorAll('.prepSel').forEach(s=>s.onchange=()=>{PREP=+s.value;syncSettings();if(phase==='idle'&&cur&&!$('#player').classList.contains('hidden')){setRing(PREP,PREP,'var(--pri)');setBar('','PREPARATION TIME',PREP);setPhase('','Sẵn sàng',`Bấm “Bắt đầu”: ${PREP} giây chuẩn bị, sau tiếng bíp đọc to trong ${SPEAK} giây.`)}});
+document.querySelectorAll('.speakSel').forEach(s=>s.onchange=()=>{SPEAK=+s.value;syncSettings();if(phase==='idle'&&cur)setPhase('','Sẵn sàng',`Bấm “Bắt đầu”: ${PREP} giây chuẩn bị, sau tiếng bíp đọc to trong ${SPEAK} giây.`)});
+document.querySelectorAll('.cueChk').forEach(c=>c.onchange=()=>{CUE=c.checked;syncSettings()});
+syncSettings();
+$('#startBtn').onclick=startTask;
+$('#skipBtn').onclick=startSpeak;
+$('#stopBtn').onclick=finishSpeak;
+$('#againBtn').onclick=()=>{abortAll();loadPassage(cur.idx);window.scrollTo(0,0)};
+$('#hintChk').onchange=showText;
+$('#ttsPlay').onclick=()=>speak(plain(cur.a),$('#ttsRate').value);
+$('#ttsStop').onclick=stopSpeak;
+$('#saveBtn').onclick=()=>{store[cur.idx]={p:$('#scP').value,i:$('#scI').value,d:new Date().toISOString().slice(0,10)};save();$('#savedNote').classList.remove('hidden');renderList()};
+$('#backBtn').onclick=()=>{
+  if(busy()&&!confirm('Đang làm bài. Thoát ra?'))return;
+  abortAll();$('#player').classList.add('hidden');
+  if(mode==='exam'){$('#tab-exam').classList.remove('hidden')}else{$('#tab-practice').classList.remove('hidden');renderList()}
+  mode='practice';
+};
+
+/* ===== THI THỬ ===== */
+$('#examStart').onclick=async()=>{
+  const a=Math.floor(Math.random()*P.length);let b;do{b=Math.floor(Math.random()*P.length)}while(b===a);
+  examQ=[a,b];examIdx=0;examRes=[];mode='exam';
+  $('#tab-exam').classList.add('hidden');$('#review').classList.add('hidden');$('#player').classList.remove('hidden');
+  loadPassage(examQ[0]);window.scrollTo(0,0);startTask();
+};
+function examNext(){
+  if(examIdx===0){
+    examIdx=1;setPhase('done','Hoàn thành Question 1 ✓','Chuyển sang Question 2 sau 3 giây…');
+    nextT=setTimeout(()=>{loadPassage(examQ[1]);startTask()},3000);
+  } else showReview();
+}
+function showReview(){
+  mode='practice';phase='idle';
+  $('#player').classList.add('hidden');
+  const R=$('#review');R.classList.remove('hidden');
+  R.innerHTML=`<div class="card"><div class="row top"><p class="qtitle">Kết quả thi thử</p><div class="row"><button class="btn" id="rvAgain">↻ Thi lại</button><button class="btn" id="rvBack">← Về danh sách</button></div></div>
+  <p class="sub">Nghe lại từng câu, so sánh với đọc mẫu và tự chấm theo bảng ở mục “Mẹo &amp; tiêu chí chấm”. Gợi ý nhấn âm, ngắt nghỉ đã được hiện ra để em đối chiếu.</p></div>`;
+  examRes.forEach((r,k)=>{
+    const p=P[r.idx];const d=document.createElement('div');d.className='card';d.style.marginTop='12px';
+    d.innerHTML=`<p class="qtitle">Question ${k+1} · <span class="sub">${esc(p.t)}</span></p>
+      <div class="text">${rich(p.a)}</div>
+      ${r.url?`<audio controls src="${r.url}"></audio><div class="row" style="margin-top:6px"><a class="btn" href="${r.url}" download="thi-thu-q${k+1}.${ext()}">⬇ Tải bản ghi</a>`:'<div class="note warn">Không có bản ghi (micro chưa được cho phép).</div><div class="row" style="margin-top:6px">'}
+      <button class="btn rvTts" data-i="${r.idx}">▶ Nghe mẫu</button><button class="btn rvStop">■ Dừng</button></div>
+      <div class="row" style="margin-top:10px"><span>Phát âm</span><select class="rvP"><option value="">–</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+      <span>Ngữ điệu &amp; trọng âm</span><select class="rvI"><option value="">–</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+      <button class="btn pri rvSave" data-i="${r.idx}">Lưu</button></div>`;
+    R.appendChild(d);
+  });
+  R.querySelectorAll('.rvTts').forEach(b=>b.onclick=()=>speak(plain(P[+b.dataset.i].a),$('#ttsRate').value));
+  R.querySelectorAll('.rvStop').forEach(b=>b.onclick=stopSpeak);
+  R.querySelectorAll('.rvSave').forEach(b=>b.onclick=()=>{const c=b.closest('.card');store[+b.dataset.i]={p:c.querySelector('.rvP').value,i:c.querySelector('.rvI').value,d:new Date().toISOString().slice(0,10)};save();b.textContent='Đã lưu ✓'});
+  $('#rvAgain').onclick=()=>$('#examStart').onclick();
+  $('#rvBack').onclick=()=>{stopSpeak();R.classList.add('hidden');document.querySelector('nav button[data-tab=practice]').click()};
+  window.scrollTo(0,0);
+}
+
+renderList();
+</script>
+</body>
+</html>
