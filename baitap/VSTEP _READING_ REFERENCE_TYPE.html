@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSTEP Reading – Reference Questions</title>
+<style>
+:root{
+  --bg:#f4f1ea; --paper:#fffdf8; --ink:#1f2328; --muted:#6b6f76; --line:#e2ddd2;
+  --accent:#1d5c63; --accent-2:#e7f0ef; --warn:#b4541a; --ok:#2f7d4f; --ok-bg:#e6f3ea;
+  --bad:#b3261e; --bad-bg:#fbe9e7; --sel:#dcebe9; --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+.hidden{display:none!important}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--accent);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px}
+.top h1{font-size:16px;margin:0;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clock{font-variant-numeric:tabular-nums;font-weight:700;background:rgba(255,255,255,.14);padding:4px 10px;border-radius:6px;letter-spacing:.5px}
+.clock.low{background:#f3b27a;color:#3a1d06}
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:9px 16px;border-radius:8px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.light{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:#fff;padding:5px 12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+
+/* start */
+.start{max-width:680px;margin:24px auto;padding:28px}
+.start h2{margin:0 0 4px;font-size:26px}
+.start .sub{color:var(--muted);margin:0 0 20px}
+.start ul{padding-left:20px;margin:0 0 20px}
+.start li{margin:4px 0}
+.field{display:flex;flex-direction:column;gap:6px;margin:0 0 18px}
+.field input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.history{margin-top:22px;border-top:1px solid var(--line);padding-top:14px;font-size:14px}
+.history table{width:100%;border-collapse:collapse}
+.history td,.history th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+.history th{color:var(--muted);font-weight:600}
+
+/* reading phase */
+.reader{max-width:780px;margin:12px auto;padding:28px 30px}
+.reader .meta{display:flex;justify-content:space-between;align-items:baseline;gap:12px;color:var(--muted);font-size:14px;margin-bottom:6px}
+.reader h2{margin:0 0 4px;font-size:20px}
+.reader .ptitle{font-weight:700;text-align:center;margin:10px 0 0}
+.pbar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin:14px 0 20px}
+.pbar i{display:block;height:100%;background:var(--accent);width:100%;transition:width 1s linear}
+.para-now{font-size:18px;line-height:1.75;text-align:justify;min-height:180px}
+.para-now .num{display:inline-block;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-2);border-radius:4px;padding:0 6px;margin-right:6px;vertical-align:2px}
+.dots{display:flex;gap:6px;justify-content:center;margin:18px 0 6px}
+.dots span{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dots span.done{background:var(--accent)}
+.dots span.cur{background:var(--warn)}
+.reader .actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:12px}
+.reader .hint{font-size:13px;color:var(--muted)}
+
+/* question phase */
+.ptabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ptab{border:1px solid var(--line);background:var(--paper);padding:7px 14px;border-radius:999px;font-size:14px}
+.ptab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.ptab small{opacity:.75}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.pane{padding:20px 22px}
+.passage,.qpane{position:sticky;top:64px;height:calc(100vh - 84px);overflow:auto}
+.qpane .nav{margin-bottom:4px}
+.passage h3{margin:0 0 10px;font-size:16px;color:var(--accent)}
+.passage .ptitle{font-weight:700;text-align:center;margin:0 0 10px}
+.passage p{text-align:justify;margin:0 0 12px}
+.passage p .num{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-2);border-radius:4px;padding:0 5px;margin-right:6px}
+.q{padding:14px 0;border-bottom:1px solid var(--line)}
+.q:last-child{border-bottom:0}
+.q .stem{font-weight:600;margin-bottom:8px}
+.q .ins{font-style:italic;background:#f6f3ea;border-left:3px solid var(--warn);padding:8px 12px;margin:0 0 10px;border-radius:0 6px 6px 0}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;color:var(--ink)}
+.opt:hover{border-color:var(--accent)}
+.opt b{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:13px}
+.opt.on{background:var(--sel);border-color:var(--accent)}
+.opt.on b{background:var(--accent);border-color:var(--accent);color:#fff}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)}
+.opt.right b{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.opt.wrong b{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt[disabled]{cursor:default}
+.mark{font-size:13px;font-weight:700;margin-left:8px}
+.mark.ok{color:var(--ok)} .mark.no{color:var(--bad)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.palette{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;padding:14px;}
+.palette .grp{display:flex;gap:4px;flex-wrap:wrap;margin-right:10px}
+.palette button{width:32px;height:30px;border-radius:6px;border:1px solid var(--line);background:#fff;font-size:13px;padding:0}
+.palette button.ans{background:var(--accent);color:#fff;border-color:var(--accent)}
+.palette button.r{background:var(--ok);border-color:var(--ok);color:#fff}
+.palette button.w{background:var(--bad);border-color:var(--bad);color:#fff}
+.palette button.locked{opacity:.4}
+.mtabs{display:none}
+.ref{font-weight:700;text-decoration:underline;text-decoration-color:var(--warn);text-underline-offset:3px}
+.ref sup{font-size:10px;color:#fff;background:var(--warn);border-radius:3px;padding:0 3px;margin-left:2px;text-decoration:none;display:inline-block;line-height:1.3}
+.ref.flash{background:#fde7c8;border-radius:3px}
+.exp{margin-top:8px;font-size:14px;background:#f6f3ea;border-radius:6px;padding:8px 12px;color:#3a3f45}
+.stem .goto{font-size:12px;font-weight:600;color:var(--accent);background:none;border:0;padding:0 0 0 6px;text-decoration:underline}
+
+/* result */
+.result{max-width:780px;margin:12px auto;padding:28px}
+.score{display:flex;align-items:baseline;gap:10px;margin:6px 0 16px}
+.score .big{font-size:48px;font-weight:800;color:var(--accent);line-height:1}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 20px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+.stat .k{font-size:13px;color:var(--muted)}
+.stat .v{font-size:20px;font-weight:700}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(20,24,28,.45);display:grid;place-items:center;z-index:50;padding:16px}
+.modal .box{background:var(--paper);border-radius:12px;max-width:420px;width:100%;padding:22px;box-shadow:var(--shadow)}
+.modal h3{margin:0 0 8px}
+.modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+@media (max-width:560px){.passage p{text-align:left}}
+@media (max-width:860px){
+  .split{gap:8px}
+  .pane{padding:12px 12px}
+  .passage p,.q{font-size:14px;line-height:1.55}
+  .opt{padding:6px 8px;gap:6px}
+  .opt b{width:20px;height:20px;font-size:12px}
+  .wrap{padding:12px 8px 30px}
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .reader{padding:22px 18px}
+  .para-now{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>VSTEP Reading – Reference Questions</h1>
+  <span id="clock" class="clock hidden">60:00</span>
+  <button id="submitTop" class="btn light hidden">Nộp bài</button>
+</div>
+
+<div class="wrap">
+  <!-- START -->
+  <section id="scrStart" class="card start">
+    <h2>Reference Questions · B2–C1</h2>
+    <p class="sub">4 bài đọc · 40 câu hỏi quy chiếu · 60 phút</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="btnStart" class="btn primary">Bắt đầu làm bài</button>
+      <button id="btnResume" class="btn hidden">Tiếp tục bài đang làm</button>
+    </div>
+    <div id="history" class="history hidden"></div>
+  </section>
+
+  <!-- READING -->
+  <section id="scrRead" class="card reader hidden">
+    <div class="meta"><span id="rPassage">Passage 1</span><span id="rStep">Đoạn 1/4</span></div>
+    <h2 id="rHead">PASSAGE 1 – QUESTIONS 1–10</h2>
+    <div id="rTitle" class="ptitle"></div>
+    <div class="pbar"><i id="rBar"></i></div>
+    <div id="rPara" class="para-now"></div>
+    <div id="rDots" class="dots"></div>
+    <div class="actions">
+      <span class="hint">Thời gian còn lại cho đoạn này: <b id="rLeft">0</b> giây</span>
+      <button id="rNext" class="btn primary">Đoạn tiếp theo →</button>
+    </div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <section id="scrQ" class="hidden">
+    <div id="ptabs" class="ptabs"></div>
+    <div id="split" class="split show-q">
+      <div id="passage" class="card pane passage"></div>
+      <div class="qpane">
+        <div id="qlist" class="card pane"></div>
+        <div class="nav">
+          <button id="prevP" class="btn">← Bài trước</button>
+          <button id="nextP" class="btn primary">Bài tiếp theo →</button>
+        </div>
+      </div>
+    </div>
+    <div id="palette" class="card palette"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="scrResult" class="card result hidden">
+    <h2 style="margin:0">Kết quả</h2>
+    <div id="rName" style="color:var(--muted)"></div>
+    <div class="score"><span id="sBig" class="big">0</span><span>/ 40 câu đúng</span><span id="sPct" style="color:var(--muted)"></span></div>
+    <div id="sGrid" class="grid4"></div>
+    <div id="sTime" style="color:var(--muted);margin-bottom:18px"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="btnReview" class="btn primary">Xem lại bài và đáp án</button>
+      <button id="btnAgain" class="btn">Làm lại từ đầu</button>
+    </div>
+  </section>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="box">
+    <h3 id="mTitle">Nộp bài?</h3>
+    <div id="mBody"></div>
+    <div class="row"><button id="mNo" class="btn">Làm tiếp</button><button id="mYes" class="btn primary">Nộp bài</button></div>
+  </div>
+</div>
+
+<script>
+const DATA = [{"title": "The Four-Day Working Week", "paras": ["For most of the past century, the five-day working week has been treated as a natural fact of economic life. Yet <span class=\"ref\" id=\"r1\">it<sup>1</sup></span> is a relatively recent invention. In the early twentieth century, many factory workers laboured six days a week, and the move to a two-day weekend was fiercely resisted by employers, who feared that <span class=\"ref\" id=\"r2\">this<sup>2</sup></span> would ruin their profits. Today, a growing number of companies and governments are asking whether the time has come for another reduction.", "The idea has already been tested in several large trials. In one of the best known, conducted in the UK in 2022, around sixty companies allowed staff to work four days a week for six months without any loss of pay. In return, employees were expected to maintain <span class=\"ref\" id=\"r3\">their<sup>3</sup></span> usual output. Most of the firms involved reported that productivity stayed roughly the same, and the great majority decided to continue with <span class=\"ref\" id=\"r4\">the scheme<sup>4</sup></span> after the trial had ended.", "Supporters argue that a shorter week benefits both workers and employers. Staff who have an extra day to rest, see their families or deal with personal matters tend to return to work refreshed, and <span class=\"ref\" id=\"r5\">they<sup>5</sup></span> are less likely to take sick days or to look for a new job. For employers, <span class=\"ref\" id=\"r6\">these<sup>6</sup></span> are significant gains, since recruiting and training replacements can be extremely expensive.", "Critics, however, point out that the model does not suit every industry. A software company may be able to shorten meetings and cut wasted time, but a hospital, a care home or a school cannot simply close for an extra day. In <span class=\"ref\" id=\"r7\">such sectors<sup>7</sup></span>, introducing a four-day week would mean hiring additional staff, which would raise costs considerably. Others worry that employees may end up squeezing five days of work into four, leaving <span class=\"ref\" id=\"r8\">them<sup>8</sup></span> more exhausted than before.", "There is also the question of how the extra day is actually used. Researchers have found that the benefits depend heavily on whether workers genuinely switch off. <span class=\"ref\" id=\"r9\">Those<sup>9</sup></span> who spend their free day answering emails and checking messages appear to gain far less than colleagues who use it to rest, exercise or spend time with friends.", "Whatever <span class=\"ref\" id=\"r10\">its<sup>10</sup></span> long-term future, the four-day week has already changed the terms of the debate. For decades, the main question was how many hours people should work. Increasingly, it is how well they work during the hours they spend at their desks, and whether the traditional working week still makes sense in an economy that looks very different from the one in which it was created."], "qs": [{"q": "The word “it” in paragraph 1 refers to ________.", "insert": null, "opts": ["the five-day working week", "the twentieth century", "economic life", "a natural fact"], "key": 0, "exp": "\"it\" = the five-day working week. Câu sau nói nó là \"a relatively recent invention\" – chỉ có tuần làm 5 ngày mới là \"phát minh\" được bàn đến."}, {"q": "The word “this” in paragraph 1 refers to ________.", "insert": null, "opts": ["the move to a two-day weekend", "a six-day week", "the early twentieth century", "factory workers"], "key": 0, "exp": "Giới chủ phản đối việc chuyển sang nghỉ hai ngày cuối tuần vì sợ \"this\" làm mất lợi nhuận → this = the move to a two-day weekend."}, {"q": "The word “their” in paragraph 2 refers to ________.", "insert": null, "opts": ["companies’", "employees’", "trials’", "governments’"], "key": 1, "exp": "Người lao động được yêu cầu giữ năng suất thường ngày của chính họ → their = employees'."}, {"q": "The phrase “the scheme” in paragraph 2 refers to ________.", "insert": null, "opts": ["the trial", "the UK", "the six-month period", "working four days a week with no loss of pay"], "key": 3, "exp": "\"the scheme\" là chế độ được áp dụng trong thử nghiệm: làm 4 ngày/tuần mà không giảm lương. \"the trial\" là đợt thử nghiệm, đã kết thúc."}, {"q": "The word “they” in paragraph 3 refers to ________.", "insert": null, "opts": ["families", "personal matters", "staff who have an extra day off", "employers"], "key": 2, "exp": "Người có thêm một ngày nghỉ trở lại làm việc sảng khoái và (they) ít nghỉ ốm, ít nhảy việc hơn."}, {"q": "The word “these” in paragraph 3 refers to ________.", "insert": null, "opts": ["recruiting and training replacements", "extra days off for staff", "fewer sick days and fewer staff leaving", "new jobs"], "key": 2, "exp": "\"these\" chỉ những điều có lợi cho chủ: nhân viên ít nghỉ ốm và ít bỏ việc. Việc tuyển và đào tạo người thay thế là chi phí, không phải lợi ích."}, {"q": "The phrase “such sectors” in paragraph 4 refers to ________.", "insert": null, "opts": ["software companies", "industries with long meetings", "sectors that hire additional staff", "areas such as hospitals, care homes and schools"], "key": 3, "exp": "\"such sectors\" chỉ các ngành không thể đóng cửa thêm một ngày: bệnh viện, viện dưỡng lão, trường học."}, {"q": "The word “them” in paragraph 4 refers to ________.", "insert": null, "opts": ["critics", "days of work", "employees", "costs"], "key": 2, "exp": "Nhân viên dồn 5 ngày việc vào 4 ngày nên chính họ (them) còn kiệt sức hơn trước."}, {"q": "The word “Those” in paragraph 5 refers to ________.", "insert": null, "opts": ["researchers", "colleagues", "emails and messages", "workers"], "key": 3, "exp": "\"Those who spend their free day answering emails\" = những người lao động dùng ngày nghỉ để trả lời email, đối lập với \"colleagues who use it to rest\"."}, {"q": "The word “its” in paragraph 6 refers to ________.", "insert": null, "opts": ["the debate’s", "the four-day week’s", "the economy’s", "the working day’s"], "key": 1, "exp": "\"its long-term future\" = tương lai lâu dài của tuần làm 4 ngày – chủ đề chính của cả đoạn."}], "wc": 420}, {"title": "", "paras": ["Almost everyone has experienced <span class=\"ref\" id=\"r11\">it<sup>11</sup></span>: an important task sits untouched while we tidy our desks, scroll through our phones or suddenly decide that the kitchen urgently needs cleaning. Procrastination is often dismissed as simple laziness, but psychologists increasingly see the habit as something quite different, and far more complicated.", "According to one influential view, procrastination is primarily a problem of managing emotions rather than managing time. When a task makes us feel anxious, bored or insecure, putting <span class=\"ref\" id=\"r12\">it<sup>12</sup></span> off provides immediate relief. The trouble is that the relief does not last. As the deadline approaches, the unpleasant feelings return, often stronger than before, and <span class=\"ref\" id=\"r13\">they<sup>13</sup></span> may now be accompanied by guilt and self-criticism.", "Researchers have also linked procrastination to the way people think about their future selves. In brain-imaging studies, participants who were asked to imagine themselves ten years from now showed patterns of brain activity similar to <span class=\"ref\" id=\"r14\">those<sup>14</sup></span> recorded when they thought about complete strangers. In other words, many of us treat our future self almost as another person, someone who will somehow find the energy and motivation that we lack today. It is only natural, then, to leave unpleasant work to <span class=\"ref\" id=\"r15\">such a person<sup>15</sup></span>.", "It is important, however, to distinguish procrastination from other kinds of delay. Psychologists separate deliberately postponing a task for a good reason, such as waiting for more information, from putting it off even though we expect to be worse off as a result. Only <span class=\"ref\" id=\"r16\">the latter<sup>16</sup></span> counts as true procrastination.", "Perfectionists are thought to be especially vulnerable. Because <span class=\"ref\" id=\"r17\">they<sup>17</sup></span> set extremely high standards for themselves, starting a task means risking the discovery that they cannot meet them. Delaying the work protects their self-image, at least for a while: a poor result can always be blamed on a lack of time rather than a lack of ability.", "Fortunately, there are strategies that help. One is to break a large project into a series of small steps, each of <span class=\"ref\" id=\"r18\">which<sup>18</sup></span> feels manageable on its own. Another, perhaps surprisingly, is self-compassion. In one study, university students who forgave <span class=\"ref\" id=\"r19\">themselves<sup>19</sup></span> for procrastinating before their first exam procrastinated noticeably less before the next one, while those who criticised themselves harshly continued to delay.", "<span class=\"ref\" id=\"r20\">This finding<sup>20</sup></span> supports the idea that procrastination is driven by emotion. Rather than fighting the habit with discipline alone, experts suggest paying attention to the feelings that a task produces, and finding ways to make starting it feel a little less threatening."], "qs": [{"q": "The word “it” in paragraph 1 refers to ________.", "insert": null, "opts": ["laziness", "tidying our desks", "the kitchen", "procrastination, the habit of delaying important tasks"], "key": 3, "exp": "\"it\" được giải thích ngay sau dấu hai chấm: một việc quan trọng bị bỏ dở trong khi ta làm việc khác. Đó chính là procrastination (từ được nêu tên ở câu sau)."}, {"q": "The word “it” in paragraph 2 refers to ________.", "insert": null, "opts": ["the relief", "managing time", "an influential view", "a task that makes us feel anxious, bored or insecure"], "key": 3, "exp": "\"putting it off\" = trì hoãn việc gì → it = công việc khiến ta lo lắng, chán hay bất an."}, {"q": "The word “they” in paragraph 2 refers to ________.", "insert": null, "opts": ["deadlines", "guilt and self-criticism", "the unpleasant feelings", "tasks"], "key": 2, "exp": "Cảm giác khó chịu quay lại, và giờ chúng (they) còn đi kèm cảm giác tội lỗi. Guilt là thứ đi kèm, không phải chủ thể."}, {"q": "The word “those” in paragraph 3 refers to ________.", "insert": null, "opts": ["participants", "patterns of brain activity", "brain-imaging studies", "complete strangers"], "key": 1, "exp": "So sánh hai kiểu hoạt động não: khi nghĩ về bản thân tương lai và khi nghĩ về người lạ → those = patterns of brain activity."}, {"q": "The phrase “such a person” in paragraph 3 refers to ________.", "insert": null, "opts": ["a complete stranger", "a lazy colleague", "our future self", "a psychologist"], "key": 2, "exp": "\"such a person\" = người được mô tả ở câu trước: bản thân ta trong tương lai, người mà ta tin sẽ có đủ năng lượng và động lực."}, {"q": "The phrase “the latter” in paragraph 4 refers to ________.", "insert": null, "opts": ["putting a task off despite expecting to be worse off", "waiting for more information", "postponing a task for a good reason", "psychologists’ research"], "key": 0, "exp": "\"the latter\" = cái được nhắc sau trong hai cái. Cái thứ hai là trì hoãn dù biết mình sẽ thiệt → đó mới là procrastination thực sự."}, {"q": "The word “they” in paragraph 5 refers to ________.", "insert": null, "opts": ["high standards", "perfectionists", "tasks", "psychologists"], "key": 1, "exp": "Những người cầu toàn đặt tiêu chuẩn rất cao cho bản thân → they = perfectionists."}, {"q": "The word “which” in paragraph 6 refers to ________.", "insert": null, "opts": ["large projects", "strategies", "a series", "small steps"], "key": 3, "exp": "\"each of which\" = mỗi bước nhỏ đều có vẻ làm được → which = small steps (không phải \"a series\", vì \"each of\" cần danh từ số nhiều)."}, {"q": "The word “themselves” in paragraph 6 refers to ________.", "insert": null, "opts": ["their exams", "the researchers", "the students", "those who criticised themselves harshly"], "key": 2, "exp": "Đại từ phản thân \"themselves\" chỉ chủ ngữ của mệnh đề: những sinh viên đã tha thứ cho bản thân."}, {"q": "The phrase “This finding” in paragraph 7 refers to ________.", "insert": null, "opts": ["the result that self-forgiving students procrastinated less", "the idea that procrastination is driven by emotion", "the strategy of breaking projects into small steps", "the advice of experts"], "key": 0, "exp": "\"This finding\" = kết quả nghiên cứu vừa nêu: sinh viên biết tự tha thứ thì ít trì hoãn hơn. \"the idea\" là điều mà phát hiện này ủng hộ."}], "wc": 406}, {"title": "", "paras": ["For centuries, wolves were hunted, poisoned and trapped across Europe until, by the middle of the twentieth century, <span class=\"ref\" id=\"r21\">they<sup>21</sup></span> had disappeared from most of the continent. Only small, isolated populations survived, mainly in remote mountain regions of Italy, Spain and Eastern Europe. Today, however, the picture has changed dramatically. Wolves are now found in every country of mainland Europe, and <span class=\"ref\" id=\"r22\">their<sup>22</sup></span> total number has been estimated at well over 20,000.", "Several factors explain this remarkable recovery. Legal protection, introduced in many countries from the 1970s onwards, made it illegal to kill wolves without special permission. At the same time, millions of people left the countryside for the cities, abandoning farmland that gradually returned to scrub and forest. <span class=\"ref\" id=\"r23\">This<sup>23</sup></span> created ideal conditions for deer and wild boar, and an abundant supply of <span class=\"ref\" id=\"r24\">such prey<sup>24</sup></span> allowed wolves to spread far more quickly than scientists had predicted.", "Wolves are also remarkable travellers. Young animals usually leave the pack in <span class=\"ref\" id=\"r25\">which<sup>25</sup></span> they were born in order to find a partner and establish their own territory, sometimes covering hundreds of kilometres in a few weeks. As a result, wolves have reappeared in areas where they had not been seen for more than a century, including lowland regions close to towns and motorways.", "The return of the wolf has been welcomed by many ecologists, who argue that <span class=\"ref\" id=\"r26\">it<sup>26</sup></span> helps to restore a natural balance. By hunting deer, wolves can reduce the damage done to young trees, allowing forests to regenerate. Farmers, however, often see things very differently. In many regions, wolves attack sheep and goats, and <span class=\"ref\" id=\"r27\">those<sup>27</sup></span> who keep livestock on open mountain pastures are particularly affected. Compensation schemes exist in most countries, but many farmers complain that <span class=\"ref\" id=\"r28\">they<sup>28</sup></span> are slow and bureaucratic and fail to cover the full cost of losses, including the stress caused to the surviving animals.", "Governments have tried to reduce conflict by paying for electric fences and specially trained guard dogs, measures which have proved effective in some areas. Yet the debate has become increasingly political. Recently, European authorities agreed to lower the wolf’s legal status from “strictly protected” to “protected”, a decision <span class=\"ref\" id=\"r29\">that<sup>29</sup></span> gives individual countries more freedom to control wolf numbers. Supporters of <span class=\"ref\" id=\"r30\">the change<sup>30</sup></span> say it recognises the real difficulties faced by rural communities; opponents warn that it could undo decades of conservation work.", "What is clear is that wolves are unlikely to disappear again any time soon. The challenge for Europe is no longer how to bring the animal back, but how people and predators can learn to share the same landscape."], "qs": [{"q": "The word “they” in paragraph 1 refers to ________.", "insert": null, "opts": ["small populations", "wolves", "mountain regions", "Europeans"], "key": 1, "exp": "Sói bị săn bắt, đầu độc cho đến khi chúng (they) biến mất khỏi phần lớn châu lục."}, {"q": "The word “their” in paragraph 1 refers to ________.", "insert": null, "opts": ["populations’", "wolves’", "countries’", "regions’"], "key": 1, "exp": "\"their total number\" = tổng số lượng sói ở châu Âu hiện nay (hơn 20.000)."}, {"q": "The word “This” in paragraph 2 refers to ________.", "insert": null, "opts": ["legal protection", "the movement of wolves into cities", "the abandonment of farmland that turned back into forest", "the introduction of laws in the 1970s"], "key": 2, "exp": "Đất nông nghiệp bị bỏ hoang trở lại thành rừng, điều đó (This) tạo môi trường lý tưởng cho hươu, nai và lợn rừng."}, {"q": "The phrase “such prey” in paragraph 2 refers to ________.", "insert": null, "opts": ["sheep and goats", "young wolves", "farm animals", "deer and wild boar"], "key": 3, "exp": "\"such prey\" = những con mồi vừa nhắc đến: hươu, nai và lợn rừng."}, {"q": "The word “which” in paragraph 3 refers to ________.", "insert": null, "opts": ["the pack", "the territory", "the partner", "the region"], "key": 0, "exp": "\"the pack in which they were born\" = bầy mà sói con được sinh ra trong đó."}, {"q": "The word “it” in paragraph 4 refers to ________.", "insert": null, "opts": ["the return of the wolf", "ecologists’ work", "hunting deer", "a natural balance"], "key": 0, "exp": "Các nhà sinh thái học cho rằng sự trở lại của sói (it) giúp khôi phục cân bằng tự nhiên."}, {"q": "The word “those” in paragraph 4 refers to ________.", "insert": null, "opts": ["wolves", "goats", "people", "pastures"], "key": 2, "exp": "\"those who keep livestock\" = những người chăn nuôi gia súc trên đồng cỏ mở."}, {"q": "The word “they” in paragraph 4 refers to ________.", "insert": null, "opts": ["compensation schemes", "farmers", "the surviving animals", "losses"], "key": 0, "exp": "Câu dễ nhầm. Nông dân phàn nàn rằng các chương trình bồi thường (they) chậm, nhiều thủ tục và không bù đủ thiệt hại. \"Slow and bureaucratic\" chỉ hợp với các chương trình, không hợp với nông dân."}, {"q": "The word “that” in paragraph 5 refers to ________.", "insert": null, "opts": ["the wolf’s legal status", "European authorities", "individual countries", "the decision"], "key": 3, "exp": "\"a decision that gives...\" → that là đại từ quan hệ thay cho \"a decision\"."}, {"q": "The phrase “the change” in paragraph 5 refers to ________.", "insert": null, "opts": ["conservation work", "the use of guard dogs", "lowering the wolf’s protection status", "the growth of wolf numbers"], "key": 2, "exp": "\"the change\" = việc hạ mức bảo vệ của sói từ \"strictly protected\" xuống \"protected\"."}], "wc": 425}, {"title": "", "paras": ["We tend to think of memory as a kind of video recording: events are stored in the brain and can later be replayed more or less accurately. Decades of research, however, suggest that <span class=\"ref\" id=\"r31\">this<sup>31</sup></span> is a seriously misleading picture. Memory is reconstructive. Each time we recall an experience, we rebuild <span class=\"ref\" id=\"r32\">it<sup>32</sup></span> from scattered fragments, and in the process details can be altered, lost or even invented.", "Among the most influential studies in this field were <span class=\"ref\" id=\"r33\">those<sup>33</sup></span> carried out by the American psychologist Elizabeth Loftus in the 1970s. In one classic experiment, participants watched a short film of a traffic accident and were then asked how fast the cars were going when <span class=\"ref\" id=\"r34\">they<sup>34</sup></span> “smashed into” or “hit” each other. Participants who heard the word “smashed” gave higher estimates of speed. A week later, <span class=\"ref\" id=\"r35\">they<sup>35</sup></span> were also more likely to report having seen broken glass, even though there had been none in the film.", "This phenomenon, now known as the misinformation effect, has serious implications for the legal system. Eyewitness testimony is often highly persuasive to juries, yet it can be shaped by leading questions from police officers or lawyers, by conversations with other witnesses and by media reports. In the United States, reviews of wrongful convictions later overturned by DNA evidence have found that mistaken eyewitness identification played a part in the majority of <span class=\"ref\" id=\"r36\">them<sup>36</sup></span>.", "Later research went further, showing that entirely false memories can be created. In so-called “lost in the mall” studies, participants were given short written descriptions of childhood events supposedly supplied by their relatives, one of <span class=\"ref\" id=\"r37\">which<sup>37</sup></span> had been invented: getting lost in a shopping centre as a young child. A significant minority came to “remember” this event, and some even added vivid details of <span class=\"ref\" id=\"r38\">their<sup>38</sup></span> own, such as the colour of a stranger’s coat.", "Not all researchers agree on how easily <span class=\"ref\" id=\"r39\">such memories<sup>39</sup></span> can be implanted, and critics have argued that some participants may simply have been trying to please the experimenters. Nevertheless, the broader conclusion is now widely accepted: confidence is not a reliable guide to accuracy. A witness may be completely certain and still be wrong, and <span class=\"ref\" id=\"r40\">that<sup>40</sup></span> is one reason why many police forces now follow strict procedures when they interview witnesses or ask them to identify suspects.", "For the rest of us, the lesson is a humbling one. Our most treasured memories may feel perfectly clear, yet they are less like recordings than like stories that we retell, and quietly revise, each time we remember them."], "qs": [{"q": "The word “this” in paragraph 1 refers to ________.", "insert": null, "opts": ["decades of research", "the idea that memory works like a video recording", "the brain", "an accurate replay of events"], "key": 1, "exp": "\"this\" = cách nghĩ vừa nêu ở câu trước: trí nhớ giống như một đoạn băng ghi hình. Nghiên cứu cho thấy hình dung đó gây hiểu lầm."}, {"q": "The word “it” in paragraph 1 refers to ________.", "insert": null, "opts": ["an experience", "the brain", "memory", "a fragment"], "key": 0, "exp": "Mỗi lần nhớ lại một trải nghiệm, ta dựng lại nó (it) từ các mảnh rời rạc."}, {"q": "The word “those” in paragraph 2 refers to ________.", "insert": null, "opts": ["studies", "psychologists", "experiments", "fields"], "key": 0, "exp": "\"the most influential studies ... were those carried out by Loftus\" → those = studies. Câu sau mới nhắc đến \"experiment\", không phải thứ được so sánh ở đây."}, {"q": "The word “they” in paragraph 2 refers to ________.", "insert": null, "opts": ["participants", "estimates", "the films", "the cars"], "key": 3, "exp": "\"how fast the cars were going when they smashed into each other\" → they = the cars."}, {"q": "The word “they” in paragraph 2 refers to ________.", "insert": null, "opts": ["all participants", "the cars", "the researchers", "participants who heard the word “smashed”"], "key": 3, "exp": "Câu dễ nhầm. \"they\" là những người nghe từ \"smashed\", tức chủ ngữ của câu trước. Chính nhóm này về sau hay \"nhớ\" có kính vỡ."}, {"q": "The word “them” in paragraph 3 refers to ________.", "insert": null, "opts": ["juries", "DNA tests", "wrongful convictions", "eyewitnesses"], "key": 2, "exp": "\"the majority of them\" = phần lớn các vụ kết án oan đã được lật lại nhờ bằng chứng DNA."}, {"q": "The word “which” in paragraph 4 refers to ________.", "insert": null, "opts": ["relatives", "the written descriptions of childhood events", "childhood memories in general", "participants"], "key": 1, "exp": "\"one of which had been invented\" = một trong số các mô tả về sự kiện thời thơ ấu là bịa ra."}, {"q": "The word “their” in paragraph 4 refers to ________.", "insert": null, "opts": ["the relatives’", "the strangers’", "the researchers’", "the participants’"], "key": 3, "exp": "\"details of their own\" = những chi tiết do chính người tham gia tự thêm vào, ví dụ màu áo của người lạ."}, {"q": "The phrase “such memories” in paragraph 5 refers to ________.", "insert": null, "opts": ["childhood memories", "memories of traffic accidents", "false memories", "treasured memories"], "key": 2, "exp": "\"such memories\" = loại ký ức được bàn ở đoạn trước: ký ức giả bị cấy vào."}, {"q": "The word “that” in paragraph 5 refers to ________.", "insert": null, "opts": ["the fact that a confident witness can still be wrong", "the procedures used by police", "critics’ arguments", "the identification of suspects"], "key": 0, "exp": "\"that\" = toàn bộ ý vừa nêu: nhân chứng có thể hoàn toàn chắc chắn mà vẫn sai. Đó là lý do cảnh sát dùng quy trình chặt chẽ."}], "wc": 414}];
+const TEST_ID = 'vstep-reading-reference-01';
+const TOTAL_SEC = 60*60;
+const WPM = 150;              // reading speed used for paragraph timers
+const MIN_PARA = 20, MAX_PARA = 90;
+const L = 'ABCD';
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+let S = null;           // state
+let tick = null, paraTimer = null;
+
+function words(t){ return t.trim().split(/\s+/).length; }
+function paraSecs(t){ return Math.min(MAX_PARA, Math.max(MIN_PARA, Math.ceil(words(t)/WPM*60/5)*5)); }
+function fmt(s){ s=Math.max(0,s|0); return String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function qnum(p,i){ return p*10+i+1; }
+function show(id){ ['scrStart','scrRead','scrQ','scrResult'].forEach(x=>$(x).classList.toggle('hidden',x!==id)); window.scrollTo(0,0); }
+
+function newState(){
+  return { name: '', start: Date.now(), elapsed: 0,
+           ans: Array(40).fill(null), read: [false,false,false,false],
+           cur: 0, phase: 'read', para: 0, paraLeft: null, done: false, review: false };
+}
+function save(){ if(S && !S.done) store.set(TEST_ID+'-state', S); }
+
+/* ---------- global clock ---------- */
+function startClock(){
+  $('clock').classList.remove('hidden'); $('submitTop').classList.remove('hidden');
+  clearInterval(tick);
+  let last = Date.now();
+  tick = setInterval(()=>{
+    const now = Date.now(); S.elapsed += (now-last)/1000; last = now;
+    const left = TOTAL_SEC - S.elapsed;
+    $('clock').textContent = fmt(left);
+    $('clock').classList.toggle('low', left <= 300);
+    if (left <= 0){ finish(true); }
+    else if ((S.elapsed|0) % 5 === 0) save();
+  }, 1000);
+  $('clock').textContent = fmt(TOTAL_SEC - S.elapsed);
+}
+
+/* ---------- reading phase ---------- */
+function openPassage(p){
+  S.cur = p;
+  if (!S.read[p]){ S.phase='read'; if(S.paraLeft==null){ S.para=0; } showPara(); }
+  else { S.phase='q'; renderQ(); }
+  save();
+}
+function showPara(){
+  clearInterval(paraTimer);
+  const P = DATA[S.cur], i = S.para, txt = P.paras[i];
+  show('scrRead');
+  $('rPassage').textContent = 'Passage '+(S.cur+1)+' / 4';
+  $('rStep').textContent = 'Đoạn '+(i+1)+' / '+P.paras.length;
+  $('rHead').textContent = 'PASSAGE '+(S.cur+1)+' – QUESTIONS '+(S.cur*10+1)+'–'+(S.cur*10+10);
+  $('rTitle').textContent = P.title || '';
+  $('rTitle').classList.toggle('hidden', !P.title);
+  $('rPara').innerHTML = '<span class="num">'+(i+1)+'</span>'+esc(txt);
+  $('rDots').innerHTML = P.paras.map((_,k)=>'<span class="'+(k<i?'done':k===i?'cur':'')+'"></span>').join('');
+  const last = i === P.paras.length-1;
+  $('rNext').textContent = last ? 'Làm câu hỏi →' : 'Đoạn tiếp theo →';
+  const total = paraSecs(txt);
+  if (S.paraLeft == null) S.paraLeft = total;
+  const bar = $('rBar');
+  bar.style.transition='none'; bar.style.width=(S.paraLeft/total*100)+'%'; void bar.offsetWidth; bar.style.transition='width 1s linear';
+  $('rLeft').textContent = S.paraLeft;
+  paraTimer = setInterval(()=>{
+    S.paraLeft--; $('rLeft').textContent = Math.max(0,S.paraLeft);
+    bar.style.width = Math.max(0,S.paraLeft/total*100)+'%';
+    if (S.paraLeft <= 0) nextPara();
+  },1000);
+}
+function nextPara(){
+  clearInterval(paraTimer);
+  S.paraLeft = null;
+  const P = DATA[S.cur];
+  if (S.para < P.paras.length-1){ S.para++; showPara(); }
+  else { S.read[S.cur]=true; S.para=0; S.phase='q'; renderQ(); }
+  save();
+}
+
+/* ---------- question phase ---------- */
+function renderQ(){
+  clearInterval(paraTimer);
+  show('scrQ');
+  const p = S.cur, P = DATA[p], rv = S.review;
+  // passage tabs
+  $('ptabs').innerHTML = DATA.map((_,k)=>{
+    const n = S.ans.slice(k*10,k*10+10).filter(a=>a!==null).length;
+    const sub = rv ? scoreOf(k)+'/10 đúng' : (S.read[k] ? n+'/10' : 'chưa đọc');
+    return '<button class="ptab'+(k===p?' on':'')+'" data-p="'+k+'">Passage '+(k+1)+' <small>· '+sub+'</small></button>';
+  }).join('');
+  $('ptabs').querySelectorAll('.ptab').forEach(b=>b.onclick=()=>openPassage(+b.dataset.p));
+  // passage text
+  $('passage').innerHTML = '<h3>PASSAGE '+(p+1)+'</h3>' + (P.title?'<div class="ptitle">'+esc(P.title)+'</div>':'') +
+    P.paras.map((t,i)=>'<p><span class="num">'+(i+1)+'</span>'+t+'</p>').join('');
+  // questions
+  $('qlist').innerHTML = '<h3 style="margin:0 0 4px;font-size:16px;color:var(--accent)">QUESTIONS '+(p*10+1)+'–'+(p*10+10)+'</h3>' +
+    P.qs.map((q,i)=>{
+      const n = qnum(p,i), a = S.ans[n-1];
+      let mark = '';
+      if (rv) mark = a===q.key ? '<span class="mark ok">✓ Đúng</span>' : '<span class="mark no">✗ '+(a===null?'Chưa trả lời':'Sai')+' – đáp án '+L[q.key]+'</span>';
+      return '<div class="q" id="q'+n+'"><div class="stem">'+n+'. '+esc(q.q)+' <button class="goto" data-r="'+n+'">xem trong bài</button>'+mark+'</div>' +
+        (q.insert?'<div class="ins">'+esc(q.insert)+'</div>':'') +
+        q.opts.map((o,j)=>{
+          let cls = 'opt';
+          if (rv){ if (j===q.key) cls+=' right'; else if (j===a) cls+=' wrong'; }
+          else if (j===a) cls+=' on';
+          return '<button class="'+cls+'" data-n="'+n+'" data-j="'+j+'"'+(rv?' disabled':'')+'><b>'+L[j]+'</b><span>'+esc(o)+'</span></button>';
+        }).join('') + (rv && q.exp ? '<div class="exp"><b>Giải thích:</b> '+esc(q.exp)+'</div>' : '') + '</div>';
+    }).join('');
+  if (!rv) $('qlist').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const n=+b.dataset.n, j=+b.dataset.j;
+    S.ans[n-1] = S.ans[n-1]===j ? null : j;
+    b.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on', S.ans[n-1]!==null && +x.dataset.j===S.ans[n-1]));
+    renderPalette(); updateTabs(); save();
+  });
+  $('qlist').querySelectorAll('.goto').forEach(b=>b.onclick=()=>{
+    setMobile('p'); const r=$('r'+b.dataset.r); if(!r) return;
+    r.scrollIntoView({behavior:'smooth',block:'center'}); r.classList.add('flash'); setTimeout(()=>r.classList.remove('flash'),1600);
+  });
+  $('prevP').disabled = p===0;
+  $('nextP').textContent = p===3 ? (rv ? 'Về trang kết quả' : 'Nộp bài') : 'Bài tiếp theo →';
+  renderPalette();
+  $('passage').scrollTop=0; document.querySelector('.qpane').scrollTop=0;
+}
+function updateTabs(){
+  $('ptabs').querySelectorAll('.ptab').forEach((b,k)=>{
+    const n = S.ans.slice(k*10,k*10+10).filter(a=>a!==null).length;
+    b.querySelector('small').textContent = '· '+(S.read[k]? n+'/10' : 'chưa đọc');
+  });
+}
+function renderPalette(){
+  const rv = S.review;
+  $('palette').innerHTML = DATA.map((P,p)=>'<div class="grp">'+P.qs.map((q,i)=>{
+    const n=qnum(p,i), a=S.ans[n-1];
+    let cls = '';
+    if (rv) cls = a===q.key ? 'r' : 'w';
+    else if (a!==null) cls='ans';
+    if (!S.read[p] && !rv) cls+=' locked';
+    return '<button class="'+cls+'" data-n="'+n+'" title="Câu '+n+'">'+n+'</button>';
+  }).join('')+'</div>').join('');
+  $('palette').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const n=+b.dataset.n, p=(n-1)/10|0;
+    if (!S.read[p] && !S.review){ openPassage(p); return; }
+    if (p!==S.cur){ S.cur=p; renderQ(); }
+    setMobile('q');
+    const el=$('q'+n); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+}
+function setMobile(which){}
+$('rNext').onclick=()=>nextPara();
+$('prevP').onclick=()=>{ if(S.cur>0) openPassage(S.cur-1); };
+$('nextP').onclick=()=>{
+  if (S.cur<3) openPassage(S.cur+1);
+  else if (S.review) show('scrResult');
+  else askSubmit();
+};
+
+/* ---------- submit ---------- */
+function askSubmit(){
+  const blank = S.ans.filter(a=>a===null).length;
+  const unread = S.read.filter(r=>!r).length;
+  let msg = '';
+  if (unread) msg += '<p>Em còn <b>'+unread+'</b> bài đọc chưa mở.</p>';
+  msg += blank ? '<p>Em còn <b>'+blank+'</b> câu chưa trả lời. Em có chắc muốn nộp bài không?</p>' : '<p>Em đã trả lời đủ 40 câu. Nộp bài ngay?</p>';
+  $('mBody').innerHTML = msg;
+  $('modal').classList.remove('hidden');
+}
+$('mNo').onclick=()=>$('modal').classList.add('hidden');
+$('mYes').onclick=()=>{ $('modal').classList.add('hidden'); finish(false); };
+$('submitTop').onclick=()=>{ if(S && !S.done) askSubmit(); else if(S && S.done) show('scrResult'); };
+
+function scoreOf(p){ return DATA[p].qs.filter((q,i)=>S.ans[p*10+i]===q.key).length; }
+function finish(auto){
+  clearInterval(tick); clearInterval(paraTimer);
+  S.done = true; S.review = false;
+  const per = [0,1,2,3].map(scoreOf), total = per.reduce((a,b)=>a+b,0);
+  const used = Math.min(TOTAL_SEC, S.elapsed|0);
+  const hist = store.get(TEST_ID+'-history') || [];
+  hist.unshift({ name:S.name, date:new Date().toISOString(), score:total, per, time:used });
+  store.set(TEST_ID+'-history', hist.slice(0,20));
+  store.del(TEST_ID+'-state');
+  $('clock').classList.add('hidden');
+  $('submitTop').textContent = 'Kết quả';
+  $('rName').textContent = (S.name ? S.name+' · ' : '') + new Date().toLocaleString('vi-VN') + (auto ? ' · Hết giờ, bài đã tự động nộp' : '');
+  $('sBig').textContent = total;
+  $('sPct').textContent = '('+Math.round(total/40*100)+'%)';
+  $('sGrid').innerHTML = per.map((s,k)=>'<div class="stat"><div class="k">Passage '+(k+1)+'</div><div class="v">'+s+' / 10</div></div>').join('');
+  $('sTime').textContent = 'Thời gian làm bài: '+fmt(used)+' / 60:00';
+  show('scrResult');
+}
+$('btnReview').onclick=()=>{ S.review=true; S.read=[true,true,true,true]; S.cur=0; renderQ(); };
+$('btnAgain').onclick=()=>{ location.reload(); };
+
+/* ---------- start ---------- */
+function renderHistory(){
+  const h = store.get(TEST_ID+'-history') || [];
+  if (!h.length) return;
+  $('history').classList.remove('hidden');
+  $('history').innerHTML = '<b>Các lần làm trước trên máy này</b><table><tr><th>Ngày</th><th>Tên</th><th>Điểm</th><th>Thời gian</th></tr>' +
+    h.map(r=>'<tr><td>'+new Date(r.date).toLocaleDateString('vi-VN')+'</td><td>'+esc(r.name||'–')+'</td><td>'+r.score+'/40</td><td>'+fmt(r.time)+'</td></tr>').join('') + '</table>';
+}
+$('btnStart').onclick=()=>{
+  store.del(TEST_ID+'-state');
+  S = newState(); S.read=[true,true,true,true]; startClock(); openPassage(0);
+};
+const saved = store.get(TEST_ID+'-state');
+if (saved && !saved.done && saved.elapsed < TOTAL_SEC){
+  $('btnResume').classList.remove('hidden');
+  $('btnResume').textContent = 'Tiếp tục bài đang làm (còn '+fmt(TOTAL_SEC-saved.elapsed)+')';
+  $('btnResume').onclick=()=>{
+    S = saved; S.review=false; startClock();
+    if (S.phase==='read' && !S.read[S.cur]) showPara(); else { S.phase='q'; renderQ(); }
+  };
+}
+renderHistory();
+window.addEventListener('beforeunload', save);
+</script>
+</body>
+</html>
