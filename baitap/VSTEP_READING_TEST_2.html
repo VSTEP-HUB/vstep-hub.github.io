@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSTEP Reading – Test 3</title>
+<style>
+:root{
+  --bg:#f4f1ea; --paper:#fffdf8; --ink:#1f2328; --muted:#6b6f76; --line:#e2ddd2;
+  --accent:#1d5c63; --accent-2:#e7f0ef; --warn:#b4541a; --ok:#2f7d4f; --ok-bg:#e6f3ea;
+  --bad:#b3261e; --bad-bg:#fbe9e7; --sel:#dcebe9; --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+.hidden{display:none!important}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--accent);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px}
+.top h1{font-size:16px;margin:0;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clock{font-variant-numeric:tabular-nums;font-weight:700;background:rgba(255,255,255,.14);padding:4px 10px;border-radius:6px;letter-spacing:.5px}
+.clock.low{background:#f3b27a;color:#3a1d06}
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:9px 16px;border-radius:8px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.light{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:#fff;padding:5px 12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+
+/* start */
+.start{max-width:680px;margin:24px auto;padding:28px}
+.start h2{margin:0 0 4px;font-size:26px}
+.start .sub{color:var(--muted);margin:0 0 20px}
+.start ul{padding-left:20px;margin:0 0 20px}
+.start li{margin:4px 0}
+.field{display:flex;flex-direction:column;gap:6px;margin:0 0 18px}
+.field input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.history{margin-top:22px;border-top:1px solid var(--line);padding-top:14px;font-size:14px}
+.history table{width:100%;border-collapse:collapse}
+.history td,.history th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+.history th{color:var(--muted);font-weight:600}
+
+/* reading phase */
+.reader{max-width:780px;margin:12px auto;padding:28px 30px}
+.reader .meta{display:flex;justify-content:space-between;align-items:baseline;gap:12px;color:var(--muted);font-size:14px;margin-bottom:6px}
+.reader h2{margin:0 0 4px;font-size:20px}
+.reader .ptitle{font-weight:700;text-align:center;margin:10px 0 0}
+.pbar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin:14px 0 20px}
+.pbar i{display:block;height:100%;background:var(--accent);width:100%;transition:width 1s linear}
+.para-now{font-size:18px;line-height:1.75;text-align:justify;min-height:180px}
+.para-now .num{display:inline-block;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-2);border-radius:4px;padding:0 6px;margin-right:6px;vertical-align:2px}
+.dots{display:flex;gap:6px;justify-content:center;margin:18px 0 6px}
+.dots span{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dots span.done{background:var(--accent)}
+.dots span.cur{background:var(--warn)}
+.reader .actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:12px}
+.reader .hint{font-size:13px;color:var(--muted)}
+
+/* question phase */
+.ptabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ptab{border:1px solid var(--line);background:var(--paper);padding:7px 14px;border-radius:999px;font-size:14px}
+.ptab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.ptab small{opacity:.75}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.pane{padding:20px 22px}
+.passage{position:sticky;top:64px;max-height:calc(100vh - 84px);overflow:auto}
+.passage h3{margin:0 0 10px;font-size:16px;color:var(--accent)}
+.passage .ptitle{font-weight:700;text-align:center;margin:0 0 10px}
+.passage p{text-align:justify;margin:0 0 12px}
+.passage p .num{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-2);border-radius:4px;padding:0 5px;margin-right:6px}
+.q{padding:14px 0;border-bottom:1px solid var(--line)}
+.q:last-child{border-bottom:0}
+.q .stem{font-weight:600;margin-bottom:8px}
+.q .ins{font-style:italic;background:#f6f3ea;border-left:3px solid var(--warn);padding:8px 12px;margin:0 0 10px;border-radius:0 6px 6px 0}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;color:var(--ink)}
+.opt:hover{border-color:var(--accent)}
+.opt b{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:13px}
+.opt.on{background:var(--sel);border-color:var(--accent)}
+.opt.on b{background:var(--accent);border-color:var(--accent);color:#fff}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)}
+.opt.right b{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.opt.wrong b{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt[disabled]{cursor:default}
+.mark{font-size:13px;font-weight:700;margin-left:8px}
+.mark.ok{color:var(--ok)} .mark.no{color:var(--bad)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.palette{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;padding:14px;}
+.palette .grp{display:flex;gap:4px;flex-wrap:wrap;margin-right:10px}
+.palette button{width:32px;height:30px;border-radius:6px;border:1px solid var(--line);background:#fff;font-size:13px;padding:0}
+.palette button.ans{background:var(--accent);color:#fff;border-color:var(--accent)}
+.palette button.r{background:var(--ok);border-color:var(--ok);color:#fff}
+.palette button.w{background:var(--bad);border-color:var(--bad);color:#fff}
+.palette button.locked{opacity:.4}
+.mtabs{display:none}
+
+/* result */
+.result{max-width:780px;margin:12px auto;padding:28px}
+.score{display:flex;align-items:baseline;gap:10px;margin:6px 0 16px}
+.score .big{font-size:48px;font-weight:800;color:var(--accent);line-height:1}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 20px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+.stat .k{font-size:13px;color:var(--muted)}
+.stat .v{font-size:20px;font-weight:700}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(20,24,28,.45);display:grid;place-items:center;z-index:50;padding:16px}
+.modal .box{background:var(--paper);border-radius:12px;max-width:420px;width:100%;padding:22px;box-shadow:var(--shadow)}
+.modal h3{margin:0 0 8px}
+.modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+@media (max-width:860px){
+  .split{grid-template-columns:1fr}
+  .passage{position:static;max-height:none}
+  .mtabs{display:flex;gap:8px;margin-bottom:12px}
+  .mtabs button{flex:1}
+  .split.show-q .passage{display:none}
+  .split.show-p .qpane{display:none}
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .reader{padding:22px 18px}
+  .para-now{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>VSTEP Reading – Test 3</h1>
+  <span id="clock" class="clock hidden">60:00</span>
+  <button id="submitTop" class="btn light hidden">Nộp bài</button>
+</div>
+
+<div class="wrap">
+  <!-- START -->
+  <section id="scrStart" class="card start">
+    <h2>Reading Test 3</h2>
+    <p class="sub">4 bài đọc · 40 câu hỏi · 60 phút</p>
+    <ul>
+      <li>Mỗi bài đọc được hiển thị <b>từng đoạn một</b>, mỗi đoạn có thời gian đọc riêng. Hết giờ, đoạn tiếp theo tự hiện ra; em cũng có thể bấm <b>“Đoạn tiếp theo”</b> nếu đã đọc xong.</li>
+      <li>Đọc hết các đoạn, em sẽ làm 10 câu hỏi của bài đó. Lúc này toàn bộ bài đọc hiển thị bên cạnh câu hỏi, các đoạn có đánh số [1], [2]…</li>
+      <li>Đồng hồ 60 phút tính cho cả bài thi. Hết giờ, bài sẽ tự động nộp.</li>
+      <li>Kết quả chỉ được lưu trên thiết bị của em.</li>
+    </ul>
+    <div class="field">
+      <label for="name">Họ và tên (không bắt buộc)</label>
+      <input id="name" autocomplete="name" placeholder="Nguyễn Văn A">
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="btnStart" class="btn primary">Bắt đầu làm bài</button>
+      <button id="btnResume" class="btn hidden">Tiếp tục bài đang làm</button>
+    </div>
+    <div id="history" class="history hidden"></div>
+  </section>
+
+  <!-- READING -->
+  <section id="scrRead" class="card reader hidden">
+    <div class="meta"><span id="rPassage">Passage 1</span><span id="rStep">Đoạn 1/4</span></div>
+    <h2 id="rHead">PASSAGE 1 – QUESTIONS 1–10</h2>
+    <div id="rTitle" class="ptitle"></div>
+    <div class="pbar"><i id="rBar"></i></div>
+    <div id="rPara" class="para-now"></div>
+    <div id="rDots" class="dots"></div>
+    <div class="actions">
+      <span class="hint">Thời gian còn lại cho đoạn này: <b id="rLeft">0</b> giây</span>
+      <button id="rNext" class="btn primary">Đoạn tiếp theo →</button>
+    </div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <section id="scrQ" class="hidden">
+    <div id="ptabs" class="ptabs"></div>
+    <div class="mtabs"><button id="mtP" class="btn">Bài đọc</button><button id="mtQ" class="btn primary">Câu hỏi</button></div>
+    <div id="split" class="split show-q">
+      <div id="passage" class="card pane passage"></div>
+      <div class="qpane">
+        <div id="qlist" class="card pane"></div>
+        <div class="nav">
+          <button id="prevP" class="btn">← Bài trước</button>
+          <button id="nextP" class="btn primary">Bài tiếp theo →</button>
+        </div>
+      </div>
+    </div>
+    <div id="palette" class="card palette"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="scrResult" class="card result hidden">
+    <h2 style="margin:0">Kết quả</h2>
+    <div id="rName" style="color:var(--muted)"></div>
+    <div class="score"><span id="sBig" class="big">0</span><span>/ 40 câu đúng</span><span id="sPct" style="color:var(--muted)"></span></div>
+    <div id="sGrid" class="grid4"></div>
+    <div id="sTime" style="color:var(--muted);margin-bottom:18px"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="btnReview" class="btn primary">Xem lại bài và đáp án</button>
+      <button id="btnAgain" class="btn">Làm lại từ đầu</button>
+    </div>
+  </section>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="box">
+    <h3 id="mTitle">Nộp bài?</h3>
+    <div id="mBody"></div>
+    <div class="row"><button id="mNo" class="btn">Làm tiếp</button><button id="mYes" class="btn primary">Nộp bài</button></div>
+  </div>
+</div>
+
+<script>
+const DATA = [{"title": "The Benefits of Learning a Second Language", "paras": ["In an increasingly connected world, the ability to speak more than one language has become a valuable skill. Millions of people now study a second language, not only at school but also through evening classes, mobile apps and online tutors. While many begin for practical reasons, such as finding a better job, they often discover that the benefits go far beyond the workplace.", "From a career point of view, bilingual employees are in high demand. Companies that trade internationally need staff who can communicate with clients and partners in their own language. Moreover, job seekers who speak a second language often have access to a wider range of positions and, in some industries, may earn higher salaries than their monolingual colleagues.", "Learning a language also appears to benefit the brain. Studies suggest that bilingual people are often better at switching between tasks and ignoring distractions, because they constantly manage two language systems. Some researchers even believe that speaking two languages may help delay memory problems in old age, although this claim is still being investigated.", "Of course, the process is not effortless. Adults in particular may find it hard to master new sounds and grammar, and many learners give up when progress feels slow. Lack of time and limited opportunities to practise with native speakers are common obstacles. Experts recommend setting realistic goals and practising a little every day rather than studying for long hours once a week.", "Perhaps the greatest reward, however, is cultural. Speaking another language allows people to understand jokes, films and traditions that are often lost in translation. It opens doors to new friendships and helps learners see the world from a different perspective."], "qs": [{"q": "According to paragraph 1, why do many people begin learning a second language?", "insert": null, "opts": ["For practical reasons, such as finding a better job", "To travel abroad on holiday", "Because it is required at school", "To make friends online"], "key": 0}, {"q": "The word “monolingual” in paragraph 2 is closest in meaning to ________.", "insert": null, "opts": ["speaking many languages", "working in only one country", "having little experience", "speaking only one language"], "key": 3}, {"q": "Which of the following is NOT mentioned as a career benefit of speaking a second language?", "insert": null, "opts": ["Communicating with international clients", "Access to a wider range of jobs", "Possibly higher salaries", "Shorter working hours"], "key": 3}, {"q": "The word “Moreover” in paragraph 2 can best be replaced by ________.", "insert": null, "opts": ["Furthermore", "However", "Instead", "As a result"], "key": 0}, {"q": "According to paragraph 3, why might bilingual people be better at switching between tasks?", "insert": null, "opts": ["They study harder than other people.", "They have more free time.", "They constantly manage two language systems.", "They are born with better memories."], "key": 2}, {"q": "The word “effortless” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["quick", "easy", "expensive", "boring"], "key": 1}, {"q": "The phrase “lost in translation” in paragraph 5 refers to ________.", "insert": null, "opts": ["books that cannot be found in libraries", "people who get lost in foreign countries", "mistakes made by professional translators", "meanings that disappear when something is put into another language"], "key": 3}, {"q": "What do experts recommend for language learners?", "insert": null, "opts": ["Studying for long hours once a week", "Living abroad for several years", "Practising a little every day", "Avoiding native speakers until they are fluent"], "key": 2}, {"q": "The main purpose of this passage is to ________.", "insert": null, "opts": ["compare different methods of teaching languages.", "outline the advantages and challenges of learning a second language.", "argue that adults cannot learn languages well.", "describe the history of bilingual education."], "key": 1}, {"q": "The word “It” in paragraph 5 refers to ________.", "insert": null, "opts": ["speaking another language", "culture", "translation", "a different perspective"], "key": 0}]}, {"title": "", "paras": ["When Daniel Morris opened his small noodle restaurant five years ago, almost all of his customers ate at one of its twelve tables. Today, more than half of his orders arrive through a smartphone screen and leave the kitchen in the hands of a delivery rider. His experience reflects a revolution in the way people eat, driven by food delivery apps that promise almost any meal at the touch of a button. [A]", "“At first, it felt like a gift,” Mr Morris said. “Suddenly people on the other side of the city could find us. We were cooking more meals than ever before.”", "The first shock for many restaurant owners, however, is the cost. Delivery platforms typically charge restaurants a commission of between 15 and 35 per cent on every order, and some charge extra for better visibility within the app. For a business whose profit margin may be less than 10 per cent, these fees can wipe out the profit on a meal entirely. [B]", "Mr Morris said that when he first calculated how much he was paying the platforms, he was so alarmed that “I seriously thought about deleting the app and going back to the old way of doing things.”", "Instead, like many owners, he adapted. He raised his prices on the app, created a smaller delivery menu of dishes that travel well, and began encouraging regular customers to order directly by phone. “If you rely on the apps for everything, you are working for them, not for yourself,” he said.", "The thousands of restaurants that have joined delivery platforms in recent years are discovering that success online demands a different set of skills from running a dining room. [C]", "The second shock is how much control the apps have over a restaurant’s reputation. Customers rate the whole experience, so a meal that arrives cold because a rider was delayed can still earn the restaurant a one-star review. Owners also complain that they rarely receive customers’ contact details, which makes it hard to build loyalty.", "[D] Meanwhile, the industry itself is changing. A growing number of food businesses never welcome customers at all. These “dark kitchens” operate from industrial units and cook only for delivery, sometimes producing food for several different brands from a single kitchen. According to one industry report, sales from dark kitchens in some large cities have more than doubled in recent years, putting extra pressure on traditional restaurants.", "Those that survive tend to treat the apps as one tool among many rather than as their entire business. Some have joined together to create local delivery services that charge lower fees, while others have invested in their own websites and loyalty schemes."], "qs": [{"q": "Which of the following would be the best title for this article?", "insert": null, "opts": ["How to Open a Successful Noodle Restaurant", "Why Customers Prefer Eating at Home", "Dark Kitchens Replace Traditional Restaurants", "Delivery Apps – A Mixed Blessing for Restaurants"], "key": 3}, {"q": "According to the passage, how much commission do delivery platforms typically charge restaurants?", "insert": null, "opts": ["Less than 10 per cent of each order", "More than half of each order", "Between 15 and 35 per cent of each order", "A fixed fee every month"], "key": 2}, {"q": "Which of the following words can best replace the word “alarmed” in paragraph 4?", "insert": null, "opts": ["Worried", "Excited", "Relieved", "Bored"], "key": 0}, {"q": "Which of the following is NOT mentioned as a way Mr Morris adapted to the cost of the apps?", "insert": null, "opts": ["Raising his prices on the app", "Hiring his own delivery riders", "Creating a smaller delivery menu", "Encouraging customers to order by phone"], "key": 1}, {"q": "According to Mr Morris, what is the danger of relying completely on delivery apps?", "insert": null, "opts": ["Customers will stop visiting the dining room.", "The quality of the food will decline.", "The restaurant ends up working for the apps rather than for itself.", "Riders will demand higher wages."], "key": 2}, {"q": "Which of the following best describes Mr Morris’s feelings about delivery apps when he first started using them?", "insert": null, "opts": ["Delighted", "Suspicious", "Indifferent", "Disappointed"], "key": 0}, {"q": "In which space (marked A, B, C and D in the passage) will the following sentence fit?", "insert": "For many small businesses, this means selling more meals while earning less money.", "opts": ["A", "B", "C", "D"], "key": 1}, {"q": "Why did the writer mention the industry report on dark kitchens?", "insert": null, "opts": ["To prove that dark kitchens produce better food than restaurants", "To suggest that traditional restaurants will disappear very soon", "To explain how dark kitchens are designed and organised", "To show that delivery-only kitchens are growing quickly and challenging traditional restaurants"], "key": 3}, {"q": "What does the word “Those” in paragraph 9 refer to?", "insert": null, "opts": ["Delivery apps", "Dark kitchens", "Customers", "Traditional restaurants"], "key": 3}, {"q": "Which of the following sentences would best complete the last paragraph?", "insert": null, "opts": ["So you had better close your restaurant and open a dark kitchen instead.", "For them, the lesson is clear: the apps can bring in new customers, but they should never be the only way customers reach the kitchen.", "On top of that, most customers prefer food that has been cooked at home.", "Most delivery riders work long hours for relatively low pay."], "key": 1}]}, {"title": "", "paras": ["The trader lifted the plastic-wrapped bale onto her table and cut it open with a knife. “Every bale is a gamble,” she told me, as she pulled out a stained shirt, a pair of torn jeans and a jacket with a broken zip. “When I started twenty years ago, almost everything was good. Now I am lucky if half of it can be sold.” Around us, in one of the largest second-hand clothing markets in West Africa, thousands of traders were opening similar bales shipped from Europe, North America and Asia. What could not be sold, I later learned, would end up in a landfill, a river or on a nearby beach.", "The clothes in that bale tell a story that goes far beyond one market. Global clothing production roughly doubled in the first fifteen years of this century, while the number of times a garment is worn before being thrown away fell sharply. One frequently quoted estimate suggests that the equivalent of a rubbish truck full of textiles is burned or buried somewhere in the world every second. Much of the clothing collected for recycling in wealthy countries is in fact exported, and a growing share of it is of such poor quality that it can never be worn again.", "This is the logic of fast fashion: new styles reach shops every few weeks, prices are kept low, and customers are encouraged to see clothing as almost disposable. [A] The environmental cost is considerable. Producing a single pair of jeans can require thousands of litres of water, and many synthetic fabrics are made from oil and shed tiny fibres every time they are washed. Because these costs are rarely visible in the shop, most shoppers do not connect a cheap T-shirt with a polluted river on the other side of the world. [B] Brands, for their part, often point to the recycling bins in their stores, even though only a tiny fraction of old clothing is actually turned into new garments.", "Some governments have begun to intervene. France has banned companies from destroying unsold clothing, and the European Union has agreed on rules that will stop large companies from doing the same and require producers to help pay for the collection and recycling of textiles. Supporters argue that such policies will push brands to make clothes that last longer and are easier to repair. Critics, however, warn that the rules will be difficult to enforce, particularly for online sellers based outside Europe, and that higher costs may simply be passed on to consumers. “Laws can change what companies are allowed to do,” one European environmental adviser told me, “but they cannot change what people want to buy.” [C]", "That may be the real challenge. Second-hand shopping, clothing rental and repair services are growing in popularity, especially among younger consumers, yet the same generation is also among the most enthusiastic buyers of ultra-cheap online fashion. [D] Until buying less becomes as attractive as buying new, the bales will keep arriving, and traders like the woman I met will keep cutting them open, hoping to find something worth selling."], "qs": [{"q": "In paragraph 1, what does the trader mean by saying, “Every bale is a gamble”?", "insert": null, "opts": ["She enjoys taking risks in her business.", "She often loses money playing games of chance.", "The bales are sold at extremely high prices.", "She cannot know in advance how much of the clothing can be sold."], "key": 3}, {"q": "What is the author’s purpose when describing the scene at the market?", "insert": null, "opts": ["To encourage readers to shop at second-hand markets", "To describe the daily life of traders in West Africa", "To introduce the problem of clothing waste through a real example", "To criticise the traders for selling damaged clothes"], "key": 2}, {"q": "What is “disposable” in paragraph 3 closest in meaning to?", "insert": null, "opts": ["Easy to wash", "Available everywhere", "Intended to be thrown away after use", "Highly fashionable"], "key": 2}, {"q": "What is the main idea of paragraph 3?", "insert": null, "opts": ["Fast fashion has hidden environmental costs that shoppers and brands largely ignore.", "Jeans require more water to produce than any other garment.", "Recycling bins in stores have solved the problem of clothing waste.", "New clothing styles reach shops every few weeks."], "key": 0}, {"q": "What does “such policies” in paragraph 4 refer to?", "insert": null, "opts": ["Recycling bins placed in clothing stores", "Second-hand clothing markets in West Africa", "Clothing rental and repair services", "Rules against destroying unsold clothing and making producers pay for recycling"], "key": 3}, {"q": "In which space (marked A, B, C and D in the passage) will the following sentence fit?", "insert": "Out of sight, it seems, really is out of mind.", "opts": ["A", "B", "C", "D"], "key": 1}, {"q": "According to paragraph 4, the author’s attitude toward government intervention can be best described as", "insert": null, "opts": ["hostile", "enthusiastic", "balanced", "uninterested"], "key": 2}, {"q": "What can the word “intervene” in paragraph 4 be best replaced by?", "insert": null, "opts": ["take action", "give up", "make money", "stay silent"], "key": 0}, {"q": "Which of the following best describes the tone of the author in this passage?", "insert": null, "opts": ["humorous", "indifferent", "optimistic", "critical"], "key": 3}, {"q": "Which of the following could best describe the message that the author wants to pass to readers?", "insert": null, "opts": ["Second-hand markets should stop importing used clothing.", "Reducing clothing waste depends not only on laws but also on changing consumer habits.", "Synthetic fabrics should be banned by all governments.", "Young people are solely responsible for the rise of fast fashion."], "key": 1}]}, {"title": "", "paras": ["Humans spend roughly a third of their lives asleep, and almost every animal that has been studied, from fruit flies to whales, sleeps in some form. Even certain jellyfish, which have no brain at all, show regular periods of reduced activity that closely resemble sleep. A behaviour so widespread must surely serve an important purpose, yet scientists are still debating exactly what that purpose is.", "The oldest explanation is that sleep simply saves energy. By resting during the hours when food is hard to find and predators are active, animals conserve resources. However, the energy saved is surprisingly small; a night’s sleep saves a person only about as many calories as are contained in a slice of bread. Critics also point out that sleep leaves animals defenceless, a heavy price to pay for so modest a gain. Besides, animals that truly need to save energy already have more effective strategies, such as hibernation, which suggests that ordinary sleep must be doing something more.", "A second theory focuses on repair. During sleep, the body releases growth hormones and produces proteins that help to heal damaged tissues. Recent research has added a striking detail: in the sleeping brain, the spaces between cells appear to widen, allowing fluid to flush away waste products that build up during waking hours. Some of these substances have been linked to diseases that affect memory in later life.", "Many researchers, though, believe that the most important work of sleep concerns memory and learning. In experiments, people who sleep after learning a new task generally perform better the next day than those who stay awake. During sleep, the brain seems to replay the day’s experiences, strengthening some connections between nerve cells and weakening others. Recordings from the brains of sleeping rats have even revealed patterns of activity that match the activity recorded while the animals were learning a route earlier in the day.", "“Think of the brain as a garden,” said Dr. Sophie Lindqvist, a neuroscientist who studies sleep. “During the day, everything grows wildly. At night, the brain does the pruning, so that what matters can flourish and what doesn’t is cut back.”", "Not all scientists accept that sleep has a single main function. Some suggest that sleep began as a way of keeping animals still and safe at times when activity was dangerous, and that other functions, such as memory processing and repair, were added over millions of years of evolution simply because the brain was already offline and could use the time.", "Lindqvist is sympathetic to this view. “Asking what sleep is for may be like asking what the daytime is for,” she said. “Once sleep existed, the body found many useful things to do with it. The question is not which theory is correct, but how all these processes fit together.” Answering that question, she believes, will require scientists from very different fields to work together."], "qs": [{"q": "The word “those” in paragraph 4 refers to", "insert": null, "opts": ["experiments", "people", "tasks", "connections"], "key": 1}, {"q": "According to the passage, how much energy does a night’s sleep save a person?", "insert": null, "opts": ["About a third of the energy used each day", "Around half of the calories eaten each day", "About as much as a slice of bread contains", "No energy at all"], "key": 2}, {"q": "The phrase “flush away” in paragraph 3 is closest in meaning to", "insert": null, "opts": ["build up", "slow down", "break into", "wash out"], "key": 3}, {"q": "According to the passage, what is NOT true about the repair theory?", "insert": null, "opts": ["Waste products in the brain build up mainly while we sleep.", "The body releases growth hormones during sleep.", "The spaces between brain cells appear to widen during sleep.", "Some waste substances have been linked to memory diseases."], "key": 0}, {"q": "What does Dr. Lindqvist mean when she says, “At night, the brain does the pruning”?", "insert": null, "opts": ["During sleep, the brain cuts back less useful connections so that important ones can grow.", "The brain stops growing completely at night.", "Gardening in the evening helps people sleep better.", "The brain creates a large number of new memories during sleep."], "key": 0}, {"q": "Which of the following statements would supporters of the energy theory most probably agree with?", "insert": null, "opts": ["The main purpose of sleep is to strengthen memories.", "Resting when food is scarce helps animals conserve resources.", "Sleep exposes animals to danger without offering any benefit.", "Sleep first developed as a way of cleaning the brain."], "key": 1}, {"q": "According to the passage, which is most likely supported by Dr. Lindqvist?", "insert": null, "opts": ["Saving energy is the only real purpose of sleep.", "Sleep has no real biological purpose.", "Sleep probably serves several functions that developed over time.", "The memory theory has been proved wrong."], "key": 2}, {"q": "Which of the following is NOT mentioned as a possible function of sleep?", "insert": null, "opts": ["Saving energy", "Repairing tissues", "Processing memories", "Controlling body temperature"], "key": 3}, {"q": "Which of the following conclusions can be drawn from this passage?", "insert": null, "opts": ["Animals without brains do not really sleep.", "Sleep seems to serve many purposes, and scientists have not agreed on a single main function.", "The memory theory of sleep is now accepted by all scientists.", "Humans need more sleep than any other animal."], "key": 1}, {"q": "Which of the following best describes the organization of this passage?", "insert": null, "opts": ["A puzzle is introduced, several theories are examined, and a broader view is offered.", "One theory is described in detail and then rejected.", "A list of sleep problems is followed by possible treatments.", "Sleep in humans and animals is compared, followed by a conclusion about evolution."], "key": 0}]}];
+const TEST_ID = 'vstep-reading-test-3';
+const TOTAL_SEC = 60*60;
+const WPM = 150;              // reading speed used for paragraph timers
+const MIN_PARA = 20, MAX_PARA = 90;
+const L = 'ABCD';
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+let S = null;           // state
+let tick = null, paraTimer = null;
+
+function words(t){ return t.trim().split(/\s+/).length; }
+function paraSecs(t){ return Math.min(MAX_PARA, Math.max(MIN_PARA, Math.ceil(words(t)/WPM*60/5)*5)); }
+function fmt(s){ s=Math.max(0,s|0); return String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function qnum(p,i){ return p*10+i+1; }
+function show(id){ ['scrStart','scrRead','scrQ','scrResult'].forEach(x=>$(x).classList.toggle('hidden',x!==id)); window.scrollTo(0,0); }
+
+function newState(){
+  return { name: $('name').value.trim(), start: Date.now(), elapsed: 0,
+           ans: Array(40).fill(null), read: [false,false,false,false],
+           cur: 0, phase: 'read', para: 0, paraLeft: null, done: false, review: false };
+}
+function save(){ if(S && !S.done) store.set(TEST_ID+'-state', S); }
+
+/* ---------- global clock ---------- */
+function startClock(){
+  $('clock').classList.remove('hidden'); $('submitTop').classList.remove('hidden');
+  clearInterval(tick);
+  let last = Date.now();
+  tick = setInterval(()=>{
+    const now = Date.now(); S.elapsed += (now-last)/1000; last = now;
+    const left = TOTAL_SEC - S.elapsed;
+    $('clock').textContent = fmt(left);
+    $('clock').classList.toggle('low', left <= 300);
+    if (left <= 0){ finish(true); }
+    else if ((S.elapsed|0) % 5 === 0) save();
+  }, 1000);
+  $('clock').textContent = fmt(TOTAL_SEC - S.elapsed);
+}
+
+/* ---------- reading phase ---------- */
+function openPassage(p){
+  S.cur = p;
+  if (!S.read[p]){ S.phase='read'; if(S.paraLeft==null){ S.para=0; } showPara(); }
+  else { S.phase='q'; renderQ(); }
+  save();
+}
+function showPara(){
+  clearInterval(paraTimer);
+  const P = DATA[S.cur], i = S.para, txt = P.paras[i];
+  show('scrRead');
+  $('rPassage').textContent = 'Passage '+(S.cur+1)+' / 4';
+  $('rStep').textContent = 'Đoạn '+(i+1)+' / '+P.paras.length;
+  $('rHead').textContent = 'PASSAGE '+(S.cur+1)+' – QUESTIONS '+(S.cur*10+1)+'–'+(S.cur*10+10);
+  $('rTitle').textContent = P.title || '';
+  $('rTitle').classList.toggle('hidden', !P.title);
+  $('rPara').innerHTML = '<span class="num">'+(i+1)+'</span>'+esc(txt);
+  $('rDots').innerHTML = P.paras.map((_,k)=>'<span class="'+(k<i?'done':k===i?'cur':'')+'"></span>').join('');
+  const last = i === P.paras.length-1;
+  $('rNext').textContent = last ? 'Làm câu hỏi →' : 'Đoạn tiếp theo →';
+  const total = paraSecs(txt);
+  if (S.paraLeft == null) S.paraLeft = total;
+  const bar = $('rBar');
+  bar.style.transition='none'; bar.style.width=(S.paraLeft/total*100)+'%'; void bar.offsetWidth; bar.style.transition='width 1s linear';
+  $('rLeft').textContent = S.paraLeft;
+  paraTimer = setInterval(()=>{
+    S.paraLeft--; $('rLeft').textContent = Math.max(0,S.paraLeft);
+    bar.style.width = Math.max(0,S.paraLeft/total*100)+'%';
+    if (S.paraLeft <= 0) nextPara();
+  },1000);
+}
+function nextPara(){
+  clearInterval(paraTimer);
+  S.paraLeft = null;
+  const P = DATA[S.cur];
+  if (S.para < P.paras.length-1){ S.para++; showPara(); }
+  else { S.read[S.cur]=true; S.para=0; S.phase='q'; renderQ(); }
+  save();
+}
+
+/* ---------- question phase ---------- */
+function renderQ(){
+  clearInterval(paraTimer);
+  show('scrQ');
+  const p = S.cur, P = DATA[p], rv = S.review;
+  // passage tabs
+  $('ptabs').innerHTML = DATA.map((_,k)=>{
+    const n = S.ans.slice(k*10,k*10+10).filter(a=>a!==null).length;
+    const sub = rv ? scoreOf(k)+'/10 đúng' : (S.read[k] ? n+'/10' : 'chưa đọc');
+    return '<button class="ptab'+(k===p?' on':'')+'" data-p="'+k+'">Passage '+(k+1)+' <small>· '+sub+'</small></button>';
+  }).join('');
+  $('ptabs').querySelectorAll('.ptab').forEach(b=>b.onclick=()=>openPassage(+b.dataset.p));
+  // passage text
+  $('passage').innerHTML = '<h3>PASSAGE '+(p+1)+'</h3>' + (P.title?'<div class="ptitle">'+esc(P.title)+'</div>':'') +
+    P.paras.map((t,i)=>'<p><span class="num">'+(i+1)+'</span>'+esc(t)+'</p>').join('');
+  // questions
+  $('qlist').innerHTML = '<h3 style="margin:0 0 4px;font-size:16px;color:var(--accent)">QUESTIONS '+(p*10+1)+'–'+(p*10+10)+'</h3>' +
+    P.qs.map((q,i)=>{
+      const n = qnum(p,i), a = S.ans[n-1];
+      let mark = '';
+      if (rv) mark = a===q.key ? '<span class="mark ok">✓ Đúng</span>' : '<span class="mark no">✗ '+(a===null?'Chưa trả lời':'Sai')+' – đáp án '+L[q.key]+'</span>';
+      return '<div class="q" id="q'+n+'"><div class="stem">'+n+'. '+esc(q.q)+mark+'</div>' +
+        (q.insert?'<div class="ins">'+esc(q.insert)+'</div>':'') +
+        q.opts.map((o,j)=>{
+          let cls = 'opt';
+          if (rv){ if (j===q.key) cls+=' right'; else if (j===a) cls+=' wrong'; }
+          else if (j===a) cls+=' on';
+          return '<button class="'+cls+'" data-n="'+n+'" data-j="'+j+'"'+(rv?' disabled':'')+'><b>'+L[j]+'</b><span>'+esc(o)+'</span></button>';
+        }).join('') + '</div>';
+    }).join('');
+  if (!rv) $('qlist').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const n=+b.dataset.n, j=+b.dataset.j;
+    S.ans[n-1] = S.ans[n-1]===j ? null : j;
+    b.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on', S.ans[n-1]!==null && +x.dataset.j===S.ans[n-1]));
+    renderPalette(); updateTabs(); save();
+  });
+  $('prevP').disabled = p===0;
+  $('nextP').textContent = p===3 ? (rv ? 'Về trang kết quả' : 'Nộp bài') : 'Bài tiếp theo →';
+  renderPalette();
+  setMobile('q');
+}
+function updateTabs(){
+  $('ptabs').querySelectorAll('.ptab').forEach((b,k)=>{
+    const n = S.ans.slice(k*10,k*10+10).filter(a=>a!==null).length;
+    b.querySelector('small').textContent = '· '+(S.read[k]? n+'/10' : 'chưa đọc');
+  });
+}
+function renderPalette(){
+  const rv = S.review;
+  $('palette').innerHTML = DATA.map((P,p)=>'<div class="grp">'+P.qs.map((q,i)=>{
+    const n=qnum(p,i), a=S.ans[n-1];
+    let cls = '';
+    if (rv) cls = a===q.key ? 'r' : 'w';
+    else if (a!==null) cls='ans';
+    if (!S.read[p] && !rv) cls+=' locked';
+    return '<button class="'+cls+'" data-n="'+n+'" title="Câu '+n+'">'+n+'</button>';
+  }).join('')+'</div>').join('');
+  $('palette').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const n=+b.dataset.n, p=(n-1)/10|0;
+    if (!S.read[p] && !S.review){ openPassage(p); return; }
+    if (p!==S.cur){ S.cur=p; renderQ(); }
+    setMobile('q');
+    const el=$('q'+n); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+}
+function setMobile(which){
+  $('split').className = 'split show-'+which;
+  $('mtP').className = 'btn'+(which==='p'?' primary':'');
+  $('mtQ').className = 'btn'+(which==='q'?' primary':'');
+}
+$('rNext').onclick=()=>nextPara();
+$('mtP').onclick=()=>setMobile('p');
+$('mtQ').onclick=()=>setMobile('q');
+$('prevP').onclick=()=>{ if(S.cur>0) openPassage(S.cur-1); };
+$('nextP').onclick=()=>{
+  if (S.cur<3) openPassage(S.cur+1);
+  else if (S.review) show('scrResult');
+  else askSubmit();
+};
+
+/* ---------- submit ---------- */
+function askSubmit(){
+  const blank = S.ans.filter(a=>a===null).length;
+  const unread = S.read.filter(r=>!r).length;
+  let msg = '';
+  if (unread) msg += '<p>Em còn <b>'+unread+'</b> bài đọc chưa mở.</p>';
+  msg += blank ? '<p>Em còn <b>'+blank+'</b> câu chưa trả lời. Em có chắc muốn nộp bài không?</p>' : '<p>Em đã trả lời đủ 40 câu. Nộp bài ngay?</p>';
+  $('mBody').innerHTML = msg;
+  $('modal').classList.remove('hidden');
+}
+$('mNo').onclick=()=>$('modal').classList.add('hidden');
+$('mYes').onclick=()=>{ $('modal').classList.add('hidden'); finish(false); };
+$('submitTop').onclick=()=>{ if(S && !S.done) askSubmit(); else if(S && S.done) show('scrResult'); };
+
+function scoreOf(p){ return DATA[p].qs.filter((q,i)=>S.ans[p*10+i]===q.key).length; }
+function finish(auto){
+  clearInterval(tick); clearInterval(paraTimer);
+  S.done = true; S.review = false;
+  const per = [0,1,2,3].map(scoreOf), total = per.reduce((a,b)=>a+b,0);
+  const used = Math.min(TOTAL_SEC, S.elapsed|0);
+  const hist = store.get(TEST_ID+'-history') || [];
+  hist.unshift({ name:S.name, date:new Date().toISOString(), score:total, per, time:used });
+  store.set(TEST_ID+'-history', hist.slice(0,20));
+  store.del(TEST_ID+'-state');
+  $('clock').classList.add('hidden');
+  $('submitTop').textContent = 'Kết quả';
+  $('rName').textContent = (S.name ? S.name+' · ' : '') + new Date().toLocaleString('vi-VN') + (auto ? ' · Hết giờ, bài đã tự động nộp' : '');
+  $('sBig').textContent = total;
+  $('sPct').textContent = '('+Math.round(total/40*100)+'%)';
+  $('sGrid').innerHTML = per.map((s,k)=>'<div class="stat"><div class="k">Passage '+(k+1)+'</div><div class="v">'+s+' / 10</div></div>').join('');
+  $('sTime').textContent = 'Thời gian làm bài: '+fmt(used)+' / 60:00';
+  show('scrResult');
+}
+$('btnReview').onclick=()=>{ S.review=true; S.read=[true,true,true,true]; S.cur=0; renderQ(); };
+$('btnAgain').onclick=()=>{ location.reload(); };
+
+/* ---------- start ---------- */
+function renderHistory(){
+  const h = store.get(TEST_ID+'-history') || [];
+  if (!h.length) return;
+  $('history').classList.remove('hidden');
+  $('history').innerHTML = '<b>Các lần làm trước trên máy này</b><table><tr><th>Ngày</th><th>Tên</th><th>Điểm</th><th>Thời gian</th></tr>' +
+    h.map(r=>'<tr><td>'+new Date(r.date).toLocaleDateString('vi-VN')+'</td><td>'+esc(r.name||'–')+'</td><td>'+r.score+'/40</td><td>'+fmt(r.time)+'</td></tr>').join('') + '</table>';
+}
+$('btnStart').onclick=()=>{
+  store.del(TEST_ID+'-state');
+  S = newState(); startClock(); openPassage(0);
+};
+const saved = store.get(TEST_ID+'-state');
+if (saved && !saved.done && saved.elapsed < TOTAL_SEC){
+  $('btnResume').classList.remove('hidden');
+  $('btnResume').textContent = 'Tiếp tục bài đang làm (còn '+fmt(TOTAL_SEC-saved.elapsed)+')';
+  $('btnResume').onclick=()=>{
+    S = saved; S.review=false; startClock();
+    if (S.phase==='read' && !S.read[S.cur]) showPara(); else { S.phase='q'; renderQ(); }
+  };
+}
+renderHistory();
+window.addEventListener('beforeunload', save);
+</script>
+</body>
+</html>
