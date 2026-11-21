@@ -1,24 +1,13 @@
 :root {
-  --nen: #f6f7fb;
-  --the: #ffffff;
-  --chu: #1d2433;
-  --phu: #5b6475;
-  --vien: #e3e6ee;
-  --chinh: #1f5fd1;
-  --chinh-nhat: #e8effc;
-  --xanh: #1e8e5a;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --nen: #12151c;
-    --the: #1b2029;
-    --chu: #e8ebf2;
-    --phu: #a1a9b8;
-    --vien: #2c3340;
-    --chinh: #6f9dff;
-    --chinh-nhat: #1f2a40;
-    --xanh: #4cc38a;
-  }
+  color-scheme: dark;
+  --nen: #12151c;
+  --the: #1b2029;
+  --chu: #e8ebf2;
+  --phu: #a1a9b8;
+  --vien: #2c3340;
+  --chinh: #6f9dff;
+  --chinh-nhat: #1f2a40;
+  --xanh: #4cc38a;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
