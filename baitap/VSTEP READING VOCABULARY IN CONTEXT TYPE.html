@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSTEP Reading – Vocabulary in Context</title>
+<style>
+:root{
+  --bg:#f4f1ea; --paper:#fffdf8; --ink:#1f2328; --muted:#6b6f76; --line:#e2ddd2;
+  --accent:#1d5c63; --accent-2:#e7f0ef; --warn:#b4541a; --ok:#2f7d4f; --ok-bg:#e6f3ea;
+  --bad:#b3261e; --bad-bg:#fbe9e7; --sel:#dcebe9; --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+.hidden{display:none!important}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--accent);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px}
+.top h1{font-size:16px;margin:0;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clock{font-variant-numeric:tabular-nums;font-weight:700;background:rgba(255,255,255,.14);padding:4px 10px;border-radius:6px;letter-spacing:.5px}
+.clock.low{background:#f3b27a;color:#3a1d06}
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:9px 16px;border-radius:8px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.light{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:#fff;padding:5px 12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+
+/* start */
+.start{max-width:680px;margin:24px auto;padding:28px}
+.start h2{margin:0 0 4px;font-size:26px}
+.start .sub{color:var(--muted);margin:0 0 20px}
+.start ul{padding-left:20px;margin:0 0 20px}
+.start li{margin:4px 0}
+.field{display:flex;flex-direction:column;gap:6px;margin:0 0 18px}
+.field input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.history{margin-top:22px;border-top:1px solid var(--line);padding-top:14px;font-size:14px}
+.history table{width:100%;border-collapse:collapse}
+.history td,.history th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+.history th{color:var(--muted);font-weight:600}
+
+/* reading phase */
+.reader{max-width:780px;margin:12px auto;padding:28px 30px}
+.reader .meta{display:flex;justify-content:space-between;align-items:baseline;gap:12px;color:var(--muted);font-size:14px;margin-bottom:6px}
+.reader h2{margin:0 0 4px;font-size:20px}
+.reader .ptitle{font-weight:700;text-align:center;margin:10px 0 0}
+.pbar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin:14px 0 20px}
+.pbar i{display:block;height:100%;background:var(--accent);width:100%;transition:width 1s linear}
+.para-now{font-size:18px;line-height:1.75;text-align:justify;min-height:180px}
+.para-now .num{display:inline-block;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-2);border-radius:4px;padding:0 6px;margin-right:6px;vertical-align:2px}
+.dots{display:flex;gap:6px;justify-content:center;margin:18px 0 6px}
+.dots span{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dots span.done{background:var(--accent)}
+.dots span.cur{background:var(--warn)}
+.reader .actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:12px}
+.reader .hint{font-size:13px;color:var(--muted)}
+
+/* question phase */
+.ptabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ptab{border:1px solid var(--line);background:var(--paper);padding:7px 14px;border-radius:999px;font-size:14px}
+.ptab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.ptab small{opacity:.75}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.pane{padding:20px 22px}
+.passage,.qpane{position:sticky;top:64px;height:calc(100vh - 84px);overflow:auto}
+.qpane .nav{margin-bottom:4px}
+.passage h3{margin:0 0 10px;font-size:16px;color:var(--accent)}
+.passage .ptitle{font-weight:700;text-align:center;margin:0 0 10px}
+.passage p{text-align:justify;margin:0 0 12px}
+.passage p .num{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-2);border-radius:4px;padding:0 5px;margin-right:6px}
+.q{padding:14px 0;border-bottom:1px solid var(--line)}
+.q:last-child{border-bottom:0}
+.q .stem{font-weight:600;margin-bottom:8px}
+.q .ins{font-style:italic;background:#f6f3ea;border-left:3px solid var(--warn);padding:8px 12px;margin:0 0 10px;border-radius:0 6px 6px 0}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;color:var(--ink)}
+.opt:hover{border-color:var(--accent)}
+.opt b{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:13px}
+.opt.on{background:var(--sel);border-color:var(--accent)}
+.opt.on b{background:var(--accent);border-color:var(--accent);color:#fff}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)}
+.opt.right b{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.opt.wrong b{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt[disabled]{cursor:default}
+.mark{font-size:13px;font-weight:700;margin-left:8px}
+.mark.ok{color:var(--ok)} .mark.no{color:var(--bad)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.palette{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;padding:14px;}
+.palette .grp{display:flex;gap:4px;flex-wrap:wrap;margin-right:10px}
+.palette button{width:32px;height:30px;border-radius:6px;border:1px solid var(--line);background:#fff;font-size:13px;padding:0}
+.palette button.ans{background:var(--accent);color:#fff;border-color:var(--accent)}
+.palette button.r{background:var(--ok);border-color:var(--ok);color:#fff}
+.palette button.w{background:var(--bad);border-color:var(--bad);color:#fff}
+.palette button.locked{opacity:.4}
+.mtabs{display:none}
+.ref{font-weight:700;text-decoration:underline;text-decoration-color:var(--warn);text-underline-offset:3px}
+.ref sup{font-size:10px;color:#fff;background:var(--warn);border-radius:3px;padding:0 3px;margin-left:2px;text-decoration:none;display:inline-block;line-height:1.3}
+.ref.flash{background:#fde7c8;border-radius:3px}
+.exp{margin-top:8px;font-size:14px;background:#f6f3ea;border-radius:6px;padding:8px 12px;color:#3a3f45}
+.stem .goto{font-size:12px;font-weight:600;color:var(--accent);background:none;border:0;padding:0 0 0 6px;text-decoration:underline}
+
+/* result */
+.result{max-width:780px;margin:12px auto;padding:28px}
+.score{display:flex;align-items:baseline;gap:10px;margin:6px 0 16px}
+.score .big{font-size:48px;font-weight:800;color:var(--accent);line-height:1}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 20px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+.stat .k{font-size:13px;color:var(--muted)}
+.stat .v{font-size:20px;font-weight:700}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(20,24,28,.45);display:grid;place-items:center;z-index:50;padding:16px}
+.modal .box{background:var(--paper);border-radius:12px;max-width:420px;width:100%;padding:22px;box-shadow:var(--shadow)}
+.modal h3{margin:0 0 8px}
+.modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+@media (max-width:560px){.passage p{text-align:left}}
+@media (max-width:860px){
+  .split{gap:8px}
+  .pane{padding:12px 12px}
+  .passage p,.q{font-size:14px;line-height:1.55}
+  .opt{padding:6px 8px;gap:6px}
+  .opt b{width:20px;height:20px;font-size:12px}
+  .wrap{padding:12px 8px 30px}
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .reader{padding:22px 18px}
+  .para-now{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>VSTEP Reading – Vocabulary in Context</h1>
+  <span id="clock" class="clock hidden">60:00</span>
+  <button id="submitTop" class="btn light hidden">Nộp bài</button>
+</div>
+
+<div class="wrap">
+  <!-- START -->
+  <section id="scrStart" class="card start">
+    <h2>Vocabulary in Context · C1</h2>
+    <p class="sub">4 bài đọc · 40 câu hỏi từ vựng theo ngữ cảnh · 60 phút</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="btnStart" class="btn primary">Bắt đầu làm bài</button>
+      <button id="btnResume" class="btn hidden">Tiếp tục bài đang làm</button>
+    </div>
+    <div id="history" class="history hidden"></div>
+  </section>
+
+  <!-- READING -->
+  <section id="scrRead" class="card reader hidden">
+    <div class="meta"><span id="rPassage">Passage 1</span><span id="rStep">Đoạn 1/4</span></div>
+    <h2 id="rHead">PASSAGE 1 – QUESTIONS 1–10</h2>
+    <div id="rTitle" class="ptitle"></div>
+    <div class="pbar"><i id="rBar"></i></div>
+    <div id="rPara" class="para-now"></div>
+    <div id="rDots" class="dots"></div>
+    <div class="actions">
+      <span class="hint">Thời gian còn lại cho đoạn này: <b id="rLeft">0</b> giây</span>
+      <button id="rNext" class="btn primary">Đoạn tiếp theo →</button>
+    </div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <section id="scrQ" class="hidden">
+    <div id="ptabs" class="ptabs"></div>
+    <div id="split" class="split show-q">
+      <div id="passage" class="card pane passage"></div>
+      <div class="qpane">
+        <div id="qlist" class="card pane"></div>
+        <div class="nav">
+          <button id="prevP" class="btn">← Bài trước</button>
+          <button id="nextP" class="btn primary">Bài tiếp theo →</button>
+        </div>
+      </div>
+    </div>
+    <div id="palette" class="card palette"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="scrResult" class="card result hidden">
+    <h2 style="margin:0">Kết quả</h2>
+    <div id="rName" style="color:var(--muted)"></div>
+    <div class="score"><span id="sBig" class="big">0</span><span>/ 40 câu đúng</span><span id="sPct" style="color:var(--muted)"></span></div>
+    <div id="sGrid" class="grid4"></div>
+    <div id="sTime" style="color:var(--muted);margin-bottom:18px"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="btnReview" class="btn primary">Xem lại bài và đáp án</button>
+      <button id="btnAgain" class="btn">Làm lại từ đầu</button>
+    </div>
+  </section>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="box">
+    <h3 id="mTitle">Nộp bài?</h3>
+    <div id="mBody"></div>
+    <div class="row"><button id="mNo" class="btn">Làm tiếp</button><button id="mYes" class="btn primary">Nộp bài</button></div>
+  </div>
+</div>
+
+<script>
+const DATA = [{"title": "The Paradox of Choice", "paras": ["Modern consumers are confronted with an almost <span class=\"ref\" id=\"r1\">bewildering<sup>1</sup></span> range of options. A typical supermarket stocks tens of thousands of products, and a single online retailer may offer hundreds of varieties of something as <span class=\"ref\" id=\"r2\">mundane<sup>2</sup></span> as toothpaste. Conventional economic thinking holds that this abundance can only be beneficial: the more options people have, the more likely they are to find exactly what they want.", "Yet a growing body of research suggests that, beyond a certain point, choice can become a burden rather than a blessing. In a frequently cited experiment, shoppers at an upmarket food store came across a tasting table displaying either six or twenty-four varieties of jam. The larger display attracted more attention, but shoppers who saw the smaller selection were roughly ten times more likely to make a purchase. Faced with too many alternatives, it seems, people often <span class=\"ref\" id=\"r3\">defer<sup>3</sup></span> the decision altogether.", "Psychologists have proposed several explanations. One is that evaluating many options <span class=\"ref\" id=\"r4\">taxes<sup>4</sup></span> our limited mental resources: comparing dozens of products on price, quality and features is simply exhausting. Another is that a wide selection raises expectations. When there are only a few options, a disappointing purchase can be blamed on the world; when there are hundreds, the <span class=\"ref\" id=\"r5\">onus<sup>5</sup></span> falls on the chooser, who feels that the perfect option must have been out there somewhere.", "The psychologist Barry Schwartz has drawn a distinction between two kinds of decision-makers. “Maximisers” feel <span class=\"ref\" id=\"r6\">compelled<sup>6</sup></span> to examine every possibility in search of the very best, whereas “satisficers” are willing to <span class=\"ref\" id=\"r7\">settle for<sup>7</sup></span> an option that is good enough. Studies suggest that maximisers often achieve objectively better outcomes, such as higher-paying jobs, yet report lower satisfaction with them and greater regret about the paths they did not take.", "Not all researchers accept these findings <span class=\"ref\" id=\"r8\">uncritically<sup>8</sup></span>. Some attempts to repeat the jam study have failed, and a large review of the evidence concluded that “choice overload” is far from universal: whether it occurs depends heavily on circumstances, such as how complex the options are, how familiar shoppers are with the product and how clearly the alternatives are presented.", "For businesses and policymakers, then, the lesson is not that choice should be eliminated, but that it should be <span class=\"ref\" id=\"r9\">curated<sup>9</sup></span>. Restaurants that offer shorter menus, pension schemes that provide a sensible default option and websites that allow users to filter results are all ways of preserving freedom while <span class=\"ref\" id=\"r10\">alleviating<sup>10</sup></span> the strain of decision-making."], "qs": [{"q": "The word “bewildering” in paragraph 1 is closest in meaning to ________.", "insert": null, "opts": ["limited", "attractive", "confusing", "expensive"], "key": 2, "exp": "\"bewildering\" = gây bối rối, hoang mang. Ngữ cảnh: hàng chục nghìn sản phẩm, hàng trăm loại kem đánh răng → nhiều đến mức khó chọn."}, {"q": "The word “mundane” in paragraph 1 is closest in meaning to ________.", "insert": null, "opts": ["essential", "ordinary", "expensive", "popular"], "key": 1, "exp": "\"something as mundane as toothpaste\" = thứ bình thường, tầm thường như kem đánh răng. Tác giả nhấn mạnh: đến cả món tầm thường cũng có hàng trăm loại."}, {"q": "The word “defer” in paragraph 2 is closest in meaning to ________.", "insert": null, "opts": ["respect", "refuse", "simplify", "postpone"], "key": 3, "exp": "\"defer the decision\" = hoãn quyết định (người mua bỏ đi không mua). Bẫy: \"defer to someone\" mới có nghĩa là tôn trọng, nghe theo."}, {"q": "The word “taxes” in paragraph 3 is closest in meaning to ________.", "insert": null, "opts": ["charges money for", "improves", "records", "places heavy demands on"], "key": 3, "exp": "\"tax\" (động từ) ở đây = làm hao tổn, đòi hỏi nhiều. Vế sau giải thích: so sánh hàng chục sản phẩm \"is simply exhausting\". Bẫy: nghĩa thường gặp là đánh thuế."}, {"q": "The word “onus” in paragraph 3 is closest in meaning to ________.", "insert": null, "opts": ["advantage", "responsibility", "cost", "doubt"], "key": 1, "exp": "\"the onus falls on the chooser\" = trách nhiệm đổ lên người chọn. Đối lập với vế trước: khi ít lựa chọn thì có thể đổ lỗi cho hoàn cảnh."}, {"q": "The word “compelled” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["obliged", "encouraged", "forbidden", "delighted"], "key": 0, "exp": "\"feel compelled to examine every possibility\" = cảm thấy bị thôi thúc, buộc phải xem xét mọi khả năng. \"encouraged\" (được khuyến khích) quá nhẹ, không có ý ép buộc."}, {"q": "The phrase “settle for” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["argue about", "pay more for", "move towards", "accept, although it is not ideal"], "key": 3, "exp": "\"settle for an option that is good enough\" = chấp nhận một lựa chọn tạm đủ tốt, dù chưa phải tốt nhất. Đối lập với \"maximisers\", những người tìm \"the very best\"."}, {"q": "The word “uncritically” in paragraph 5 is closest in meaning to ________.", "insert": null, "opts": ["with great enthusiasm", "in public", "without questioning them", "without reading them"], "key": 2, "exp": "\"accept uncritically\" = chấp nhận mà không đặt câu hỏi, không phản biện. Câu sau đưa ra lý do để nghi ngờ (không lặp lại được kết quả)."}, {"q": "The word “curated” in paragraph 6 is closest in meaning to ________.", "insert": null, "opts": ["carefully selected and organised", "reduced to a single option", "made more expensive", "advertised widely"], "key": 0, "exp": "\"curated\" = được chọn lọc và sắp xếp cẩn thận. Các ví dụ sau đó: thực đơn ngắn, phương án mặc định hợp lý, bộ lọc kết quả. Không phải \"chỉ còn một lựa chọn\", vì bài nói rõ \"not that choice should be eliminated\"."}, {"q": "The word “alleviating” in paragraph 6 is closest in meaning to ________.", "insert": null, "opts": ["increasing", "easing", "ignoring", "explaining"], "key": 1, "exp": "\"alleviating the strain\" = làm giảm bớt căng thẳng. Mục đích là giữ quyền tự do lựa chọn mà bớt mệt mỏi khi quyết định."}]}, {"title": "", "paras": ["Of the roughly 7,000 languages spoken in the world today, linguists estimate that as many as half may <span class=\"ref\" id=\"r11\">vanish<sup>11</sup></span> by the end of this century. Many are spoken by only a few hundred people, most of them elderly, and some by a mere <span class=\"ref\" id=\"r12\">handful<sup>12</sup></span> of speakers, or even by a single person. When the last fluent speaker dies, a language that may have been passed down for thousands of years falls silent.", "Languages rarely die because their speakers are wiped out. Far more often, they are gradually <span class=\"ref\" id=\"r13\">abandoned<sup>13</sup></span>. When a community comes into contact with a more powerful language, one that offers access to education, employment and social mobility, parents may decide that their children’s prospects will be better served by the dominant tongue. Within two or three generations, the ancestral language may survive only among grandparents, used at home but no longer <span class=\"ref\" id=\"r14\">transmitted<sup>14</sup></span> to the young.", "Why should this matter? One argument is scientific. Each language represents a unique way of organising experience, and many contain knowledge that is not <span class=\"ref\" id=\"r15\">readily<sup>15</sup></span> available elsewhere: detailed classifications of local plants and animals, for example, or ways of describing space and time that challenge assumptions based on European languages. When a language disappears, much of this knowledge is lost with it.", "Another argument concerns identity. For many communities, the <span class=\"ref\" id=\"r16\">erosion<sup>16</sup></span> of their language is bound up with a wider history of marginalisation, and its loss is felt as a loss of connection with ancestors, land and tradition. Critics, however, caution against romanticising the past. They point out that language shift is often the result of choices made by speakers themselves, and that it would be <span class=\"ref\" id=\"r17\">patronising<sup>17</sup></span> for outsiders to insist that communities preserve languages they have decided to leave behind.", "Encouragingly, decline is not always <span class=\"ref\" id=\"r18\">irreversible<sup>18</sup></span>. Hebrew, which had not been used as an everyday spoken language for many centuries, was revived in the late nineteenth and twentieth centuries and now has millions of native speakers. More recently, communities in Wales, New Zealand and Hawaii have used immersion schools, in which children are taught entirely in the heritage language, to <span class=\"ref\" id=\"r19\">bolster<sup>19</sup></span> the number of young speakers.", "Revival is rarely straightforward, however. It requires sustained funding, trained teachers and suitable materials and, above all, the <span class=\"ref\" id=\"r20\">conviction<sup>20</sup></span> among speakers themselves that their language has a future worth fighting for."], "qs": [{"q": "The word “vanish” in paragraph 1 is closest in meaning to ________.", "insert": null, "opts": ["change", "spread", "weaken", "disappear"], "key": 3, "exp": "\"vanish\" = biến mất. Câu sau nói rõ: khi người nói cuối cùng qua đời, ngôn ngữ \"falls silent\"."}, {"q": "The word “handful” in paragraph 1 is closest in meaning to ________.", "insert": null, "opts": ["small number", "large group", "family", "generation"], "key": 0, "exp": "\"a mere handful of speakers\" = chỉ một nhúm, một số rất ít người nói. \"mere\" và cụm \"or even by a single person\" là manh mối."}, {"q": "The word “abandoned” in paragraph 2 is closest in meaning to ________.", "insert": null, "opts": ["given up", "forbidden", "recorded", "criticised"], "key": 0, "exp": "\"gradually abandoned\" = dần dần bị từ bỏ. Phần sau giải thích: cha mẹ tự chọn ngôn ngữ mạnh hơn cho con. Đây là tự nguyện, không phải bị cấm (\"forbidden\")."}, {"q": "The word “transmitted” in paragraph 2 is closest in meaning to ________.", "insert": null, "opts": ["broadcast", "translated", "passed on", "explained"], "key": 2, "exp": "\"no longer transmitted to the young\" = không còn được truyền lại cho thế hệ trẻ. Bẫy: \"transmit\" còn có nghĩa là phát sóng (broadcast), không hợp ngữ cảnh."}, {"q": "The word “readily” in paragraph 3 is closest in meaning to ________.", "insert": null, "opts": ["willingly", "rarely", "officially", "easily"], "key": 3, "exp": "\"not readily available elsewhere\" = không dễ tìm thấy ở nơi khác. Bẫy: \"readily\" còn có nghĩa là sẵn lòng (willingly), như trong \"readily agreed\"."}, {"q": "The word “erosion” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["sudden destruction", "gradual decline", "official recognition", "careful study"], "key": 1, "exp": "\"erosion\" = sự xói mòn, suy giảm dần dần. Đoạn 2 đã mô tả ngôn ngữ mất đi qua hai, ba thế hệ, nên không phải \"sudden\"."}, {"q": "The word “patronising” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["generous", "unrealistic", "condescending", "illegal"], "key": 2, "exp": "\"patronising\" = kẻ cả, coi thường, như thể người khác không tự quyết định được. Người ngoài ép cộng đồng giữ ngôn ngữ mà chính họ đã chọn bỏ."}, {"q": "The word “irreversible” in paragraph 5 is closest in meaning to ________.", "insert": null, "opts": ["unavoidable", "impossible to undo", "rapid", "expected"], "key": 1, "exp": "\"irreversible\" = không thể đảo ngược. Ví dụ tiếng Hebrew được hồi sinh cho thấy sự suy tàn có thể đảo ngược được."}, {"q": "The word “bolster” in paragraph 5 is closest in meaning to ________.", "insert": null, "opts": ["count", "increase", "limit", "replace"], "key": 1, "exp": "\"bolster the number of young speakers\" = củng cố, làm tăng số người nói trẻ tuổi. Đây là mục đích của trường học hoàn toàn bằng ngôn ngữ đó (immersion schools)."}, {"q": "The word “conviction” in paragraph 6 is closest in meaning to ________.", "insert": null, "opts": ["firm belief", "legal judgement", "disagreement", "official agreement"], "key": 0, "exp": "\"the conviction that their language has a future\" = niềm tin vững chắc rằng ngôn ngữ của mình có tương lai. Bẫy: \"conviction\" còn có nghĩa là sự kết án trong luật."}]}, {"title": "", "paras": ["In 2025, a biotechnology company announced that it had produced mice with long, woolly coats by editing genes linked to hair growth, based on genetic information from mammoths. The animals were <span class=\"ref\" id=\"r21\">hailed<sup>21</sup></span> in some headlines as a first step towards bringing back the woolly mammoth, a species that died out around 4,000 years ago. Weeks later, the same company presented three gene-edited grey wolf pups that it described as “dire wolves”, an extinct species, a claim that many scientists <span class=\"ref\" id=\"r22\">disputed<sup>22</sup></span>.", "Strictly speaking, true de-extinction is impossible. DNA breaks down over time, and no complete, usable mammoth genome survives. What scientists can do is edit the genes of a living relative, in this case the Asian elephant, so that the resulting animal <span class=\"ref\" id=\"r23\">resembles<sup>23</sup></span> the extinct species in certain respects, such as its thick fur, layers of fat and tolerance of cold.", "Supporters argue that such animals could play a valuable ecological role. Mammoth-like elephants, they suggest, might help to restore the grasslands of the Arctic by trampling snow and knocking down trees, which could slow the thawing of the frozen ground beneath. Others see de-extinction as a way of <span class=\"ref\" id=\"r24\">atoning<sup>24</sup></span> for the enormous damage that humans have done to the natural world.", "Critics raise a <span class=\"ref\" id=\"r25\">host<sup>25</sup></span> of objections. Elephants are intelligent, highly social animals with a pregnancy lasting almost two years, and creating a herd of hybrids would require surrogate mothers from an endangered species. There are also doubts about whether animals raised without parents of their own kind could ever learn the behaviours <span class=\"ref\" id=\"r26\">essential<sup>26</sup></span> to survival in the wild. Perhaps most seriously, conservationists worry that the prospect of reversing extinction could encourage complacency, <span class=\"ref\" id=\"r27\">undermining<sup>27</sup></span> the urgency of protecting species that are still alive.", "Money is another <span class=\"ref\" id=\"r28\">contentious<sup>28</sup></span> issue. Projects of this kind cost hundreds of millions of dollars, and some ecologists argue that the same funds could protect vast areas of habitat for existing species. Supporters reply that the investment is largely private and that the genetic tools developed along the way could benefit conservation more broadly, for example by helping endangered species <span class=\"ref\" id=\"r29\">withstand<sup>29</sup></span> disease.", "Whatever its eventual success, de-extinction raises a <span class=\"ref\" id=\"r30\">profound<sup>30</sup></span> question. If humans gain the power to recreate lost species, they will also have to decide which ones deserve to return, and whether the world they would return to still has a place for them."], "qs": [{"q": "The word “hailed” in paragraph 1 is closest in meaning to ________.", "insert": null, "opts": ["loudly called to", "strongly criticised", "secretly tested", "enthusiastically described"], "key": 3, "exp": "\"hailed as a first step\" = được ca ngợi là bước đầu tiên. Bẫy: \"hail a taxi\" là gọi taxi, ở đây không hợp."}, {"q": "The word “disputed” in paragraph 1 is closest in meaning to ________.", "insert": null, "opts": ["supported", "questioned", "investigated", "ignored"], "key": 1, "exp": "\"a claim that many scientists disputed\" = tuyên bố bị nhiều nhà khoa học phản bác, nghi ngờ. Những con sói này chỉ là sói xám được chỉnh gen."}, {"q": "The word “resembles” in paragraph 2 is closest in meaning to ________.", "insert": null, "opts": ["replaces", "is descended from", "is similar to", "outlives"], "key": 2, "exp": "\"resembles the extinct species in certain respects\" = giống loài đã tuyệt chủng ở một số mặt (bộ lông dày, lớp mỡ, chịu lạnh)."}, {"q": "The word “atoning” in paragraph 3 is closest in meaning to ________.", "insert": null, "opts": ["forgetting", "making amends", "profiting", "measuring"], "key": 1, "exp": "\"atoning for the damage\" = chuộc lỗi, bù đắp cho những thiệt hại con người đã gây ra cho tự nhiên."}, {"q": "The word “host” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["large number", "person who receives guests", "single example", "official list"], "key": 0, "exp": "\"a host of objections\" = rất nhiều lời phản đối. Các ý sau liệt kê hàng loạt vấn đề. Bẫy: \"host\" còn có nghĩa là chủ nhà."}, {"q": "The word “essential” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["natural", "additional", "harmful", "necessary"], "key": 3, "exp": "\"behaviours essential to survival\" = những hành vi thiết yếu để sống sót trong tự nhiên."}, {"q": "The word “undermining” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["increasing", "explaining", "weakening", "hiding"], "key": 2, "exp": "\"undermining the urgency\" = làm suy yếu sự cấp bách. Người ta có thể nghĩ \"đằng nào cũng hồi sinh được\", nên bớt lo bảo vệ các loài còn sống."}, {"q": "The word “contentious” in paragraph 5 is closest in meaning to ________.", "insert": null, "opts": ["financial", "minor", "urgent", "causing disagreement"], "key": 3, "exp": "\"contentious issue\" = vấn đề gây tranh cãi. Phần sau trình bày hai phía phản bác nhau về chuyện tiền bạc. Bẫy \"financial\": đoạn này nói về tiền, nhưng \"contentious\" không có nghĩa là tài chính."}, {"q": "The word “withstand” in paragraph 5 is closest in meaning to ________.", "insert": null, "opts": ["resist", "spread", "identify", "catch"], "key": 0, "exp": "\"withstand disease\" = chống chịu được bệnh tật. Công cụ di truyền có thể giúp các loài nguy cấp kháng bệnh."}, {"q": "The word “profound” in paragraph 6 is closest in meaning to ________.", "insert": null, "opts": ["simple", "popular", "deep and serious", "recent"], "key": 2, "exp": "\"a profound question\" = một câu hỏi sâu sắc, hệ trọng: con người có quyền chọn loài nào được hồi sinh hay không."}]}, {"title": "", "paras": ["In 1906, the scientist Francis Galton visited a country fair in the south-west of England, where around 800 people paid to guess the weight of an ox once it had been slaughtered and prepared for sale. Galton, who took a <span class=\"ref\" id=\"r31\">dim<sup>31</sup></span> view of the intelligence of ordinary people, expected most of the guesses to be <span class=\"ref\" id=\"r32\">wildly<sup>32</sup></span> inaccurate. To his surprise, the middle value of all the estimates was within one per cent of the true weight, closer than the guesses of most of the cattle experts present.", "Galton’s observation has since been <span class=\"ref\" id=\"r33\">replicated<sup>33</sup></span> in countless settings, from estimating the number of sweets in a jar to forecasting election results. The phenomenon, popularised by the journalist James Surowiecki in his book The Wisdom of Crowds, rests on a simple statistical principle. Each individual estimate contains some information and some error. Provided the errors are random, those that are too high and those that are too low tend to <span class=\"ref\" id=\"r34\">cancel each other out<sup>34</sup></span>, leaving the average remarkably close to the truth.", "Crucially, however, crowds are wise only under certain conditions. Their members must hold a <span class=\"ref\" id=\"r35\">diverse<sup>35</sup></span> range of views, form their judgements independently and draw on different sources of information. When these conditions break down, a crowd can become spectacularly foolish. If people can see one another’s guesses, they tend to <span class=\"ref\" id=\"r36\">converge<sup>36</sup></span> on early estimates, and errors that would otherwise have cancelled out begin to reinforce one another instead.", "This helps to explain phenomena such as financial bubbles, in which investors <span class=\"ref\" id=\"r37\">pile into<sup>37</sup></span> an asset largely because others are doing so, pushing its price far beyond any reasonable value. When confidence finally collapses, the same herd behaviour drives prices down just as dramatically. Social media, critics argue, may <span class=\"ref\" id=\"r38\">exacerbate<sup>38</sup></span> the problem by exposing people constantly to the opinions of others and by rewarding those who agree with the majority.", "Organisations have tried to <span class=\"ref\" id=\"r39\">harness<sup>39</sup></span> the wisdom of crowds while avoiding its pitfalls. Some companies run internal “prediction markets”, in which employees bet on the likelihood of future events, such as whether a product will be launched on time. Others ask team members to submit their estimates <span class=\"ref\" id=\"r40\">anonymously<sup>40</sup></span> before any discussion takes place, so that the opinions of senior figures do not dominate the outcome.", "The lesson is not that crowds are always right, nor that experts are unnecessary. It is that the quality of a group’s judgement depends less on the brilliance of any one member than on how independently its members think, and how carefully their views are combined."], "qs": [{"q": "The word “dim” in paragraph 1 is closest in meaning to ________.", "insert": null, "opts": ["faint", "neutral", "well-informed", "unfavourable"], "key": 3, "exp": "\"took a dim view of\" = có cái nhìn tiêu cực, đánh giá thấp. Ông cho rằng người thường kém thông minh nên đoán sẽ sai. Bẫy: \"dim light\" là ánh sáng mờ."}, {"q": "The word “wildly” in paragraph 1 is closest in meaning to ________.", "insert": null, "opts": ["angrily", "naturally", "occasionally", "extremely"], "key": 3, "exp": "\"wildly inaccurate\" = sai lệch cực kỳ, sai bét. Galton nghĩ các phỏng đoán sẽ rất sai, nhưng kết quả lại gần đúng."}, {"q": "The word “replicated” in paragraph 2 is closest in meaning to ________.", "insert": null, "opts": ["repeated with similar results", "copied illegally", "questioned", "celebrated"], "key": 0, "exp": "\"replicated in countless settings\" = được lặp lại (với kết quả tương tự) trong vô số tình huống, như đoán số kẹo hay dự đoán bầu cử."}, {"q": "The phrase “cancel each other out” in paragraph 2 is closest in meaning to ________.", "insert": null, "opts": ["make one another larger", "delete one another", "balance one another so that their effect disappears", "postpone one another"], "key": 2, "exp": "\"cancel each other out\" = triệt tiêu lẫn nhau. Đoán quá cao và đoán quá thấp bù trừ cho nhau nên giá trị trung bình rất gần đúng."}, {"q": "The word “diverse” in paragraph 3 is closest in meaning to ________.", "insert": null, "opts": ["varied", "extreme", "popular", "expert"], "key": 0, "exp": "\"a diverse range of views\" = nhiều quan điểm khác nhau, đa dạng. Đây là điều kiện để các sai số mang tính ngẫu nhiên."}, {"q": "The word “converge” in paragraph 3 is closest in meaning to ________.", "insert": null, "opts": ["argue with each other", "move towards the same point", "move further apart", "vote"], "key": 1, "exp": "\"converge on early estimates\" = dồn về, hội tụ quanh những con số đoán đầu tiên. Vì thế các sai số không còn bù trừ được nữa."}, {"q": "The phrase “pile into” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["carefully study", "rush to buy", "quickly sell", "complain about"], "key": 1, "exp": "\"pile into an asset\" = ồ ạt đổ tiền mua tài sản chỉ vì người khác cũng mua. Hệ quả là giá bị đẩy lên quá cao."}, {"q": "The word “exacerbate” in paragraph 4 is closest in meaning to ________.", "insert": null, "opts": ["make worse", "solve", "reveal", "measure"], "key": 0, "exp": "\"exacerbate the problem\" = làm vấn đề trầm trọng thêm. Mạng xã hội khiến người ta liên tục thấy ý kiến của người khác, đúng điều kiện làm \"đám đông\" mất khôn."}, {"q": "The word “harness” in paragraph 5 is closest in meaning to ________.", "insert": null, "opts": ["fasten equipment to", "criticise", "make use of", "reduce"], "key": 2, "exp": "\"harness the wisdom of crowds\" = tận dụng, khai thác trí tuệ đám đông. Bẫy: nghĩa đen của \"harness\" là đóng yên cương cho ngựa."}, {"q": "The word “anonymously” in paragraph 5 is closest in meaning to ________.", "insert": null, "opts": ["in writing", "without giving their names", "quickly", "together as a group"], "key": 1, "exp": "\"submit estimates anonymously\" = nộp dự đoán ẩn danh, không ghi tên. Vì vậy ý kiến của cấp trên không chi phối kết quả."}]}];
+const TEST_ID = 'vstep-reading-vocab-c1-01';
+const TOTAL_SEC = 60*60;
+const WPM = 150;              // reading speed used for paragraph timers
+const MIN_PARA = 20, MAX_PARA = 90;
+const L = 'ABCD';
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+let S = null;           // state
+let tick = null, paraTimer = null;
+
+function words(t){ return t.trim().split(/\s+/).length; }
+function paraSecs(t){ return Math.min(MAX_PARA, Math.max(MIN_PARA, Math.ceil(words(t)/WPM*60/5)*5)); }
+function fmt(s){ s=Math.max(0,s|0); return String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function qnum(p,i){ return p*10+i+1; }
+function show(id){ ['scrStart','scrRead','scrQ','scrResult'].forEach(x=>$(x).classList.toggle('hidden',x!==id)); window.scrollTo(0,0); }
+
+function newState(){
+  return { name: '', start: Date.now(), elapsed: 0,
+           ans: Array(40).fill(null), read: [false,false,false,false],
+           cur: 0, phase: 'read', para: 0, paraLeft: null, done: false, review: false };
+}
+function save(){ if(S && !S.done) store.set(TEST_ID+'-state', S); }
+
+/* ---------- global clock ---------- */
+function startClock(){
+  $('clock').classList.remove('hidden'); $('submitTop').classList.remove('hidden');
+  clearInterval(tick);
+  let last = Date.now();
+  tick = setInterval(()=>{
+    const now = Date.now(); S.elapsed += (now-last)/1000; last = now;
+    const left = TOTAL_SEC - S.elapsed;
+    $('clock').textContent = fmt(left);
+    $('clock').classList.toggle('low', left <= 300);
+    if (left <= 0){ finish(true); }
+    else if ((S.elapsed|0) % 5 === 0) save();
+  }, 1000);
+  $('clock').textContent = fmt(TOTAL_SEC - S.elapsed);
+}
+
+/* ---------- reading phase ---------- */
+function openPassage(p){
+  S.cur = p;
+  if (!S.read[p]){ S.phase='read'; if(S.paraLeft==null){ S.para=0; } showPara(); }
+  else { S.phase='q'; renderQ(); }
+  save();
+}
+function showPara(){
+  clearInterval(paraTimer);
+  const P = DATA[S.cur], i = S.para, txt = P.paras[i];
+  show('scrRead');
+  $('rPassage').textContent = 'Passage '+(S.cur+1)+' / 4';
+  $('rStep').textContent = 'Đoạn '+(i+1)+' / '+P.paras.length;
+  $('rHead').textContent = 'PASSAGE '+(S.cur+1)+' – QUESTIONS '+(S.cur*10+1)+'–'+(S.cur*10+10);
+  $('rTitle').textContent = P.title || '';
+  $('rTitle').classList.toggle('hidden', !P.title);
+  $('rPara').innerHTML = '<span class="num">'+(i+1)+'</span>'+esc(txt);
+  $('rDots').innerHTML = P.paras.map((_,k)=>'<span class="'+(k<i?'done':k===i?'cur':'')+'"></span>').join('');
+  const last = i === P.paras.length-1;
+  $('rNext').textContent = last ? 'Làm câu hỏi →' : 'Đoạn tiếp theo →';
+  const total = paraSecs(txt);
+  if (S.paraLeft == null) S.paraLeft = total;
+  const bar = $('rBar');
+  bar.style.transition='none'; bar.style.width=(S.paraLeft/total*100)+'%'; void bar.offsetWidth; bar.style.transition='width 1s linear';
+  $('rLeft').textContent = S.paraLeft;
+  paraTimer = setInterval(()=>{
+    S.paraLeft--; $('rLeft').textContent = Math.max(0,S.paraLeft);
+    bar.style.width = Math.max(0,S.paraLeft/total*100)+'%';
+    if (S.paraLeft <= 0) nextPara();
+  },1000);
+}
+function nextPara(){
+  clearInterval(paraTimer);
+  S.paraLeft = null;
+  const P = DATA[S.cur];
+  if (S.para < P.paras.length-1){ S.para++; showPara(); }
+  else { S.read[S.cur]=true; S.para=0; S.phase='q'; renderQ(); }
+  save();
+}
+
+/* ---------- question phase ---------- */
+function renderQ(){
+  clearInterval(paraTimer);
+  show('scrQ');
+  const p = S.cur, P = DATA[p], rv = S.review;
+  // passage tabs
+  $('ptabs').innerHTML = DATA.map((_,k)=>{
+    const n = S.ans.slice(k*10,k*10+10).filter(a=>a!==null).length;
+    const sub = rv ? scoreOf(k)+'/10 đúng' : (S.read[k] ? n+'/10' : 'chưa đọc');
+    return '<button class="ptab'+(k===p?' on':'')+'" data-p="'+k+'">Passage '+(k+1)+' <small>· '+sub+'</small></button>';
+  }).join('');
+  $('ptabs').querySelectorAll('.ptab').forEach(b=>b.onclick=()=>openPassage(+b.dataset.p));
+  // passage text
+  $('passage').innerHTML = '<h3>PASSAGE '+(p+1)+'</h3>' + (P.title?'<div class="ptitle">'+esc(P.title)+'</div>':'') +
+    P.paras.map((t,i)=>'<p><span class="num">'+(i+1)+'</span>'+t+'</p>').join('');
+  // questions
+  $('qlist').innerHTML = '<h3 style="margin:0 0 4px;font-size:16px;color:var(--accent)">QUESTIONS '+(p*10+1)+'–'+(p*10+10)+'</h3>' +
+    P.qs.map((q,i)=>{
+      const n = qnum(p,i), a = S.ans[n-1];
+      let mark = '';
+      if (rv) mark = a===q.key ? '<span class="mark ok">✓ Đúng</span>' : '<span class="mark no">✗ '+(a===null?'Chưa trả lời':'Sai')+' – đáp án '+L[q.key]+'</span>';
+      return '<div class="q" id="q'+n+'"><div class="stem">'+n+'. '+esc(q.q)+' <button class="goto" data-r="'+n+'">xem trong bài</button>'+mark+'</div>' +
+        (q.insert?'<div class="ins">'+esc(q.insert)+'</div>':'') +
+        q.opts.map((o,j)=>{
+          let cls = 'opt';
+          if (rv){ if (j===q.key) cls+=' right'; else if (j===a) cls+=' wrong'; }
+          else if (j===a) cls+=' on';
+          return '<button class="'+cls+'" data-n="'+n+'" data-j="'+j+'"'+(rv?' disabled':'')+'><b>'+L[j]+'</b><span>'+esc(o)+'</span></button>';
+        }).join('') + (rv && q.exp ? '<div class="exp"><b>Giải thích:</b> '+esc(q.exp)+'</div>' : '') + '</div>';
+    }).join('');
+  if (!rv) $('qlist').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const n=+b.dataset.n, j=+b.dataset.j;
+    S.ans[n-1] = S.ans[n-1]===j ? null : j;
+    b.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on', S.ans[n-1]!==null && +x.dataset.j===S.ans[n-1]));
+    renderPalette(); updateTabs(); save();
+  });
+  $('qlist').querySelectorAll('.goto').forEach(b=>b.onclick=()=>{
+    setMobile('p'); const r=$('r'+b.dataset.r); if(!r) return;
+    r.scrollIntoView({behavior:'smooth',block:'center'}); r.classList.add('flash'); setTimeout(()=>r.classList.remove('flash'),1600);
+  });
+  $('prevP').disabled = p===0;
+  $('nextP').textContent = p===3 ? (rv ? 'Về trang kết quả' : 'Nộp bài') : 'Bài tiếp theo →';
+  renderPalette();
+  $('passage').scrollTop=0; document.querySelector('.qpane').scrollTop=0;
+}
+function updateTabs(){
+  $('ptabs').querySelectorAll('.ptab').forEach((b,k)=>{
+    const n = S.ans.slice(k*10,k*10+10).filter(a=>a!==null).length;
+    b.querySelector('small').textContent = '· '+(S.read[k]? n+'/10' : 'chưa đọc');
+  });
+}
+function renderPalette(){
+  const rv = S.review;
+  $('palette').innerHTML = DATA.map((P,p)=>'<div class="grp">'+P.qs.map((q,i)=>{
+    const n=qnum(p,i), a=S.ans[n-1];
+    let cls = '';
+    if (rv) cls = a===q.key ? 'r' : 'w';
+    else if (a!==null) cls='ans';
+    if (!S.read[p] && !rv) cls+=' locked';
+    return '<button class="'+cls+'" data-n="'+n+'" title="Câu '+n+'">'+n+'</button>';
+  }).join('')+'</div>').join('');
+  $('palette').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const n=+b.dataset.n, p=(n-1)/10|0;
+    if (!S.read[p] && !S.review){ openPassage(p); return; }
+    if (p!==S.cur){ S.cur=p; renderQ(); }
+    setMobile('q');
+    const el=$('q'+n); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+}
+function setMobile(which){}
+$('rNext').onclick=()=>nextPara();
+$('prevP').onclick=()=>{ if(S.cur>0) openPassage(S.cur-1); };
+$('nextP').onclick=()=>{
+  if (S.cur<3) openPassage(S.cur+1);
+  else if (S.review) show('scrResult');
+  else askSubmit();
+};
+
+/* ---------- submit ---------- */
+function askSubmit(){
+  const blank = S.ans.filter(a=>a===null).length;
+  const unread = S.read.filter(r=>!r).length;
+  let msg = '';
+  if (unread) msg += '<p>Em còn <b>'+unread+'</b> bài đọc chưa mở.</p>';
+  msg += blank ? '<p>Em còn <b>'+blank+'</b> câu chưa trả lời. Em có chắc muốn nộp bài không?</p>' : '<p>Em đã trả lời đủ 40 câu. Nộp bài ngay?</p>';
+  $('mBody').innerHTML = msg;
+  $('modal').classList.remove('hidden');
+}
+$('mNo').onclick=()=>$('modal').classList.add('hidden');
+$('mYes').onclick=()=>{ $('modal').classList.add('hidden'); finish(false); };
+$('submitTop').onclick=()=>{ if(S && !S.done) askSubmit(); else if(S && S.done) show('scrResult'); };
+
+function scoreOf(p){ return DATA[p].qs.filter((q,i)=>S.ans[p*10+i]===q.key).length; }
+function finish(auto){
+  clearInterval(tick); clearInterval(paraTimer);
+  S.done = true; S.review = false;
+  const per = [0,1,2,3].map(scoreOf), total = per.reduce((a,b)=>a+b,0);
+  const used = Math.min(TOTAL_SEC, S.elapsed|0);
+  const hist = store.get(TEST_ID+'-history') || [];
+  hist.unshift({ name:S.name, date:new Date().toISOString(), score:total, per, time:used });
+  store.set(TEST_ID+'-history', hist.slice(0,20));
+  store.del(TEST_ID+'-state');
+  $('clock').classList.add('hidden');
+  $('submitTop').textContent = 'Kết quả';
+  $('rName').textContent = (S.name ? S.name+' · ' : '') + new Date().toLocaleString('vi-VN') + (auto ? ' · Hết giờ, bài đã tự động nộp' : '');
+  $('sBig').textContent = total;
+  $('sPct').textContent = '('+Math.round(total/40*100)+'%)';
+  $('sGrid').innerHTML = per.map((s,k)=>'<div class="stat"><div class="k">Passage '+(k+1)+'</div><div class="v">'+s+' / 10</div></div>').join('');
+  $('sTime').textContent = 'Thời gian làm bài: '+fmt(used)+' / 60:00';
+  show('scrResult');
+}
+$('btnReview').onclick=()=>{ S.review=true; S.read=[true,true,true,true]; S.cur=0; renderQ(); };
+$('btnAgain').onclick=()=>{ location.reload(); };
+
+/* ---------- start ---------- */
+function renderHistory(){
+  const h = store.get(TEST_ID+'-history') || [];
+  if (!h.length) return;
+  $('history').classList.remove('hidden');
+  $('history').innerHTML = '<b>Các lần làm trước trên máy này</b><table><tr><th>Ngày</th><th>Tên</th><th>Điểm</th><th>Thời gian</th></tr>' +
+    h.map(r=>'<tr><td>'+new Date(r.date).toLocaleDateString('vi-VN')+'</td><td>'+esc(r.name||'–')+'</td><td>'+r.score+'/40</td><td>'+fmt(r.time)+'</td></tr>').join('') + '</table>';
+}
+$('btnStart').onclick=()=>{
+  store.del(TEST_ID+'-state');
+  S = newState(); S.read=[true,true,true,true]; startClock(); openPassage(0);
+};
+const saved = store.get(TEST_ID+'-state');
+if (saved && !saved.done && saved.elapsed < TOTAL_SEC){
+  $('btnResume').classList.remove('hidden');
+  $('btnResume').textContent = 'Tiếp tục bài đang làm (còn '+fmt(TOTAL_SEC-saved.elapsed)+')';
+  $('btnResume').onclick=()=>{
+    S = saved; S.review=false; startClock();
+    if (S.phase==='read' && !S.read[S.cur]) showPara(); else { S.phase='q'; renderQ(); }
+  };
+}
+renderHistory();
+window.addEventListener('beforeunload', save);
+</script>
+</body>
+</html>
