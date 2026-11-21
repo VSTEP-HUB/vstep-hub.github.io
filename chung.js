@@ -14,7 +14,7 @@ var CAU_HINH = {
 
   // Danh sách dự phòng nếu không lấy được danh sách tự động
   // (ví dụ khi mở thử trên máy). Ghi tên file, ví dụ: ["bai-1.html"]
-  DANH_SACH_DU_PHONG: ["bai-mau-reading.html"]
+  DANH_SACH_DU_PHONG: []
 };
 
 /* ---------- Nhận ra kho GitHub từ địa chỉ trang ---------- */
@@ -56,18 +56,46 @@ function khoaBai(tenFile) {
   return ("bai-" + vietTat(tenFile).slice(0, 40) + "-" + bam(tenFile)).slice(0, 60);
 }
 
-function demTang(khoa) { // +1 và trả về số mới
-  return fetch(MAY_DEM + "/hit/" + khongGianDem() + "/" + khoa)
-    .then(function (r) { return r.ok ? r.json() : null; })
+/* Gọi máy đếm, tối đa 8 giây; quá thời gian thì bỏ qua (dùng số đã nhớ) */
+function goiMayDem(duong) {
+  var huy = typeof AbortController !== "undefined" ? new AbortController() : null;
+  var hen = huy ? setTimeout(function () { huy.abort(); }, 8000) : null;
+  return fetch(MAY_DEM + duong, huy ? { signal: huy.signal } : {})
+    .then(function (r) { return r.status === 404 ? { value: 0 } : (r.ok ? r.json() : null); })
     .then(function (d) { return d && typeof d.value === "number" ? d.value : null; })
-    .catch(function () { return null; });
+    .catch(function () { return null; })
+    .then(function (v) { if (hen) clearTimeout(hen); return v; });
+}
+
+/* Nhớ số mới nhất trong máy để lần sau mở web hiện ngay, không phải chờ */
+function soDaNho(khoa) {
+  var v = docTam("localStorage", "vstep-so-" + khongGianDem() + "-" + khoa);
+  return v === null ? null : Number(v);
+}
+function nhoSo(khoa, n) {
+  if (n === null || n === undefined) return n;
+  var cu = soDaNho(khoa);
+  if (cu !== null && cu > n) n = cu; // số đếm không bao giờ giảm
+  luuTam("localStorage", "vstep-so-" + khongGianDem() + "-" + khoa, String(n));
+  return n;
+}
+
+function demTang(khoa) { // +1 và trả về số mới
+  var cu = soDaNho(khoa);
+  if (cu !== null) luuTam("localStorage", "vstep-so-" + khongGianDem() + "-" + khoa, String(cu + 1));
+  return goiMayDem("/hit/" + khongGianDem() + "/" + khoa)
+    .then(function (n) { return n === null ? soDaNho(khoa) : nhoSo(khoa, n); });
 }
 
 function docSoDem(khoa) { // chỉ đọc, không tăng
-  return fetch(MAY_DEM + "/get/" + khongGianDem() + "/" + khoa)
-    .then(function (r) { return r.status === 404 ? { value: 0 } : (r.ok ? r.json() : null); })
-    .then(function (d) { return d && typeof d.value === "number" ? d.value : null; })
-    .catch(function () { return null; });
+  return goiMayDem("/get/" + khongGianDem() + "/" + khoa)
+    .then(function (n) { return n === null ? soDaNho(khoa) : nhoSo(khoa, n); });
+}
+
+/* Hiện số: có số đã nhớ thì hiện ngay; chưa có thì hiện "…" */
+function hienSoNgay(oSo, khoa) {
+  var n = soDaNho(khoa);
+  oSo.textContent = n === null ? "…" : dinhDangSo(n);
 }
 
 function dinhDangSo(n) {

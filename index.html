@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VSTEP – HUB</title>
-<link rel="stylesheet" href="kieu.css"> <link rel="icon" href="logo.png">
+<title>VSTEP – Tan.ed</title>
+<link rel="stylesheet" href="kieu.css">
+<link rel="icon" href="logo.png">
 </head>
 <body>
 <header class="dau">
   <div class="khung">
-        <img class="logo" src="logo.png" alt="VSTEP-HUB" style="object-fit:cover;background:none">
+    <img class="logo" src="logo.png" alt="VSTEP" style="object-fit:cover;background:none">
     <div>
       <h1>VSTEP</h1>
       <p>Tan.ed</p>
@@ -32,75 +33,105 @@
   <p id="thongBao" class="thong-bao">Đang tải danh sách bài…</p>
 </main>
 
-<footer>Vstep</footer>
+<footer>VSTEP</footer>
 
 <script src="chung.js"></script>
 <script>
 (function () {
-  // 1) Đếm lượt truy cập: mỗi lần mở web (mỗi phiên trình duyệt) tính 1 lượt
-  var o = document.getElementById("soTruyCap");
-  if (!docTam("sessionStorage", "vstep-da-dem")) {
-    demTang("truy-cap").then(function (n) {
-      if (n !== null) luuTam("sessionStorage", "vstep-da-dem", "1");
-      o.textContent = dinhDangSo(n);
-    });
-  } else {
-    docSoDem("truy-cap").then(function (n) { o.textContent = dinhDangSo(n); });
-  }
-
-  // 2) Tổng lượt làm bài
-  docSoDem("lam-bai-tong").then(function (n) {
-    document.getElementById("soLamBai").textContent = dinhDangSo(n);
-  });
-
-  // 3) Danh sách bài
+  var CAP_NHAT_SAU = 5 * 60 * 1000;   // tự cập nhật số mỗi 5 phút
+  var oTruyCap = document.getElementById("soTruyCap");
+  var oLamBai  = document.getElementById("soLamBai");
   var ul = document.getElementById("dsBai");
   var tb = document.getElementById("thongBao");
+  var oTim = document.getElementById("oTim");
+  var KHOA_DS = "vstep-ds-hien-" + khongGianDem();
 
-  layDanhSachBai().then(function (ds) {
-    ds.sort(function (a, b) { return a.file.localeCompare(b.file, "vi", { numeric: true }); });
+  // 1) Hiện NGAY số đã nhớ từ lần trước (không phải chờ)
+  hienSoNgay(oTruyCap, "truy-cap");
+  hienSoNgay(oLamBai, "lam-bai-tong");
+
+  // 2) Đếm lượt truy cập: mỗi phiên trình duyệt tính 1 lượt
+  if (!docTam("sessionStorage", "vstep-da-dem")) {
+    luuTam("sessionStorage", "vstep-da-dem", "1");
+    demTang("truy-cap").then(function (n) { oTruyCap.textContent = dinhDangSo(n); });
+  } else {
+    docSoDem("truy-cap").then(function (n) { oTruyCap.textContent = dinhDangSo(n); });
+  }
+  docSoDem("lam-bai-tong").then(function (n) { oLamBai.textContent = dinhDangSo(n); });
+
+  // 3) Danh sách bài: hiện ngay danh sách đã nhớ, rồi cập nhật
+  function veDanhSach(ds) {
+    ds = ds.slice().sort(function (a, b) { return a.file.localeCompare(b.file, "vi", { numeric: true }); });
     document.getElementById("soBai").textContent = ds.length;
-    if (!ds.length) { tb.textContent = "Chưa có bài tập nào."; return; }
+    ul.innerHTML = "";
+    if (!ds.length) { tb.style.display = ""; tb.textContent = "Chưa có bài tập nào."; return; }
     tb.style.display = "none";
 
     ds.forEach(function (muc, i) {
-      var tenFile = muc.file;
       var li = document.createElement("li");
-      li.dataset.tim = vietTat(tenFile);
+      li.dataset.tim = vietTat(muc.file) + " " + vietTat(muc.title || "");
+      li.dataset.khoa = khoaBai(muc.file);
       var a = document.createElement("a");
-      a.href = "lam-bai.html?bai=" + encodeURIComponent(tenFile);
+      a.href = "lam-bai.html?bai=" + encodeURIComponent(muc.file);
       a.innerHTML =
         '<span class="so-tt">' + (i + 1) + '</span>' +
         '<span class="ten-bai"><strong></strong><small>Đã làm: <span class="dl">…</span> lượt</small></span>' +
         '<span class="nut-lam">Làm bài</span>';
-      a.querySelector("strong").textContent = tenTuFile(tenFile);
+      a.querySelector("strong").textContent = muc.title || tenTuFile(muc.file);
+      hienSoNgay(a.querySelector(".dl"), li.dataset.khoa);
       li.appendChild(a);
       ul.appendChild(li);
-
-      var datTen = function (t) {
-        a.querySelector("strong").textContent = t;
-        li.dataset.tim += " " + vietTat(t);
-      };
-      if (muc.title) {
-        var tam = document.createElement("textarea");
-        tam.innerHTML = muc.title;
-        datTen(tam.value);
-      } else {
-        layTieuDe(tenFile).then(datTen);
-      }
-      docSoDem(khoaBai(tenFile)).then(function (n) {
-        a.querySelector(".dl").textContent = dinhDangSo(n);
-      });
     });
+    locTheoTuKhoa();
+  }
+
+  function giaiMa(t) {
+    var tam = document.createElement("textarea");
+    tam.innerHTML = t;
+    return tam.value;
+  }
+
+  function capNhatSoTungBai() {
+    Array.prototype.forEach.call(ul.children, function (li) {
+      var o = li.querySelector(".dl");
+      docSoDem(li.dataset.khoa).then(function (n) { o.textContent = dinhDangSo(n); });
+    });
+  }
+
+  var dsCu = null;
+  try { dsCu = JSON.parse(docTam("localStorage", KHOA_DS) || "null"); } catch (e) {}
+  if (Array.isArray(dsCu) && dsCu.length) veDanhSach(dsCu);
+
+  layDanhSachBai().then(function (ds) {
+    // lấy tên bài: dùng tên đã nhớ nếu có, thiếu thì đọc từ file
+    var nhoTen = {};
+    (dsCu || []).forEach(function (m) { if (m.title) nhoTen[m.file] = m.title; });
+    return Promise.all(ds.map(function (m) {
+      if (m.title) return { file: m.file, title: giaiMa(m.title) };
+      return layTieuDe(m.file).then(function (t) { return { file: m.file, title: t || nhoTen[m.file] || "" }; });
+    }));
+  }).then(function (ds) {
+    if (!ds.length && Array.isArray(dsCu) && dsCu.length) ds = dsCu; // lỗi tạm thời: giữ danh sách cũ
+    luuTam("localStorage", KHOA_DS, JSON.stringify(ds));
+    veDanhSach(ds);
+    capNhatSoTungBai();
   });
 
-  // 4) Ô tìm bài
-  document.getElementById("oTim").addEventListener("input", function () {
-    var q = vietTat(this.value);
+  // 4) Tự cập nhật các con số mỗi 5 phút
+  setInterval(function () {
+    docSoDem("truy-cap").then(function (n) { oTruyCap.textContent = dinhDangSo(n); });
+    docSoDem("lam-bai-tong").then(function (n) { oLamBai.textContent = dinhDangSo(n); });
+    capNhatSoTungBai();
+  }, CAP_NHAT_SAU);
+
+  // 5) Ô tìm bài
+  function locTheoTuKhoa() {
+    var q = vietTat(oTim.value);
     Array.prototype.forEach.call(ul.children, function (li) {
       li.style.display = !q || li.dataset.tim.indexOf(q) !== -1 ? "" : "none";
     });
-  });
+  }
+  oTim.addEventListener("input", locTheoTuKhoa);
 })();
 </script>
 </body>
