@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSTEP Reading – Author's Purpose</title>
+<style>
+:root{
+  --bg:#f4f1ea; --paper:#fffdf8; --ink:#1f2328; --muted:#6b6f76; --line:#e2ddd2;
+  --accent:#1d5c63; --accent-2:#e7f0ef; --warn:#b4541a; --ok:#2f7d4f; --ok-bg:#e6f3ea;
+  --bad:#b3261e; --bad-bg:#fbe9e7; --sel:#dcebe9; --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+.hidden{display:none!important}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--accent);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px}
+.top h1{font-size:16px;margin:0;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clock{font-variant-numeric:tabular-nums;font-weight:700;background:rgba(255,255,255,.14);padding:4px 10px;border-radius:6px;letter-spacing:.5px}
+.clock.low{background:#f3b27a;color:#3a1d06}
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:9px 16px;border-radius:8px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.light{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:#fff;padding:5px 12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+
+/* start */
+.start{max-width:680px;margin:24px auto;padding:28px}
+.start h2{margin:0 0 4px;font-size:26px}
+.start .sub{color:var(--muted);margin:0 0 20px}
+.start ul{padding-left:20px;margin:0 0 20px}
+.start li{margin:4px 0}
+.field{display:flex;flex-direction:column;gap:6px;margin:0 0 18px}
+.field input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.history{margin-top:22px;border-top:1px solid var(--line);padding-top:14px;font-size:14px}
+.history table{width:100%;border-collapse:collapse}
+.history td,.history th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+.history th{color:var(--muted);font-weight:600}
+
+/* reading phase */
+.reader{max-width:780px;margin:12px auto;padding:28px 30px}
+.reader .meta{display:flex;justify-content:space-between;align-items:baseline;gap:12px;color:var(--muted);font-size:14px;margin-bottom:6px}
+.reader h2{margin:0 0 4px;font-size:20px}
+.reader .ptitle{font-weight:700;text-align:center;margin:10px 0 0}
+.pbar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin:14px 0 20px}
+.pbar i{display:block;height:100%;background:var(--accent);width:100%;transition:width 1s linear}
+.para-now{font-size:18px;line-height:1.75;text-align:justify;min-height:180px}
+.para-now .num{display:inline-block;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-2);border-radius:4px;padding:0 6px;margin-right:6px;vertical-align:2px}
+.dots{display:flex;gap:6px;justify-content:center;margin:18px 0 6px}
+.dots span{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dots span.done{background:var(--accent)}
+.dots span.cur{background:var(--warn)}
+.reader .actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:12px}
+.reader .hint{font-size:13px;color:var(--muted)}
+
+/* question phase */
+.ptabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ptab{border:1px solid var(--line);background:var(--paper);padding:7px 14px;border-radius:999px;font-size:14px}
+.ptab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.ptab small{opacity:.75}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.pane{padding:20px 22px}
+.passage,.qpane{position:sticky;top:64px;height:calc(100vh - 84px);overflow:auto}
+.qpane .nav{margin-bottom:4px}
+.passage h3{margin:0 0 10px;font-size:16px;color:var(--accent)}
+.passage .ptitle{font-weight:700;text-align:center;margin:0 0 10px}
+.passage p{text-align:justify;margin:0 0 12px}
+.passage p .num{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-2);border-radius:4px;padding:0 5px;margin-right:6px}
+.q{padding:14px 0;border-bottom:1px solid var(--line)}
+.q:last-child{border-bottom:0}
+.q .stem{font-weight:600;margin-bottom:8px}
+.q .ins{font-style:italic;background:#f6f3ea;border-left:3px solid var(--warn);padding:8px 12px;margin:0 0 10px;border-radius:0 6px 6px 0}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:6px 0;color:var(--ink)}
+.opt:hover{border-color:var(--accent)}
+.opt b{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:13px}
+.opt.on{background:var(--sel);border-color:var(--accent)}
+.opt.on b{background:var(--accent);border-color:var(--accent);color:#fff}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)}
+.opt.right b{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.opt.wrong b{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt[disabled]{cursor:default}
+.mark{font-size:13px;font-weight:700;margin-left:8px}
+.mark.ok{color:var(--ok)} .mark.no{color:var(--bad)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.palette{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;padding:14px;}
+.palette .grp{display:flex;gap:4px;flex-wrap:wrap;margin-right:10px}
+.palette button{width:32px;height:30px;border-radius:6px;border:1px solid var(--line);background:#fff;font-size:13px;padding:0}
+.palette button.ans{background:var(--accent);color:#fff;border-color:var(--accent)}
+.palette button.r{background:var(--ok);border-color:var(--ok);color:#fff}
+.palette button.w{background:var(--bad);border-color:var(--bad);color:#fff}
+.palette button.locked{opacity:.4}
+.mtabs{display:none}
+.ref{font-weight:700;text-decoration:underline;text-decoration-color:var(--warn);text-underline-offset:3px}
+.ref sup{font-size:10px;color:#fff;background:var(--warn);border-radius:3px;padding:0 3px;margin-left:2px;text-decoration:none;display:inline-block;line-height:1.3}
+.ref.flash,p.flash{background:#fde7c8;border-radius:3px}
+p{transition:background .3s}
+.exp{margin-top:8px;font-size:14px;background:#f6f3ea;border-radius:6px;padding:8px 12px;color:#3a3f45}
+.stem .goto{font-size:12px;font-weight:600;color:var(--accent);background:none;border:0;padding:0 0 0 6px;text-decoration:underline}
+
+/* result */
+.result{max-width:780px;margin:12px auto;padding:28px}
+.score{display:flex;align-items:baseline;gap:10px;margin:6px 0 16px}
+.score .big{font-size:48px;font-weight:800;color:var(--accent);line-height:1}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 20px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+.stat .k{font-size:13px;color:var(--muted)}
+.stat .v{font-size:20px;font-weight:700}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(20,24,28,.45);display:grid;place-items:center;z-index:50;padding:16px}
+.modal .box{background:var(--paper);border-radius:12px;max-width:420px;width:100%;padding:22px;box-shadow:var(--shadow)}
+.modal h3{margin:0 0 8px}
+.modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+@media (max-width:560px){.passage p{text-align:left}}
+@media (max-width:860px){
+  .split{gap:8px}
+  .pane{padding:12px 12px}
+  .passage p,.q{font-size:14px;line-height:1.55}
+  .opt{padding:6px 8px;gap:6px}
+  .opt b{width:20px;height:20px;font-size:12px}
+  .wrap{padding:12px 8px 30px}
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .reader{padding:22px 18px}
+  .para-now{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>VSTEP Reading – Author's Purpose</h1>
+  <span id="clock" class="clock hidden">60:00</span>
+  <button id="submitTop" class="btn light hidden">Nộp bài</button>
+</div>
+
+<div class="wrap">
+  <!-- START -->
+  <section id="scrStart" class="card start">
+    <h2>Author's Purpose · C1</h2>
+    <p class="sub">4 bài đọc · 40 câu hỏi về mục đích của tác giả · 60 phút</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="btnStart" class="btn primary">Bắt đầu làm bài</button>
+      <button id="btnResume" class="btn hidden">Tiếp tục bài đang làm</button>
+    </div>
+    <div id="history" class="history hidden"></div>
+  </section>
+
+  <!-- READING -->
+  <section id="scrRead" class="card reader hidden">
+    <div class="meta"><span id="rPassage">Passage 1</span><span id="rStep">Đoạn 1/4</span></div>
+    <h2 id="rHead">PASSAGE 1 – QUESTIONS 1–10</h2>
+    <div id="rTitle" class="ptitle"></div>
+    <div class="pbar"><i id="rBar"></i></div>
+    <div id="rPara" class="para-now"></div>
+    <div id="rDots" class="dots"></div>
+    <div class="actions">
+      <span class="hint">Thời gian còn lại cho đoạn này: <b id="rLeft">0</b> giây</span>
+      <button id="rNext" class="btn primary">Đoạn tiếp theo →</button>
+    </div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <section id="scrQ" class="hidden">
+    <div id="ptabs" class="ptabs"></div>
+    <div id="split" class="split show-q">
+      <div id="passage" class="card pane passage"></div>
+      <div class="qpane">
+        <div id="qlist" class="card pane"></div>
+        <div class="nav">
+          <button id="prevP" class="btn">← Bài trước</button>
+          <button id="nextP" class="btn primary">Bài tiếp theo →</button>
+        </div>
+      </div>
+    </div>
+    <div id="palette" class="card palette"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="scrResult" class="card result hidden">
+    <h2 style="margin:0">Kết quả</h2>
+    <div id="rName" style="color:var(--muted)"></div>
+    <div class="score"><span id="sBig" class="big">0</span><span>/ 40 câu đúng</span><span id="sPct" style="color:var(--muted)"></span></div>
+    <div id="sGrid" class="grid4"></div>
+    <div id="sTime" style="color:var(--muted);margin-bottom:18px"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="btnReview" class="btn primary">Xem lại bài và đáp án</button>
+      <button id="btnAgain" class="btn">Làm lại từ đầu</button>
+    </div>
+  </section>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="box">
+    <h3 id="mTitle">Nộp bài?</h3>
+    <div id="mBody"></div>
+    <div class="row"><button id="mNo" class="btn">Làm tiếp</button><button id="mYes" class="btn primary">Nộp bài</button></div>
+  </div>
+</div>
+
+<script>
+const DATA = [{"title": "The Myth of the Mozart Effect", "paras": ["In 1993, a short paper in the scientific journal Nature reported that university students who listened to ten minutes of a Mozart sonata performed slightly better on a spatial reasoning task than students who sat in silence. The effect was small and lasted only about fifteen minutes. Within a few years, however, it had been transformed into something far grander.", "Newspapers announced that Mozart makes you smarter. Companies began selling CDs designed to boost babies’ intelligence, and in 1998 <span class=\"ref\" id=\"r3\">the governor of the US state of Georgia<sup>3</sup></span> proposed spending public money to give every newborn in the state a classical music recording. <span class=\"ref\" id=\"r4\">What had begun as a modest laboratory finding had become a cultural phenomenon.<sup>4</sup></span>", "Yet the original study had said nothing about babies, nor about general intelligence. <span class=\"ref\" id=\"r5\">When other researchers tried to reproduce the result, many of them failed.<sup>5</sup></span> A review combining data from dozens of studies concluded that any benefit was tiny, and later work suggested that it had little to do with Mozart at all. Listening to <span class=\"ref\" id=\"r6\">an upbeat pop song or an exciting story<sup>6</sup></span>, it turned out, could produce a similar short-lived improvement, apparently because it left listeners more alert and in a better mood.", "<span class=\"ref\" id=\"r7\">“The Mozart effect is really an arousal effect,”<sup>7</sup></span> explains Dr Hannah Reyes, a psychologist who studies music and the mind. “Anything that wakes you up and puts you in a good mood will help you perform a little better for a few minutes. There’s nothing magical about the music itself.”", "Why did the myth spread so successfully? Part of the answer lies in the way science is reported. Headlines reward simple, surprising claims, and the careful qualifications found in research papers are often lost along the way. Part of it lies in us. <span class=\"ref\" id=\"r8\">Parents understandably want to give their children every possible advantage,<sup>8</sup></span> and a claim that requires nothing more than pressing “play” is hard to resist.", "None of this means that music is unimportant for children. There is evidence that learning to play an instrument over a long period may bring certain benefits, such as improved listening skills, although researchers continue to debate how far these extend to other areas. The difference is that such benefits come from years of active effort rather than passive listening.", "The story of the Mozart effect is, in the end, <span class=\"ref\" id=\"r10\">a cautionary tale<sup>10</sup></span>. It shows how easily a narrow finding can be stretched beyond recognition as it travels from the laboratory to the living room, and why it is always worth asking what a study actually found before believing what it is said to prove."], "qs": [{"q": "The main purpose of this passage is to ________.", "insert": null, "opts": ["prove that listening to classical music regularly improves children’s intelligence", "persuade parents to play more music to their babies from an early age", "explain how a limited scientific finding grew into a popular myth", "describe how Mozart’s music has been studied by scientists over the centuries"], "key": 2, "exp": "Cả bài đi theo trình tự: nghiên cứu nhỏ năm 1993 → bị thổi phồng → không lặp lại được → vì sao lan truyền → bài học. Mục đích là giải thích một phát hiện nhỏ đã trở thành \"huyền thoại\" như thế nào. B và C là chính những điều bài phản bác.", "target": ""}, {"q": "What is the purpose of paragraph 1?", "insert": null, "opts": ["To criticise the journal Nature for publishing a study with so few participants", "To present what the original research actually found before showing how it was exaggerated", "To explain in detail how spatial reasoning is measured in laboratory experiments", "To show that the effect was strong enough to last for many years"], "key": 1, "exp": "Đoạn 1 nêu đúng nội dung gốc: hiệu ứng nhỏ, chỉ kéo dài khoảng 15 phút. Câu cuối \"transformed into something far grander\" báo hiệu phần thổi phồng ở đoạn sau. D trái với bài (\"small\", \"fifteen minutes\").", "target": "pp0-1"}, {"q": "Why does the author mention the governor of Georgia?", "insert": null, "opts": ["To praise the governor for supporting classical music and the arts in schools", "To suggest that politicians usually understand scientific research better than journalists", "To show how far the claim had spread, reaching even government policy", "To explain how companies managed to sell so many music CDs in the 1990s"], "key": 2, "exp": "Ví dụ ông thống đốc đề xuất dùng tiền công để tặng đĩa nhạc cổ điển cho mọi trẻ sơ sinh cho thấy tuyên bố đã lan đến cả chính sách nhà nước.", "target": "r3"}, {"q": "What is the function of the sentence “What had begun as a modest laboratory finding had become a cultural phenomenon”?", "insert": null, "opts": ["To sum up the contrast between the original result and its later popularity", "To introduce a new scientific study that confirmed the original result", "To argue that the original finding was correct despite the criticism it received", "To describe what happened in Georgia after the governor’s proposal was accepted"], "key": 0, "exp": "Câu này tổng kết đoạn 2 bằng sự đối lập: \"modest laboratory finding\" và \"cultural phenomenon\". Đây là câu chốt ý, không đưa ra thông tin mới.", "target": "r4"}, {"q": "The author mentions that many researchers failed to reproduce the result in order to ________.", "insert": null, "opts": ["cast doubt on the reliability of the original claim", "show that the other researchers lacked the experience to repeat the experiment properly", "prove that Mozart’s music has absolutely no effect on the way anyone thinks", "explain why the design of the original experiment was so difficult to copy"], "key": 0, "exp": "Kết quả không lặp lại được là dấu hiệu tuyên bố ban đầu không đáng tin. C quá tuyệt đối: bài chỉ nói lợi ích \"tiny\", không nói hoàn toàn không có tác dụng.", "target": "r5"}, {"q": "Why does the author mention “an upbeat pop song or an exciting story”?", "insert": null, "opts": ["To recommend pop music as a more effective way of improving intelligence", "To show that the effect was not specific to Mozart’s music", "To show that most students would rather listen to pop music than to Mozart", "To compare the effects of different styles of music on people’s long-term memory"], "key": 1, "exp": "Nhạc pop sôi động hay một câu chuyện hấp dẫn cũng tạo ra hiệu ứng tương tự. Vậy hiệu ứng không phải do riêng nhạc Mozart (\"little to do with Mozart at all\").", "target": "r6"}, {"q": "Why does the author quote Dr Reyes?", "insert": null, "opts": ["To introduce a view that contradicts the explanation given in the previous paragraph", "To show that psychologists strongly disagree about whether music affects the mind", "To describe Dr Reyes’s own experiments on music and children’s development", "To support, with an expert’s opinion, the explanation that the effect comes from alertness and mood"], "key": 3, "exp": "Lời chuyên gia khẳng định lại ý ở đoạn 3: đó là hiệu ứng \"kích thích\" (arousal), tức tỉnh táo và tâm trạng tốt, chứ âm nhạc không có gì \"thần kỳ\".", "target": "r7"}, {"q": "What is the purpose of the statement “Parents understandably want to give their children every possible advantage”?", "insert": null, "opts": ["To criticise parents for believing claims without checking the scientific evidence", "To argue that parents should spend more money on their children’s education", "To describe how parents in different countries try to help their children succeed", "To explain why the public was so willing to believe the claim"], "key": 3, "exp": "Câu này trả lời câu hỏi \"Why did the myth spread so successfully?\" từ phía người nghe: cha mẹ muốn con có mọi lợi thế. Từ \"understandably\" cho thấy tác giả thông cảm chứ không chỉ trích, nên loại B.", "target": "r8"}, {"q": "What is the purpose of paragraph 6?", "insert": null, "opts": ["To prevent readers from concluding that music has no value for children", "To prove that learning an instrument makes children more intelligent in every subject", "To repeat the original claims about the Mozart effect in a more careful way", "To introduce another popular myth about the way children’s brains develop"], "key": 0, "exp": "\"None of this means that music is unimportant…\" → đoạn 6 giới hạn lại kết luận: nghe nhạc thụ động thì không hiệu quả, nhưng học nhạc cụ lâu dài có thể có ích. B quá mạnh, vì bài nói các nhà nghiên cứu vẫn còn tranh luận.", "target": "pp0-6"}, {"q": "The author describes the story as “a cautionary tale” in order to ________.", "insert": null, "opts": ["suggest that the story of the Mozart effect was invented by journalists", "criticise the people who still listen to Mozart in order to become smarter", "present it as a lesson about how to judge scientific claims", "entertain readers with an unusual story about a famous composer"], "key": 2, "exp": "\"a cautionary tale\" = câu chuyện để cảnh tỉnh. Câu sau nêu bài học: hãy hỏi nghiên cứu thực sự tìm ra điều gì trước khi tin vào những gì người ta nói nó chứng minh.", "target": "r10"}]}, {"title": "", "paras": ["Look down at almost any keyboard in the English-speaking world and you will see the same six letters in the top left-hand corner: Q, W, E, R, T, Y. The layout was developed in the 1870s for mechanical typewriters, machines that bear little resemblance to the laptops and smartphones on which it now appears. <span class=\"ref\" id=\"r12\">Why, nearly 150 years later, are we still using it?<sup>12</sup></span>", "According to a popular account, the QWERTY arrangement was deliberately designed to slow typists down, because on early machines the metal bars carrying the letters tended to jam if neighbouring keys were pressed in quick succession. Historians have since questioned <span class=\"ref\" id=\"r13\">this tidy explanation<sup>13</sup></span>, pointing out that the layout went through many changes and was shaped as much by the needs of telegraph operators as by mechanical problems. Whatever its origins, by the early twentieth century QWERTY had become the standard.", "Its survival has become a famous example of what economists call “path dependence”: the idea that decisions made in the past can lock societies into particular technologies or practices long after the original reasons for them have disappeared. Once millions of people had learned to type on QWERTY and businesses had invested in QWERTY machines, <span class=\"ref\" id=\"r15\">switching to a different layout would have meant retraining an entire workforce<sup>15</sup></span>. Each new typist learned QWERTY because everyone else used it, and each manufacturer produced it because that was what typists knew.", "Alternative layouts certainly exist. The best known, the Dvorak keyboard, was patented in 1936 and places the most commonly used letters on the middle row. <span class=\"ref\" id=\"r16\">Its supporters have long claimed that it allows faster and less tiring typing.<sup>16</sup></span> Yet the evidence for these claims is surprisingly weak: <span class=\"ref\" id=\"r17\">some of the early studies promoting Dvorak were carried out by its inventor himself<sup>17</sup></span>, and later comparisons found only modest differences.", "This has led some economists to argue that QWERTY is not really a story of society being trapped by an inferior technology. <span class=\"ref\" id=\"r18\">“If Dvorak were dramatically better, someone would have made a fortune by switching,”<sup>18</sup></span> argues Dr Paul Henning, an economic historian. “The fact that nobody did suggests that the gains were never large enough to justify the costs.”", "The debate matters because path dependence is found far beyond keyboards. <span class=\"ref\" id=\"r19\">Railway gauges, the side of the road on which people drive and the electrical plugs used in different countries<sup>19</sup></span> all reflect choices made long ago that would now be enormously expensive to reverse.", "QWERTY may never have been the best possible design. But its long life is a reminder that technologies succeed not only on their merits, but also because of timing, habit and the simple fact that everyone else is already using them."], "qs": [{"q": "The main purpose of this passage is to ________.", "insert": null, "opts": ["teach readers how to type more quickly by choosing a better keyboard layout", "prove that the Dvorak keyboard is superior to QWERTY in both speed and comfort", "use the history of the QWERTY keyboard to explore why some technologies persist", "describe how typewriters were designed and manufactured in the 1870s"], "key": 2, "exp": "QWERTY là ví dụ trung tâm để bàn về \"path dependence\": vì sao một công nghệ tồn tại lâu dù lý do ban đầu không còn. C sai, vì bài cho rằng bằng chứng ủng hộ Dvorak \"surprisingly weak\".", "target": ""}, {"q": "What is the function of the question “Why, nearly 150 years later, are we still using it?”", "insert": null, "opts": ["To introduce the central question that the passage will examine", "To express the author’s annoyance that such an old layout is still used today", "To test how much the reader already knows about the history of typewriters", "To suggest that QWERTY should be replaced by a more modern layout"], "key": 0, "exp": "Câu hỏi tu từ ở cuối đoạn mở đầu nêu vấn đề chính mà cả bài sẽ trả lời.", "target": "r12"}, {"q": "The author refers to the popular account as “this tidy explanation” in order to ________.", "insert": null, "opts": ["praise it for being clear, logical and easy for ordinary readers to understand", "show that historians now fully accept it as the true origin of the layout", "suggest that it is too simple to be completely accurate", "explain in detail why the metal bars of early typewriters tended to jam"], "key": 2, "exp": "\"tidy\" ở đây mang ý hơi mỉa: gọn gàng đến mức quá đơn giản. Ngay sau đó các nhà sử học chỉ ra bố cục này còn chịu ảnh hưởng của nhiều yếu tố khác.", "target": "r13"}, {"q": "What is the purpose of paragraph 3?", "insert": null, "opts": ["To describe how the design of typewriters changed in the early twentieth century", "To argue that manufacturers deliberately prevented better layouts from succeeding", "To compare the advantages and disadvantages of the QWERTY and Dvorak layouts", "To explain the idea of path dependence, using QWERTY as an example"], "key": 3, "exp": "Đoạn 3 định nghĩa \"path dependence\" rồi áp dụng vào QWERTY: người học vì ai cũng dùng, nhà sản xuất làm vì người ta đã quen.", "target": "pp1-3"}, {"q": "Why does the author mention that switching “would have meant retraining an entire workforce”?", "insert": null, "opts": ["To criticise office workers for being unwilling to learn a new and better system", "To show that training typists was cheap compared with buying new machines", "To illustrate how costly it is to change an established standard", "To explain how long it takes an experienced typist to learn the Dvorak layout"], "key": 2, "exp": "Việc phải đào tạo lại cả lực lượng lao động là ví dụ cụ thể cho cái giá rất cao khi đổi một tiêu chuẩn đã phổ biến. Đây chính là lý do xã hội bị \"khóa\" vào QWERTY.", "target": "r15"}, {"q": "Why does the author mention the claims made by Dvorak’s supporters?", "insert": null, "opts": ["To present a claim that the author goes on to question", "To recommend that readers switch to Dvorak in order to type faster", "To show how popular the Dvorak layout has become among professional typists", "To explain why the Dvorak layout places common letters on the middle row"], "key": 0, "exp": "Tác giả nêu tuyên bố \"nhanh hơn, đỡ mệt hơn\", rồi ngay câu sau phản bác: \"Yet the evidence for these claims is surprisingly weak\". Đây là cấu trúc nêu ý kiến rồi đặt câu hỏi về nó.", "target": "r16"}, {"q": "Why does the author point out that some early studies were carried out by Dvorak’s inventor himself?", "insert": null, "opts": ["To praise the inventor for testing his own design so carefully and thoroughly", "To prove that the early results showing Dvorak was faster were reliable", "To explain why the inventor waited until 1936 before patenting his layout", "To suggest that those studies may have been biased"], "key": 3, "exp": "Người phát minh tự nghiên cứu sản phẩm của mình thì dễ thiên vị. Chi tiết này được đưa ra để giải thích vì sao bằng chứng \"weak\".", "target": "r17"}, {"q": "Why does the author quote Dr Henning?", "insert": null, "opts": ["To support the claim that companies lost a fortune by refusing to switch to Dvorak", "To explain how people can make fortunes by investing in new technologies", "To describe how economic historians study the history of the typewriter industry", "To present the argument that QWERTY’s survival does not prove society was trapped by a worse design"], "key": 3, "exp": "Lập luận của ông: nếu Dvorak tốt hơn hẳn thì đã có người làm giàu nhờ chuyển đổi. Không ai làm được chứng tỏ lợi ích không đủ lớn. Lời trích minh họa cho ý ở câu đầu đoạn 5.", "target": "r18"}, {"q": "Why does the author mention railway gauges, the side of the road people drive on and electrical plugs?", "insert": null, "opts": ["To argue that these things should be standardised so that they are the same worldwide", "To show that path dependence affects many areas beyond keyboards", "To compare transport and electricity systems in different countries around the world", "To show that these technologies are more important than the design of keyboards"], "key": 1, "exp": "Câu chủ đề của đoạn: \"path dependence is found far beyond keyboards\". Ba ví dụ này chứng minh khái niệm áp dụng rộng hơn bàn phím.", "target": "r19"}, {"q": "What is the purpose of the final paragraph?", "insert": null, "opts": ["To introduce a new type of keyboard that may eventually replace QWERTY", "To draw a general conclusion about why technologies succeed", "To argue that QWERTY survived because it was the best possible design", "To summarise why the Dvorak keyboard failed to become the new standard"], "key": 1, "exp": "Đoạn cuối mở rộng từ QWERTY ra kết luận chung: công nghệ thành công không chỉ nhờ chất lượng mà còn nhờ thời điểm, thói quen và việc ai cũng đang dùng. C trái với câu \"may never have been the best possible design\".", "target": "pp1-7"}]}, {"title": "", "paras": ["On a hot afternoon in July, the centre of a large city can be several degrees warmer than the surrounding countryside. <span class=\"ref\" id=\"r22\">In some cities, the difference after sunset reaches as much as 10°C<sup>22</sup></span>, as buildings and roads release the heat they have absorbed during the day. This phenomenon, known as the urban heat island effect, is not new, but as cities grow and summers become hotter, it is becoming increasingly dangerous.", "The causes are well understood. Dark surfaces such as asphalt and roofing materials absorb sunlight rather than reflecting it. Concrete and brick store heat and release it slowly. Air conditioners, cars and factories pump additional warmth into the streets, and the lack of trees and open water means there is little natural cooling through shade or evaporation. <span class=\"ref\" id=\"r23\">In effect, many cities have been built as giant storage heaters.<sup>23</sup></span>", "The consequences can be deadly. During <span class=\"ref\" id=\"r24\">the European heatwave of 2003<sup>24</sup></span>, tens of thousands of people are estimated to have died, many of them elderly residents living alone in top-floor flats in city centres. <span class=\"ref\" id=\"r25\">Heat rarely makes headlines in the way that floods or hurricanes do,<sup>25</sup></span> yet in many wealthy countries it kills more people than any other type of extreme weather. Its effects are also unequal: <span class=\"ref\" id=\"r26\">poorer neighbourhoods, which tend to have fewer trees and more densely packed buildings, are often several degrees hotter than wealthier ones<sup>26</sup></span>.", "Cities are responding in a variety of ways. Paris has turned school playgrounds into shaded “oases” with plants and water features, which are opened to the public during heatwaves. Some cities in the United States have painted streets and roofs with reflective coatings. Medellín, in Colombia, has created a network of “green corridors” along roads and waterways, and officials report that temperatures along them have fallen noticeably.", "<span class=\"ref\" id=\"r28\">“Trees are the most underrated infrastructure a city has,”<sup>28</sup></span> says urban planner Dr Lena Morales. “They cool the air, absorb rainwater and improve people’s mental health. Yet when budgets are tight, they are often the first thing to be cut.”", "Such measures are not without drawbacks. Reflective surfaces can create uncomfortable glare, trees take decades to mature and need water to survive, and new green spaces can raise property values, pushing out the very residents they were meant to help.", "Nevertheless, the cost of doing nothing is rising every year. <span class=\"ref\" id=\"r30\">By 2050, around two-thirds of the world’s population is expected to live in cities<sup>30</sup></span>, many of them in regions that are already extremely hot. Designing cities that stay cool may soon be as important as designing cities that stay dry."], "qs": [{"q": "The main purpose of this passage is to ________.", "insert": null, "opts": ["explain the causes and dangers of urban heat islands and how cities are responding", "persuade readers that it is healthier to move from cities to the countryside", "describe the causes and effects of the 2003 European heatwave in detail", "compare the ways in which Paris and Medellín have changed their climates"], "key": 0, "exp": "Bài lần lượt trình bày: hiện tượng → nguyên nhân → hậu quả → các giải pháp → hạn chế → tính cấp bách. C và D chỉ là ví dụ trong một đoạn.", "target": ""}, {"q": "Why does the author mention that the difference can reach as much as 10°C?", "insert": null, "opts": ["To show that temperatures in cities fall sharply as soon as the sun goes down", "To explain how scientists measure the temperature of buildings and roads", "To emphasise how large the temperature difference can be", "To argue that the countryside becomes uncomfortably cold at night in summer"], "key": 2, "exp": "Con số 10°C (kèm \"as much as\") làm nổi bật mức chênh lệch đáng kể giữa thành phố và nông thôn.", "target": "r22"}, {"q": "What is the function of the sentence “In effect, many cities have been built as giant storage heaters”?", "insert": null, "opts": ["To sum up the causes described in the paragraph with a vivid comparison", "To describe a type of heating system that is commonly used in city buildings", "To suggest that cities should store energy more efficiently during the winter", "To introduce an additional cause of urban heat that has not yet been mentioned"], "key": 0, "exp": "\"In effect\" báo hiệu câu tổng kết. Phép so sánh với lò sưởi tích nhiệt gói gọn các nguyên nhân vừa nêu: hấp thụ nhiệt, giữ nhiệt và tỏa ra chậm.", "target": "r23"}, {"q": "Why does the author mention the European heatwave of 2003?", "insert": null, "opts": ["To describe how elderly people in Europe usually spend the summer months", "To criticise European governments for failing to warn people about the heat", "To show that heatwaves are more common in Europe than in other parts of the world", "To provide evidence that urban heat can be deadly"], "key": 3, "exp": "Câu chủ đề \"The consequences can be deadly\" được chứng minh ngay bằng đợt nắng nóng năm 2003 với hàng chục nghìn người chết.", "target": "r24"}, {"q": "The author states that “heat rarely makes headlines in the way that floods or hurricanes do” in order to ________.", "insert": null, "opts": ["argue that journalists deliberately ignore heatwaves in favour of other stories", "show that floods and hurricanes cause more deaths than heat in wealthy countries", "point out that the danger of heat is often underestimated", "explain why floods and hurricanes attract so much attention from the media"], "key": 2, "exp": "Vế sau đối lập: \"yet… it kills more people than any other type of extreme weather\". Tác giả muốn nói nắng nóng ít được chú ý dù nguy hiểm nhất. C ngược với bài.", "target": "r25"}, {"q": "Why does the author mention that poorer neighbourhoods are often hotter than wealthier ones?", "insert": null, "opts": ["To suggest that poorer residents are responsible for making their areas hotter", "To show that the effects of urban heat are not shared equally", "To explain why property prices are higher in neighbourhoods with more trees", "To argue that poorer areas cannot afford to plant trees or build parks"], "key": 1, "exp": "Câu dẫn \"Its effects are also unequal\" cho biết ví dụ này minh họa sự bất bình đẳng: khu nghèo ít cây hơn nên nóng hơn.", "target": "r26"}, {"q": "What is the purpose of paragraph 4?", "insert": null, "opts": ["To compare how tourists experience hot weather in Paris, the US and Colombia", "To give examples of different strategies that cities use to reduce heat", "To argue that painting streets and roofs is the most effective solution", "To describe how Medellín became one of the greenest cities in South America"], "key": 1, "exp": "Câu chủ đề \"Cities are responding in a variety of ways\" + ba ví dụ: sân trường xanh ở Paris, sơn phản quang ở Mỹ, hành lang xanh ở Medellín.", "target": "pp2-4"}, {"q": "Why does the author quote Dr Morales?", "insert": null, "opts": ["To show that urban planners disagree about the value of planting trees", "To argue that cities should spend less money on parks when budgets are tight", "To describe how green spaces can be used to treat mental illness", "To stress the value of trees, which are often overlooked"], "key": 3, "exp": "\"underrated\" (bị đánh giá thấp) và \"the first thing to be cut\" → lời trích nhấn mạnh lợi ích của cây xanh thường bị xem nhẹ.", "target": "r28"}, {"q": "What is the purpose of paragraph 6?", "insert": null, "opts": ["To show that the solutions mentioned earlier do more harm than good", "To explain why reflective surfaces make cities hotter rather than cooler", "To acknowledge that the solutions have limitations", "To prove that planting trees is too slow and expensive to be worthwhile"], "key": 2, "exp": "\"Such measures are not without drawbacks\" → thừa nhận hạn chế (chói, cây lâu lớn, đẩy người nghèo đi). B sai, vì đoạn 7 mở đầu bằng \"Nevertheless\" và vẫn khẳng định cần hành động.", "target": "pp2-6"}, {"q": "Why does the author mention that two-thirds of the world’s population is expected to live in cities by 2050?", "insert": null, "opts": ["To predict that cities in hot regions will soon become cooler and safer", "To argue that people should be discouraged from moving to large cities", "To explain why the population of cities in hot regions is growing so quickly", "To stress the growing urgency of tackling urban heat"], "key": 3, "exp": "Đoạn cuối mở đầu \"the cost of doing nothing is rising\". Số liệu dân số đô thị tăng cho thấy vấn đề ngày càng cấp bách.", "target": "r30"}]}, {"title": "", "paras": ["<span class=\"ref\" id=\"r32\">In 2007, researchers paid volunteers five dollars for completing a survey and then offered them the chance to donate some of the money to a children’s charity.<sup>32</sup></span> One group read a letter presenting statistics about food shortages affecting millions of people in Africa. Another read about a single seven-year-old girl from Mali named Rokia, whose life would be improved by a donation. The second group gave more than twice as much as the first.", "<span class=\"ref\" id=\"r33\">This pattern, known as the “identifiable victim effect”, has been observed again and again.<sup>33</sup></span> People respond more generously to one named individual than to large numbers of anonymous victims, even though, logically, the suffering of millions should matter more. As <span class=\"ref\" id=\"r34\">a remark often attributed to Joseph Stalin<sup>34</sup></span> puts it, “One death is a tragedy; a million deaths is a statistic.”", "Psychologists believe that stories work because they engage our emotions in a way that numbers cannot. When we follow a narrative, we imagine ourselves in the character’s situation, and this sense of identification makes us care about the outcome. Statistics, by contrast, demand abstract thinking, and large numbers are notoriously difficult for the mind to grasp. <span class=\"ref\" id=\"r35\">The difference between a million and a billion is enormous, yet both simply feel like “a lot”.<sup>35</sup></span>", "Perhaps most surprisingly, the researchers found that combining the two approaches did not help. Volunteers who read about Rokia and were also shown the statistics gave less than those who read about Rokia alone. The numbers, it seems, made people think more analytically, and that cooled their emotional response.", "Charities, advertisers and politicians have long understood the power of stories, and <span class=\"ref\" id=\"r37\">this raises uncomfortable questions<sup>37</sup></span>. A vivid account of one victim can direct money towards causes that happen to be photogenic or well publicised, while equally serious problems that lack a compelling face are neglected. <span class=\"ref\" id=\"r38\">“Our compassion is shaped by attention, not by need,”<sup>38</sup></span> notes Dr Aisha Bello, who studies charitable giving. “That’s a problem if we want to do the most good.”", "Some researchers suggest a middle path. Rather than abandoning stories, organisations can use them as a doorway: an individual story attracts attention, while evidence about the scale of the problem and the effectiveness of different solutions guides how the money is spent. Donors, for their part, can learn to recognise when a story is moving them and pause to ask whether their generosity is going where it is most needed.", "Stories, in short, are among the most powerful tools of persuasion that we have. <span class=\"ref\" id=\"r40\">Like any powerful tool, they can be used wisely or carelessly.<sup>40</sup></span>"], "qs": [{"q": "The main purpose of this passage is to ________.", "insert": null, "opts": ["persuade readers to donate money to children’s charities working in Mali", "teach charities how to present statistics more clearly in their letters", "criticise politicians who use emotional stories to influence the public", "examine why individual stories influence generosity more than statistics, and what this means"], "key": 3, "exp": "Bài trình bày thí nghiệm → tên hiện tượng → giải thích tâm lý → phát hiện bất ngờ → hệ quả đáng lo → cách dung hòa. Mục đích là phân tích sức mạnh của câu chuyện so với con số.", "target": ""}, {"q": "Why does the author begin the passage with the 2007 experiment?", "insert": null, "opts": ["To introduce the topic with concrete evidence", "To describe how researchers usually pay volunteers for taking part in surveys", "To criticise the researchers for using such a small amount of money", "To show that charities often waste the money that volunteers donate"], "key": 0, "exp": "Mở bài bằng một thí nghiệm cụ thể, có số liệu rõ ràng (\"more than twice as much\") để dẫn vào hiện tượng chính của bài.", "target": "r32"}, {"q": "What is the function of the sentence “This pattern, known as the ‘identifiable victim effect’, has been observed again and again”?", "insert": null, "opts": ["To introduce a later study that produced exactly the opposite result", "To show that the result is a well-established finding rather than a one-off", "To describe how the 2007 experiment was carried out in more detail", "To suggest that the original result may have been a matter of chance"], "key": 1, "exp": "Câu này đặt tên cho hiện tượng và nhấn mạnh \"again and again\": kết quả đã được lặp lại nhiều lần, không phải trường hợp cá biệt.", "target": "r33"}, {"q": "Why does the author include the remark attributed to Joseph Stalin?", "insert": null, "opts": ["To express the same idea in a short, memorable way", "To show that political leaders have always understood human psychology", "To show that the author agrees with Stalin’s attitude towards human life", "To provide scientific proof for the results of the 2007 experiment"], "key": 0, "exp": "Câu nói nổi tiếng tóm gọn đúng ý của hiệu ứng: một cái chết là bi kịch, một triệu cái chết là con số. Tác giả mượn nó cho dễ nhớ, không phải để ủng hộ Stalin hay làm bằng chứng khoa học.", "target": "r34"}, {"q": "Why does the author mention the difference between a million and a billion?", "insert": null, "opts": ["To show readers how to calculate the difference between two large numbers", "To illustrate how hard it is for people to understand very large numbers", "To show that charities often exaggerate the number of people they help", "To compare the number of people affected by food shortages in different countries"], "key": 1, "exp": "Ví dụ minh họa cho câu ngay trước: \"large numbers are notoriously difficult for the mind to grasp\". Chênh lệch rất lớn nhưng cảm giác đều chỉ là \"nhiều\".", "target": "r35"}, {"q": "What is the purpose of paragraph 4?", "insert": null, "opts": ["To repeat the main result of the 2007 experiment described in paragraph 1", "To argue that charities should always include statistics alongside stories", "To report an unexpected finding about combining stories with statistics", "To describe the effect that donations had on Rokia’s life in Mali"], "key": 2, "exp": "\"Perhaps most surprisingly\" → đoạn 4 nêu phát hiện bất ngờ: thêm số liệu vào câu chuyện lại làm người ta quyên góp ít hơn.", "target": "pp3-4"}, {"q": "The author writes that “this raises uncomfortable questions” in order to ________.", "insert": null, "opts": ["accuse charities and advertisers of deliberately deceiving the public", "invite readers to think about which charities they would support", "signal a shift to the possible negative consequences of using stories", "show that the author has no answer to the problems that stories create"], "key": 2, "exp": "Cụm này là câu chuyển ý. Phần sau bàn mặt trái: tiền đổ vào những chuyện \"ăn ảnh\", còn vấn đề nghiêm trọng khác bị bỏ quên. A quá mạnh, vì bài không buộc tội ai gian dối.", "target": "r37"}, {"q": "Why does the author quote Dr Bello?", "insert": null, "opts": ["To praise modern charities for directing money to the people most in need", "To support the concern that donations do not always go where they are most needed", "To explain how researchers measure the attention that donors pay to stories", "To introduce a new experiment showing that need matters more than attention"], "key": 1, "exp": "\"shaped by attention, not by need\" = lòng trắc ẩn đi theo sự chú ý chứ không theo nhu cầu thật. Lời trích củng cố mối lo vừa nêu trong đoạn 5.", "target": "r38"}, {"q": "What is the purpose of paragraph 6?", "insert": null, "opts": ["To suggest a balanced way of using both stories and evidence", "To argue that charities should stop telling stories and rely only on evidence", "To describe the habits of donors who give regularly to many different charities", "To summarise the results of all the experiments mentioned earlier in the passage"], "key": 0, "exp": "\"Some researchers suggest a middle path\" → giải pháp dung hòa: dùng câu chuyện để thu hút, dùng bằng chứng để quyết định chi tiền. B trái với \"Rather than abandoning stories\".", "target": "pp3-6"}, {"q": "What is the function of the final sentence, “Like any powerful tool, they can be used wisely or carelessly”?", "insert": null, "opts": ["To introduce a new discussion about the tools that charities use to raise money", "To warn readers that stories are too dangerous to be used for persuasion", "To praise advertisers and politicians for their skill in using stories", "To conclude by reminding readers that stories can be used well or badly"], "key": 3, "exp": "Câu kết khép lại bài bằng một nhận định cân bằng: câu chuyện là công cụ mạnh, có thể dùng khôn ngoan hoặc cẩu thả. Bài không bảo nên tránh, nên C sai.", "target": "r40"}]}];
+const TEST_ID = 'vstep-reading-purpose-c1-01';
+const TOTAL_SEC = 60*60;
+const WPM = 150;              // reading speed used for paragraph timers
+const MIN_PARA = 20, MAX_PARA = 90;
+const L = 'ABCD';
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+let S = null;           // state
+let tick = null, paraTimer = null;
+
+function words(t){ return t.trim().split(/\s+/).length; }
+function paraSecs(t){ return Math.min(MAX_PARA, Math.max(MIN_PARA, Math.ceil(words(t)/WPM*60/5)*5)); }
+function fmt(s){ s=Math.max(0,s|0); return String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function qnum(p,i){ return p*10+i+1; }
+function show(id){ ['scrStart','scrRead','scrQ','scrResult'].forEach(x=>$(x).classList.toggle('hidden',x!==id)); window.scrollTo(0,0); }
+
+function newState(){
+  return { name: '', start: Date.now(), elapsed: 0,
+           ans: Array(40).fill(null), read: [false,false,false,false],
+           cur: 0, phase: 'read', para: 0, paraLeft: null, done: false, review: false };
+}
+function save(){ if(S && !S.done) store.set(TEST_ID+'-state', S); }
+
+/* ---------- global clock ---------- */
+function startClock(){
+  $('clock').classList.remove('hidden'); $('submitTop').classList.remove('hidden');
+  clearInterval(tick);
+  let last = Date.now();
+  tick = setInterval(()=>{
+    const now = Date.now(); S.elapsed += (now-last)/1000; last = now;
+    const left = TOTAL_SEC - S.elapsed;
+    $('clock').textContent = fmt(left);
+    $('clock').classList.toggle('low', left <= 300);
+    if (left <= 0){ finish(true); }
+    else if ((S.elapsed|0) % 5 === 0) save();
+  }, 1000);
+  $('clock').textContent = fmt(TOTAL_SEC - S.elapsed);
+}
+
+/* ---------- reading phase ---------- */
+function openPassage(p){
+  S.cur = p;
+  if (!S.read[p]){ S.phase='read'; if(S.paraLeft==null){ S.para=0; } showPara(); }
+  else { S.phase='q'; renderQ(); }
+  save();
+}
+function showPara(){
+  clearInterval(paraTimer);
+  const P = DATA[S.cur], i = S.para, txt = P.paras[i];
+  show('scrRead');
+  $('rPassage').textContent = 'Passage '+(S.cur+1)+' / 4';
+  $('rStep').textContent = 'Đoạn '+(i+1)+' / '+P.paras.length;
+  $('rHead').textContent = 'PASSAGE '+(S.cur+1)+' – QUESTIONS '+(S.cur*10+1)+'–'+(S.cur*10+10);
+  $('rTitle').textContent = P.title || '';
+  $('rTitle').classList.toggle('hidden', !P.title);
+  $('rPara').innerHTML = '<span class="num">'+(i+1)+'</span>'+esc(txt);
+  $('rDots').innerHTML = P.paras.map((_,k)=>'<span class="'+(k<i?'done':k===i?'cur':'')+'"></span>').join('');
+  const last = i === P.paras.length-1;
+  $('rNext').textContent = last ? 'Làm câu hỏi →' : 'Đoạn tiếp theo →';
+  const total = paraSecs(txt);
+  if (S.paraLeft == null) S.paraLeft = total;
+  const bar = $('rBar');
+  bar.style.transition='none'; bar.style.width=(S.paraLeft/total*100)+'%'; void bar.offsetWidth; bar.style.transition='width 1s linear';
+  $('rLeft').textContent = S.paraLeft;
+  paraTimer = setInterval(()=>{
+    S.paraLeft--; $('rLeft').textContent = Math.max(0,S.paraLeft);
+    bar.style.width = Math.max(0,S.paraLeft/total*100)+'%';
+    if (S.paraLeft <= 0) nextPara();
+  },1000);
+}
+function nextPara(){
+  clearInterval(paraTimer);
+  S.paraLeft = null;
+  const P = DATA[S.cur];
+  if (S.para < P.paras.length-1){ S.para++; showPara(); }
+  else { S.read[S.cur]=true; S.para=0; S.phase='q'; renderQ(); }
+  save();
+}
+
+/* ---------- question phase ---------- */
+function renderQ(){
+  clearInterval(paraTimer);
+  show('scrQ');
+  const p = S.cur, P = DATA[p], rv = S.review;
+  // passage tabs
+  $('ptabs').innerHTML = DATA.map((_,k)=>{
+    const n = S.ans.slice(k*10,k*10+10).filter(a=>a!==null).length;
+    const sub = rv ? scoreOf(k)+'/10 đúng' : (S.read[k] ? n+'/10' : 'chưa đọc');
+    return '<button class="ptab'+(k===p?' on':'')+'" data-p="'+k+'">Passage '+(k+1)+' <small>· '+sub+'</small></button>';
+  }).join('');
+  $('ptabs').querySelectorAll('.ptab').forEach(b=>b.onclick=()=>openPassage(+b.dataset.p));
+  // passage text
+  $('passage').innerHTML = '<h3>PASSAGE '+(p+1)+'</h3>' + (P.title?'<div class="ptitle">'+esc(P.title)+'</div>':'') +
+    P.paras.map((t,i)=>'<p id="pp'+p+'-'+(i+1)+'"><span class="num">'+(i+1)+'</span>'+t+'</p>').join('');
+  // questions
+  $('qlist').innerHTML = '<h3 style="margin:0 0 4px;font-size:16px;color:var(--accent)">QUESTIONS '+(p*10+1)+'–'+(p*10+10)+'</h3>' +
+    P.qs.map((q,i)=>{
+      const n = qnum(p,i), a = S.ans[n-1];
+      let mark = '';
+      if (rv) mark = a===q.key ? '<span class="mark ok">✓ Đúng</span>' : '<span class="mark no">✗ '+(a===null?'Chưa trả lời':'Sai')+' – đáp án '+L[q.key]+'</span>';
+      return '<div class="q" id="q'+n+'"><div class="stem">'+n+'. '+esc(q.q)+(q.target?' <button class="goto" data-t="'+q.target+'">xem trong bài</button>':'')+mark+'</div>' +
+        (q.insert?'<div class="ins">'+esc(q.insert)+'</div>':'') +
+        q.opts.map((o,j)=>{
+          let cls = 'opt';
+          if (rv){ if (j===q.key) cls+=' right'; else if (j===a) cls+=' wrong'; }
+          else if (j===a) cls+=' on';
+          return '<button class="'+cls+'" data-n="'+n+'" data-j="'+j+'"'+(rv?' disabled':'')+'><b>'+L[j]+'</b><span>'+esc(o)+'</span></button>';
+        }).join('') + (rv && q.exp ? '<div class="exp"><b>Giải thích:</b> '+esc(q.exp)+'</div>' : '') + '</div>';
+    }).join('');
+  if (!rv) $('qlist').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const n=+b.dataset.n, j=+b.dataset.j;
+    S.ans[n-1] = S.ans[n-1]===j ? null : j;
+    b.parentNode.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on', S.ans[n-1]!==null && +x.dataset.j===S.ans[n-1]));
+    renderPalette(); updateTabs(); save();
+  });
+  $('qlist').querySelectorAll('.goto').forEach(b=>b.onclick=()=>{
+    setMobile('p'); const r=$(b.dataset.t); if(!r) return;
+    r.scrollIntoView({behavior:'smooth',block:'center'}); r.classList.add('flash'); setTimeout(()=>r.classList.remove('flash'),1600);
+  });
+  $('prevP').disabled = p===0;
+  $('nextP').textContent = p===3 ? (rv ? 'Về trang kết quả' : 'Nộp bài') : 'Bài tiếp theo →';
+  renderPalette();
+  $('passage').scrollTop=0; document.querySelector('.qpane').scrollTop=0;
+}
+function updateTabs(){
+  $('ptabs').querySelectorAll('.ptab').forEach((b,k)=>{
+    const n = S.ans.slice(k*10,k*10+10).filter(a=>a!==null).length;
+    b.querySelector('small').textContent = '· '+(S.read[k]? n+'/10' : 'chưa đọc');
+  });
+}
+function renderPalette(){
+  const rv = S.review;
+  $('palette').innerHTML = DATA.map((P,p)=>'<div class="grp">'+P.qs.map((q,i)=>{
+    const n=qnum(p,i), a=S.ans[n-1];
+    let cls = '';
+    if (rv) cls = a===q.key ? 'r' : 'w';
+    else if (a!==null) cls='ans';
+    if (!S.read[p] && !rv) cls+=' locked';
+    return '<button class="'+cls+'" data-n="'+n+'" title="Câu '+n+'">'+n+'</button>';
+  }).join('')+'</div>').join('');
+  $('palette').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const n=+b.dataset.n, p=(n-1)/10|0;
+    if (!S.read[p] && !S.review){ openPassage(p); return; }
+    if (p!==S.cur){ S.cur=p; renderQ(); }
+    setMobile('q');
+    const el=$('q'+n); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+}
+function setMobile(which){}
+$('rNext').onclick=()=>nextPara();
+$('prevP').onclick=()=>{ if(S.cur>0) openPassage(S.cur-1); };
+$('nextP').onclick=()=>{
+  if (S.cur<3) openPassage(S.cur+1);
+  else if (S.review) show('scrResult');
+  else askSubmit();
+};
+
+/* ---------- submit ---------- */
+function askSubmit(){
+  const blank = S.ans.filter(a=>a===null).length;
+  const unread = S.read.filter(r=>!r).length;
+  let msg = '';
+  if (unread) msg += '<p>Em còn <b>'+unread+'</b> bài đọc chưa mở.</p>';
+  msg += blank ? '<p>Em còn <b>'+blank+'</b> câu chưa trả lời. Em có chắc muốn nộp bài không?</p>' : '<p>Em đã trả lời đủ 40 câu. Nộp bài ngay?</p>';
+  $('mBody').innerHTML = msg;
+  $('modal').classList.remove('hidden');
+}
+$('mNo').onclick=()=>$('modal').classList.add('hidden');
+$('mYes').onclick=()=>{ $('modal').classList.add('hidden'); finish(false); };
+$('submitTop').onclick=()=>{ if(S && !S.done) askSubmit(); else if(S && S.done) show('scrResult'); };
+
+function scoreOf(p){ return DATA[p].qs.filter((q,i)=>S.ans[p*10+i]===q.key).length; }
+function finish(auto){
+  clearInterval(tick); clearInterval(paraTimer);
+  S.done = true; S.review = false;
+  const per = [0,1,2,3].map(scoreOf), total = per.reduce((a,b)=>a+b,0);
+  const used = Math.min(TOTAL_SEC, S.elapsed|0);
+  const hist = store.get(TEST_ID+'-history') || [];
+  hist.unshift({ name:S.name, date:new Date().toISOString(), score:total, per, time:used });
+  store.set(TEST_ID+'-history', hist.slice(0,20));
+  store.del(TEST_ID+'-state');
+  $('clock').classList.add('hidden');
+  $('submitTop').textContent = 'Kết quả';
+  $('rName').textContent = (S.name ? S.name+' · ' : '') + new Date().toLocaleString('vi-VN') + (auto ? ' · Hết giờ, bài đã tự động nộp' : '');
+  $('sBig').textContent = total;
+  $('sPct').textContent = '('+Math.round(total/40*100)+'%)';
+  $('sGrid').innerHTML = per.map((s,k)=>'<div class="stat"><div class="k">Passage '+(k+1)+'</div><div class="v">'+s+' / 10</div></div>').join('');
+  $('sTime').textContent = 'Thời gian làm bài: '+fmt(used)+' / 60:00';
+  show('scrResult');
+}
+$('btnReview').onclick=()=>{ S.review=true; S.read=[true,true,true,true]; S.cur=0; renderQ(); };
+$('btnAgain').onclick=()=>{ location.reload(); };
+
+/* ---------- start ---------- */
+function renderHistory(){
+  const h = store.get(TEST_ID+'-history') || [];
+  if (!h.length) return;
+  $('history').classList.remove('hidden');
+  $('history').innerHTML = '<b>Các lần làm trước trên máy này</b><table><tr><th>Ngày</th><th>Tên</th><th>Điểm</th><th>Thời gian</th></tr>' +
+    h.map(r=>'<tr><td>'+new Date(r.date).toLocaleDateString('vi-VN')+'</td><td>'+esc(r.name||'–')+'</td><td>'+r.score+'/40</td><td>'+fmt(r.time)+'</td></tr>').join('') + '</table>';
+}
+$('btnStart').onclick=()=>{
+  store.del(TEST_ID+'-state');
+  S = newState(); S.read=[true,true,true,true]; startClock(); openPassage(0);
+};
+const saved = store.get(TEST_ID+'-state');
+if (saved && !saved.done && saved.elapsed < TOTAL_SEC){
+  $('btnResume').classList.remove('hidden');
+  $('btnResume').textContent = 'Tiếp tục bài đang làm (còn '+fmt(TOTAL_SEC-saved.elapsed)+')';
+  $('btnResume').onclick=()=>{
+    S = saved; S.review=false; startClock();
+    if (S.phase==='read' && !S.read[S.cur]) showPara(); else { S.phase='q'; renderQ(); }
+  };
+}
+renderHistory();
+window.addEventListener('beforeunload', save);
+</script>
+</body>
+</html>
