@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSTEP SPEAKING TEST</title>
+<style>
+:root{
+  --bg:#f4f1ea; --surface:#ffffff; --surface-2:#faf8f3; --ink:#1d2433; --muted:#5b6474; --line:#e3ddd0;
+  --accent:#1f4e79; --accent-ink:#ffffff; --accent-soft:#e6eef7;
+  --prep:#a85f00; --prep-soft:#fff1d6; --ok:#1e7b4a; --ok-soft:#e3f3ea; --bad:#b3261e; --bad-soft:#fbe7e5;
+  --node:#4a4f58; --node-2:#6f7480; --node-3:#9a9ea7;
+  --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --surface:#1d2129; --surface-2:#191c23; --ink:#e8e6e1; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#8fb8e8; --accent-ink:#0f1620; --accent-soft:#1f2a3a;
+    --prep:#f0b860; --prep-soft:#382a12; --ok:#5cc28a; --ok-soft:#173022; --bad:#f08a80; --bad-soft:#3a1d1b;
+    --node:#c9ced8; --node-2:#a3a9b5; --node-3:#7d8390;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --surface:#1d2129; --surface-2:#191c23; --ink:#e8e6e1; --muted:#9aa3b2; --line:#2e3440;
+  --accent:#8fb8e8; --accent-ink:#0f1620; --accent-soft:#1f2a3a;
+  --prep:#f0b860; --prep-soft:#382a12; --ok:#5cc28a; --ok-soft:#173022; --bad:#f08a80; --bad-soft:#3a1d1b;
+  --node:#c9ced8; --node-2:#a3a9b5; --node-3:#7d8390;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.5;min-height:100vh}
+button{font:inherit;cursor:pointer}
+.hidden{display:none !important}
+
+.top{position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--line);padding:10px 16px}
+.top-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-weight:700;white-space:nowrap}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.steps{display:flex;gap:6px;flex:1 1 auto;justify-content:flex-end;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:6px;padding:5px 12px 5px 6px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);background:var(--surface-2);border:1px solid var(--line)}
+.step i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;background:var(--line);color:var(--muted)}
+.step.now{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.step.now i{background:var(--accent);color:var(--accent-ink)}
+.step.done{color:var(--ok)}
+.step.done i{background:var(--ok);color:#fff}
+
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow)}
+.center{max-width:760px;margin:0 auto}
+.p-label{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 6px}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:32px;line-height:1.2;margin:0 0 8px}
+.lead{color:var(--muted);margin:0 0 22px}
+.plan{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 22px}
+.plan div{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.plan b{display:block;color:var(--accent);font-size:15px}
+.plan span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.plan em{display:block;font-style:normal;font-size:13px;font-weight:600;margin-top:6px}
+.rules{margin:0 0 22px;padding-left:20px}
+.rules li{margin-bottom:6px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.btn{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 18px;border-radius:10px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.big{padding:14px 28px;font-size:17px;border-radius:12px}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted);font-size:14px;text-decoration:underline;text-underline-offset:3px;padding:6px 8px}
+.btn.ghost:hover{color:var(--ink)}
+
+/* exam layout */
+.exam{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+.task{min-height:420px}
+.task h2{font-family:Georgia,"Times New Roman",serif;font-size:26px;margin:0 0 4px}
+.task .sub{color:var(--muted);margin:0 0 20px;font-size:15px}
+.topic{border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 14px;background:var(--surface-2)}
+.topic h3{margin:0 0 10px;font-size:18px;color:var(--accent)}
+.qlist{margin:0;padding-left:22px;font-size:18px;line-height:1.6}
+.qlist li{margin-bottom:6px}
+.situation{font-family:Georgia,"Times New Roman",serif;font-size:21px;line-height:1.65;margin:0 0 20px}
+.situation b{font-family:"Segoe UI",system-ui,sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 6px}
+.option{border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:center;font-weight:600;background:var(--surface-2)}
+.option i{display:block;font-style:normal;font-size:12px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.topic-line{font-family:Georgia,"Times New Roman",serif;font-size:22px;margin:0 0 18px}
+.topic-line b{font-family:"Segoe UI",system-ui,sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
+
+/* mind map */
+.mindmap{display:grid;grid-template-columns:1fr 1.1fr 1fr;grid-template-rows:auto auto auto;gap:22px 26px;align-items:center;justify-items:stretch;margin:6px 0 4px;position:relative;padding:8px 0}
+.mm{border-radius:10px;padding:12px 14px;text-align:center;color:#fff;font-size:16px;position:relative;z-index:1}
+.mm.center{grid-column:2;grid-row:2;background:var(--node);color:var(--surface);font-weight:700;font-size:19px;padding:20px 14px}
+.mm.n1{grid-column:2;grid-row:1;background:var(--node-2);color:var(--surface)}
+.mm.n2{grid-column:1;grid-row:2;background:var(--node-2);color:var(--surface)}
+.mm.n3{grid-column:2;grid-row:3;background:var(--node-3);color:var(--surface)}
+.mm.n4{grid-column:3;grid-row:2;background:var(--surface);color:var(--muted);border:2px dashed var(--node-3);font-style:italic}
+.mindmap::before{content:"";position:absolute;left:50%;top:10%;bottom:10%;width:3px;background:var(--node-3);transform:translateX(-50%)}
+.mindmap::after{content:"";position:absolute;top:50%;left:10%;right:10%;height:3px;background:var(--node-3);transform:translateY(-50%)}
+
+.followup .qlist{font-size:19px}
+.followup .reminder{font-size:14px;color:var(--muted);margin:0 0 16px;padding:8px 12px;border-radius:8px;background:var(--surface-2);border:1px dashed var(--line)}
+
+/* timer panel */
+.timer-card{position:sticky;top:84px;text-align:center}
+.phase{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin-bottom:14px}
+.phase.prep{background:var(--prep-soft);color:var(--prep)}
+.phase.answer{background:var(--accent-soft);color:var(--accent)}
+.phase.over{background:var(--ok-soft);color:var(--ok)}
+.ring{width:210px;height:210px;margin:0 auto;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .track{stroke:var(--line)}
+.ring .fill{transition:stroke-dashoffset .25s linear,stroke .3s}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;font-size:46px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.ring.prep .fill{stroke:var(--prep)} .ring.prep .num{color:var(--prep)}
+.ring.answer .fill{stroke:var(--accent)} .ring.answer .num{color:var(--accent)}
+.ring.low .fill{stroke:var(--bad)} .ring.low .num{color:var(--bad)}
+.ring.over .fill{stroke:var(--ok)} .ring.over .num{color:var(--ok);font-size:30px}
+.hint{margin:14px 0 4px;color:var(--muted);font-size:14px;min-height:42px}
+.next-box{margin-top:10px}
+.sound{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;color:var(--muted);margin-top:12px}
+
+/* finish */
+.done-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 22px}
+.done-list div{background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:12px;font-weight:600;font-size:14px;text-align:center}
+
+@media (max-width: 860px){
+  .exam{grid-template-columns:1fr;gap:12px}
+  .timer-card{order:-1;position:sticky;top:60px;z-index:5;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;text-align:left;padding:12px 14px}
+  .timer-card .ring{width:84px;height:84px;grid-row:1/4}
+  .timer-card .ring .num{font-size:22px}
+  .timer-card .ring.over .num{font-size:14px}
+  .timer-card .phase{margin:0;justify-self:start;font-size:11px}
+  .timer-card .hint{margin:0;min-height:0;font-size:13px}
+  .timer-card .next-box{margin:0}
+  .timer-card .sound{display:none}
+  .steps{justify-content:flex-start}
+  .step span{display:none}
+  .step{padding:4px}
+  .task{min-height:0}
+  .card{padding:20px 16px}
+  .task h2{font-size:22px}
+  .qlist{font-size:17px}
+  .situation{font-size:18px}
+  .options{grid-template-columns:1fr}
+  .plan,.done-list{grid-template-columns:1fr 1fr}
+  .mindmap{grid-template-columns:1fr;gap:10px}
+  .mindmap::before,.mindmap::after{display:none}
+  .mm.center,.mm.n1,.mm.n2,.mm.n3,.mm.n4{grid-column:1;grid-row:auto}
+  .mm.center{order:-1}
+  .mm.n4{order:5}
+  h1{font-size:26px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">VSTEP SPEAKING TEST<small>Đề 2 · 4 phần · khoảng 13 phút</small></div>
+    <div class="steps" id="steps"></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- START -->
+  <section id="startView" class="center">
+    <div class="card">
+      <p class="p-label">Speaking · Đề 2</p>
+      <h1>VSTEP SPEAKING TEST</h1>
+      <p class="lead">Bài thi gồm 4 phần. Đề bài và đồng hồ đếm ngược sẽ tự động hiện ra theo từng phần.</p>
+      <div class="plan">
+        <div><b>Phần 1</b><span>Social Interaction</span><em>Trả lời 3 phút</em></div>
+        <div><b>Phần 2</b><span>Solution Discussion</span><em>Chuẩn bị 1' · Trả lời 3'</em></div>
+        <div><b>Phần 3</b><span>Topic Development</span><em>Chuẩn bị 1' · Trả lời 3'</em></div>
+        <div><b>Phần 4</b><span>Follow-up Questions</span><em>Trả lời 2 phút</em></div>
+      </div>
+      <ul class="rules">
+        <li>Phần 1 và Phần 4 <b>không có thời gian chuẩn bị</b>: đồng hồ trả lời chạy ngay khi câu hỏi hiện ra.</li>
+        <li>Phần 2 và Phần 3 có <b>1 phút chuẩn bị</b>. Hết thời gian chuẩn bị, trang tự chuyển sang thời gian trả lời.</li>
+        <li>Có tiếng chuông báo khi bắt đầu trả lời và khi hết giờ. Hãy bật loa hoặc đeo tai nghe.</li>
+        <li>Hết giờ một phần, bấm nút để sang phần tiếp theo khi bạn sẵn sàng.</li>
+      </ul>
+      <div class="actions"><button class="btn primary big" id="startBtn">Bắt đầu bài thi</button></div>
+    </div>
+  </section>
+
+  <!-- EXAM -->
+  <section id="examView" class="exam hidden">
+    <article class="card task" id="task"></article>
+    <aside class="card timer-card">
+      <div class="phase" id="phase">Thời gian trả lời</div>
+      <div class="ring" id="ring">
+        <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52" fill="none" stroke-width="9"/><circle class="fill" id="ringFill" cx="60" cy="60" r="52" fill="none" stroke-width="9" stroke-linecap="round"/></svg>
+        <div class="num" id="num">3:00</div>
+      </div>
+      <p class="hint" id="hint"></p>
+      <div class="next-box" id="nextBox"></div>
+      <label class="sound"><input type="checkbox" id="soundOn" checked> Chuông báo</label>
+    </aside>
+  </section>
+
+  <!-- FINISH -->
+  <section id="doneView" class="center hidden">
+    <div class="card">
+      <p class="p-label">Hoàn thành</p>
+      <h1>Bạn đã hoàn thành bài thi nói</h1>
+      <p class="lead">Bạn đã đi qua đủ 4 phần của bài thi.</p>
+      <div class="done-list"><div>Phần 1 ✓</div><div>Phần 2 ✓</div><div>Phần 3 ✓</div><div>Phần 4 ✓</div></div>
+      <div class="actions"><button class="btn" id="reviewBtn">Xem lại toàn bộ đề</button><button class="btn primary" id="againBtn">Làm lại từ đầu</button></div>
+      <div id="reviewAll" class="hidden" style="margin-top:24px"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ======================= NỘI DUNG ĐỀ ======================= */
+const PARTS = [
+  { id:1, name:"Part 1: Social Interaction", prep:0, answer:180,
+    html:`<p class="sub">Answer the questions about the two topics below.</p>
+      <div class="topic"><h3>Let’s talk about your free time.</h3><ol class="qlist">
+        <li>How much free time do you usually have each week?</li>
+        <li>What do you like to do in your free time? Why?</li>
+        <li>Do you prefer spending your free time alone or with other people? Why?</li></ol></div>
+      <div class="topic"><h3>Let’s talk about public transport.</h3><ol class="qlist">
+        <li>What kinds of public transport are there in your city?</li>
+        <li>How often do you use public transport? Why?</li>
+        <li>What can be done to encourage more people to use public transport?</li></ol></div>` },
+  { id:2, name:"Part 2: Solution Discussion", prep:60, answer:180,
+    html:`<p class="situation"><b>Situation</b>Your friend has been feeling tired and stressed recently and wants to improve his health. Three options are suggested: joining a gym, taking up a team sport, and changing to a healthier diet. Which option do you think is the best choice?</p>
+      <div class="options">
+        <div class="option"><i>OPTION 1</i>Joining a gym</div>
+        <div class="option"><i>OPTION 2</i>Taking up a team sport</div>
+        <div class="option"><i>OPTION 3</i>Changing to a healthier diet</div>
+      </div>` },
+  { id:3, name:"Part 3: Topic Development", prep:60, answer:180,
+    html:`<p class="topic-line"><b>Topic</b>Having a part-time job brings many benefits to university students.</p>
+      <div class="mindmap" role="img" aria-label="Mind map: Part-time jobs for students – earning extra money, gaining work experience, developing soft skills, your own ideas">
+        <div class="mm n1">earning extra money</div>
+        <div class="mm n2">gaining work experience</div>
+        <div class="mm center">Part-time jobs for students</div>
+        <div class="mm n4">[your own ideas]</div>
+        <div class="mm n3">developing soft skills</div>
+      </div>` },
+  { id:4, name:"Part 4: Follow-up Questions", prep:0, answer:120,
+    html:`<div class="followup"><p class="reminder">Topic: Having a part-time job brings many benefits to university students.</p>
+      <ol class="qlist">
+        <li>Can having a part-time job have a negative effect on students’ studies? Why/why not?</li>
+        <li>What kinds of part-time jobs are popular among students in your country?</li>
+        <li>Should universities help students find suitable part-time jobs? Why/why not?</li></ol></div>` }
+];
+
+/* ======================= TRẠNG THÁI ======================= */
+const $ = id => document.getElementById(id);
+const C = 2*Math.PI*52;
+$("ringFill").style.strokeDasharray = C;
+let partIdx = 0, mode = "idle", endAt = 0, total = 0, tick = null, actx = null;
+const done = new Set();
+
+function fmt(s){ s = Math.max(0, Math.ceil(s)); return Math.floor(s/60) + ":" + String(s%60).padStart(2,"0"); }
+
+function renderSteps(){
+  if($("startView").classList.contains("hidden") === false){ $("steps").innerHTML = ""; return; }
+  $("steps").innerHTML = PARTS.map((p,i) => {
+    const cls = done.has(p.id) ? "done" : (i === partIdx && mode !== "finished" ? "now" : "");
+    return `<div class="step ${cls}"><i>${done.has(p.id) ? "✓" : p.id}</i><span>Phần ${p.id}</span></div>`;
+  }).join("");
+}
+
+/* ======================= ÂM THANH ======================= */
+function beep(pattern){
+  if(!$("soundOn").checked || !actx) return;
+  let t = actx.currentTime + 0.02;
+  pattern.forEach(([freq, dur, gap]) => {
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = "sine"; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + 0.05);
+    t += dur + (gap || 0.08);
+  });
+}
+const beepStart = () => beep([[880,0.25]]);
+const beepEnd = () => beep([[660,0.3],[660,0.3],[523,0.6]]);
+
+/* ======================= LUỒNG BÀI THI ======================= */
+function openPart(i){
+  partIdx = i; const P = PARTS[i];
+  $("task").innerHTML = `<p class="p-label">Phần ${P.id} / 4</p><h2>${P.name}</h2>` + P.html;
+  window.scrollTo({top:0});
+  if(P.prep > 0) startPhase("prep", P.prep); else startPhase("answer", P.answer);
+  renderSteps();
+}
+function startPhase(m, secs){
+  mode = m; total = secs; endAt = Date.now() + secs*1000;
+  $("phase").className = "phase " + m;
+  $("phase").textContent = m === "prep" ? "Thời gian chuẩn bị" : "Thời gian trả lời";
+  $("ring").className = "ring " + m;
+  const P = PARTS[partIdx];
+  if(m === "prep"){
+    $("hint").textContent = "Đọc đề và chuẩn bị ý. Hết 1 phút, trang sẽ tự chuyển sang thời gian trả lời.";
+    $("nextBox").innerHTML = `<button class="btn ghost" id="skipPrep">Bắt đầu trả lời ngay</button>`;
+    $("skipPrep").onclick = () => { beepStart(); startPhase("answer", P.answer); };
+  } else {
+    $("hint").textContent = "Bắt đầu nói. Hãy trả lời đầy đủ trong thời gian cho phép.";
+    $("nextBox").innerHTML = `<button class="btn ghost" id="endEarly">Kết thúc phần này</button>`;
+    $("endEarly").onclick = () => endPart(true);
+    if(P.prep === 0) beepStart();
+  }
+  clearInterval(tick); update(); tick = setInterval(update, 200);
+}
+function update(){
+  if(mode !== "prep" && mode !== "answer") return;
+  const left = (endAt - Date.now())/1000;
+  $("num").textContent = fmt(left);
+  $("ringFill").style.strokeDashoffset = C * (1 - Math.max(0,left)/total);
+  $("ring").classList.toggle("low", left <= 15);
+  if(left <= 0){
+    if(mode === "prep"){ beepStart(); startPhase("answer", PARTS[partIdx].answer); }
+    else endPart(false);
+  }
+}
+function endPart(early){
+  clearInterval(tick);
+  if(!early) beepEnd();
+  mode = "over"; done.add(PARTS[partIdx].id); renderSteps();
+  $("phase").className = "phase over"; $("phase").textContent = "Hết giờ";
+  $("ring").className = "ring over"; $("num").textContent = "Hết giờ";
+  $("ringFill").style.strokeDashoffset = 0;
+  const last = partIdx === PARTS.length - 1;
+  $("hint").textContent = last ? "Bạn đã hoàn thành phần cuối cùng." : `Phần ${PARTS[partIdx].id} đã kết thúc. Bấm để sang phần tiếp theo khi bạn sẵn sàng.`;
+  $("nextBox").innerHTML = last ? `<button class="btn primary" id="nextBtn">Hoàn thành bài thi</button>`
+                                : `<button class="btn primary" id="nextBtn">Sang Phần ${PARTS[partIdx+1].id} →</button>`;
+  $("nextBtn").onclick = () => last ? finish() : openPart(partIdx + 1);
+}
+function finish(){
+  mode = "finished"; renderSteps();
+  $("examView").classList.add("hidden"); $("doneView").classList.remove("hidden");
+  $("reviewAll").classList.add("hidden"); window.scrollTo({top:0});
+}
+
+$("startBtn").onclick = () => {
+  try{ actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); }catch(e){ actx = null; }
+  $("startView").classList.add("hidden"); $("examView").classList.remove("hidden");
+  done.clear(); openPart(0);
+};
+$("againBtn").onclick = () => {
+  done.clear(); $("doneView").classList.add("hidden"); $("examView").classList.remove("hidden"); openPart(0);
+};
+$("reviewBtn").onclick = () => {
+  const box = $("reviewAll");
+  box.innerHTML = PARTS.map(P => `<div style="border-top:1px solid var(--line);padding-top:18px;margin-top:18px"><p class="p-label">Phần ${P.id}</p><h2 style="font-family:Georgia,serif;margin:0 0 12px">${P.name}</h2>${P.html}</div>`).join("");
+  box.classList.toggle("hidden");
+};
+renderSteps();
+</script>
+</body>
+</html>
