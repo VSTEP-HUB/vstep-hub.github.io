@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSTEP WRITING TEST</title>
+<style>
+:root{
+  --bg:#f4f1ea; --surface:#ffffff; --surface-2:#faf8f3; --ink:#1d2433; --muted:#5b6474; --line:#e3ddd0;
+  --accent:#1f4e79; --accent-ink:#ffffff; --accent-soft:#e6eef7;
+  --ok:#1e7b4a; --ok-soft:#e3f3ea; --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#a85f00; --warn-soft:#fff1d6;
+  --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --surface:#1d2129; --surface-2:#191c23; --ink:#e8e6e1; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#8fb8e8; --accent-ink:#0f1620; --accent-soft:#1f2a3a;
+    --ok:#5cc28a; --ok-soft:#173022; --bad:#f08a80; --bad-soft:#3a1d1b; --warn:#f0b860; --warn-soft:#382a12;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --surface:#1d2129; --surface-2:#191c23; --ink:#e8e6e1; --muted:#9aa3b2; --line:#2e3440;
+  --accent:#8fb8e8; --accent-ink:#0f1620; --accent-soft:#1f2a3a;
+  --ok:#5cc28a; --ok-soft:#173022; --bad:#f08a80; --bad-soft:#3a1d1b; --warn:#f0b860; --warn-soft:#382a12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.5;display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none !important}
+
+.top{flex:0 0 auto;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:8px 16px;flex-wrap:wrap}
+.brand{font-weight:700;white-space:nowrap}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.tabs{display:flex;gap:4px;overflow-x:auto;flex:1 1 auto;scrollbar-width:none;min-width:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid transparent;background:transparent;color:var(--muted);padding:7px 12px;border-radius:999px;white-space:nowrap;font-size:14px;font-weight:600}
+.tab:hover{background:var(--surface-2);color:var(--ink)}
+.tab.active{background:var(--accent);color:var(--accent-ink)}
+.tab .cnt{font-weight:500;opacity:.8;margin-left:4px;font-size:12px}
+.timer{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums;font-weight:700;font-size:18px;padding:6px 14px;border-radius:10px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.timer svg{width:18px;height:18px}
+.timer.warn{background:var(--warn-soft);color:var(--warn)}
+.timer.danger{background:var(--bad-soft);color:var(--bad);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.6}}
+
+main{flex:1 1 auto;min-height:0;position:relative}
+.view{position:absolute;inset:0;overflow:auto}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:minmax(0,1fr);overflow:hidden}
+.panel{overflow:auto;padding:24px 28px 32px;min-height:0}
+.prompt-panel{background:var(--surface);border-right:1px solid var(--line)}
+.editor-panel{display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.mobile-switch{display:none}
+
+.p-label{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 6px}
+.prompt h2{font-family:Georgia,"Times New Roman",serif;font-size:26px;margin:0 0 4px}
+.prompt .time-tip{display:inline-block;font-size:13px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:3px 10px;border-radius:999px;margin:0 0 16px}
+.prompt .instr{font-weight:700;margin:0 0 12px;line-height:1.55}
+.prompt .source{font-family:Georgia,"Times New Roman",serif;font-size:17.5px;line-height:1.75;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:0 0 16px}
+.prompt .source.email{border-left:4px solid var(--accent)}
+.prompt .source.email .mail-head{font-family:"Segoe UI",system-ui,sans-serif;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
+.prompt .source.book{font-style:italic}
+.prompt .source p{margin:0 0 10px}
+.prompt .source p:last-child{margin:0}
+.prompt .task-q{font-weight:700;font-size:17px;margin:0 0 10px;line-height:1.55}
+.prompt .req{font-size:14.5px;color:var(--muted);margin:0 0 10px}
+.prompt .req b{color:var(--ink)}
+
+.ed-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ed-head h3{margin:0;font-size:16px}
+.wc{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
+.wc-pill{padding:4px 12px;border-radius:999px;font-variant-numeric:tabular-nums}
+.wc-pill.low{background:var(--warn-soft);color:var(--warn)}
+.wc-pill.ok{background:var(--ok-soft);color:var(--ok)}
+.wc-bar{height:6px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.wc-bar i{display:block;height:100%;background:var(--warn);border-radius:99px;transition:width .2s}
+.wc-bar i.ok{background:var(--ok)}
+textarea.essay{flex:1 1 auto;min-height:280px;width:100%;resize:none;border:1.5px solid var(--line);border-radius:14px;padding:18px 20px;background:var(--surface);color:var(--ink);font-family:Georgia,"Times New Roman",serif;font-size:17.5px;line-height:1.75;box-shadow:var(--shadow);outline:none}
+textarea.essay:focus{border-color:var(--accent)}
+textarea.essay[readonly]{background:var(--surface-2)}
+.ed-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.saved{display:flex;align-items:center;gap:6px}
+.saved i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.tipbar{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600}
+
+.btn{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 18px;border-radius:10px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.big{padding:14px 28px;font-size:17px;border-radius:12px}
+.btn.sm{padding:7px 14px;font-size:14px}
+
+.center{max-width:780px;margin:0 auto;padding:32px 20px 60px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow);margin-bottom:18px}
+.card h1{font-family:Georgia,serif;font-size:32px;margin:0 0 6px;line-height:1.2}
+.card h2{margin:0 0 14px;font-size:20px}
+.lead{color:var(--muted);margin:0 0 20px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 22px}
+.fact{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.fact b{display:block;font-size:24px;color:var(--accent)}
+.fact span{font-size:13px;color:var(--muted)}
+.rules{margin:0 0 22px;padding-left:20px}
+.rules li{margin-bottom:6px}
+.field{display:flex;flex-direction:column;gap:6px;margin:0 0 22px}
+.field label{font-weight:600;font-size:14px}
+.field input{padding:11px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);outline:none}
+.field input:focus{border-color:var(--accent)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.task-sum{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 20px}
+.ts{border-radius:14px;padding:16px;border:1px solid var(--line);background:var(--surface-2)}
+.ts h3{margin:0 0 6px;font-size:16px}
+.ts .big{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.ts .big small{font-size:14px;color:var(--muted);font-weight:600}
+.ts p{margin:6px 0 0;font-size:14px;font-weight:600}
+.ts.ok p{color:var(--ok)} .ts.low p{color:var(--warn)} .ts.empty p{color:var(--bad)}
+.banner{border-radius:12px;padding:12px 14px;margin:0 0 16px;font-weight:600}
+.banner.warn{background:var(--warn-soft);color:var(--warn)}
+.banner.ok{background:var(--ok-soft);color:var(--ok)}
+.essay-out{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--surface-2);font-family:Georgia,serif;font-size:16.5px;line-height:1.75;white-space:pre-wrap;word-wrap:break-word;margin:0 0 6px;max-height:420px;overflow:auto}
+.essay-out.empty{color:var(--muted);font-style:italic}
+.meta-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);margin:0 0 18px}
+.criteria{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px}
+.criteria span{font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+
+.modal-bg{position:fixed;inset:0;background:rgba(10,15,25,.5);display:grid;place-items:center;padding:16px;z-index:50}
+.modal{background:var(--surface);border-radius:16px;padding:24px;max-width:440px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal h3{margin:0 0 8px;font-size:20px}
+.modal p{margin:0 0 20px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:10px;font-size:14px;font-weight:600;z-index:60}
+
+@media (max-width: 860px){
+  .top{padding:8px 12px;gap:8px}
+  .brand small{display:none}
+  .tabs{order:3;flex-basis:100%}
+  .tab{padding:6px 10px;font-size:13px}
+  .timer{margin-left:auto;font-size:16px;padding:5px 12px}
+  .split{display:flex;flex-direction:column}
+  .mobile-switch{display:flex;gap:6px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--line);flex:0 0 auto}
+  .mobile-switch button{flex:1;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);border-radius:9px;padding:8px;font-weight:600;font-size:14px}
+  .mobile-switch button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .panel{flex:1 1 auto;padding:16px;border-right:0}
+  .split[data-show="prompt"] .editor-panel{display:none}
+  .split[data-show="editor"] .prompt-panel{display:none}
+  textarea.essay{font-size:16.5px;padding:14px;min-height:0}
+  .facts{gap:8px}
+  .task-sum{grid-template-columns:1fr}
+  .card{padding:20px 16px}
+  .card h1{font-size:26px}
+  .center{padding:16px 16px 40px}
+}
+@media print{
+  .top,.actions,.no-print{display:none !important}
+  body{height:auto;overflow:visible;display:block;background:#fff;color:#000}
+  main,.view{position:static;overflow:visible}
+  .card{box-shadow:none;border:0;padding:0}
+  .essay-out{max-height:none;background:#fff;border:1px solid #999}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">VSTEP WRITING TEST<small>Đề 2 · 2 task · 60 phút</small></div>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="timer hidden" id="timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg><span id="timerText">60:00</span></div>
+</header>
+
+<main>
+  <!-- START -->
+  <section class="view" id="startView">
+    <div class="center">
+      <div class="card">
+        <p class="p-label">Writing · Đề 2</p>
+        <h1>VSTEP WRITING TEST</h1>
+        <p class="lead">Bài thi gồm 2 task. Đồng hồ 60 phút tính chung cho cả 2 task.</p>
+        <div class="facts">
+          <div class="fact"><b>Task 1</b><span>Email · ít nhất 120 từ<br>khoảng 20 phút</span></div>
+          <div class="fact"><b>Task 2</b><span>Essay · ít nhất 250 từ<br>khoảng 40 phút</span></div>
+          <div class="fact"><b>60'</b><span>thời gian làm bài</span></div>
+        </div>
+        <div class="field">
+          <label for="nameIn">Họ và tên (để ghi vào bài làm khi tải về)</label>
+          <input id="nameIn" type="text" placeholder="Ví dụ: Nguyễn Văn A" autocomplete="name">
+        </div>
+        <ul class="rules">
+          <li>Bạn có thể chuyển qua lại giữa Task 1 và Task 2 bất cứ lúc nào.</li>
+          <li>Số từ được đếm tự động. Bài làm được lưu liên tục trên máy, lỡ tải lại trang cũng không mất.</li>
+          <li>Hết 60 phút, bài sẽ được <b>tự động nộp</b> và không sửa được nữa.</li>
+          <li>Sau khi nộp, bạn có thể tải bài làm về máy hoặc sao chép để gửi cho giáo viên.</li>
+        </ul>
+        <div class="actions"><button class="btn primary big" id="startBtn">Bắt đầu làm bài</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TASK -->
+  <section class="view split hidden" id="taskView" data-show="prompt">
+    <div class="mobile-switch" id="mswitch">
+      <button data-show="prompt" class="on">Đề bài</button>
+      <button data-show="editor">Bài viết <span id="mcnt"></span></button>
+    </div>
+    <article class="panel prompt-panel prompt" id="promptPanel"></article>
+    <section class="panel editor-panel">
+      <div class="tipbar hidden" id="tipbar"></div>
+      <div class="ed-head">
+        <h3 id="edTitle">Bài viết – Task 1</h3>
+        <div class="wc"><span class="wc-pill low" id="wcPill">0 / 120 từ</span></div>
+      </div>
+      <div class="wc-bar"><i id="wcBar"></i></div>
+      <textarea class="essay" id="essay" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Viết bài của bạn ở đây…"></textarea>
+      <div class="ed-foot">
+        <span class="saved" id="savedNote"><i></i>Đã lưu tự động</span>
+        <button class="btn sm primary" id="edNext">Sang Task 2 →</button>
+      </div>
+    </section>
+  </section>
+
+  <section class="view hidden" id="summaryView"></section>
+  <section class="view hidden" id="resultView"></section>
+</main>
+
+<div class="modal-bg hidden" id="modal" role="dialog" aria-modal="true">
+  <div class="modal"><h3 id="mTitle"></h3><p id="mText"></p>
+    <div class="actions"><button class="btn" id="mCancel">Quay lại</button><button class="btn primary" id="mOk">Đồng ý</button></div></div>
+</div>
+
+<script>
+/* ======================= ĐỀ BÀI ======================= */
+const TASKS = [
+  { id:1, min:120, suggest:20, title:"TASK 1",
+    html:`<p class="p-label">Task 1 · Email</p><h2>TASK 1</h2>
+      <span class="time-tip">You should spend about 20 minutes on this task.</span>
+      <p class="instr">You received an email from your English friend, Tom. He asked you for some information about your hometown. Read part of his email below.</p>
+      <div class="source email"><div class="mail-head">From: Tom</div>
+        <p>Hi, how are you?</p>
+        <p>My younger brother and I are planning to travel around Vietnam for two weeks next summer, and we’d love to spend a few days in your hometown. Can you tell me a bit about it (things like the best places to visit, the local food we should try and what the weather is like at that time of year)? Is there anything we should be careful about when we travel there? I want to make a good plan before we book our tickets.</p>
+      </div>
+      <p class="task-q">Write an email responding to Tom.</p>
+      <p class="req">You should write at least <b>120 words</b>. You do not need to include your name or addresses. Your response will be evaluated in terms of Task Fulfillment, Organization, Vocabulary and Grammar.</p>` },
+  { id:2, min:250, suggest:40, title:"TASK 2",
+    html:`<p class="p-label">Task 2 · Essay</p><h2>TASK 2</h2>
+      <span class="time-tip">You should spend about 40 minutes on this task.</span>
+      <p class="instr">Read the following text from a book about technology.</p>
+      <div class="source book"><p>Smartphones have become an essential part of modern life. Today, many children own a smartphone before they finish primary school. Some people believe that smartphones help young people learn and stay connected with others; others argue that they do more harm than good to children’s development.</p></div>
+      <p class="task-q">Write an essay to an educated reader to discuss the advantages and disadvantages of children using smartphones. Include reasons and any relevant examples to support your answer.</p>
+      <p class="req">You should write at least <b>250 words</b>. Your response will be evaluated in terms of Task Fulfillment, Organization, Vocabulary and Grammar.</p>` }
+];
+
+/* ======================= TRẠNG THÁI ======================= */
+const DURATION = 60*60*1000, STORE = "vstep-writing-de2-v1";
+const $ = id => document.getElementById(id);
+function fresh(){ return {name:"", texts:{1:"",2:""}, endTime:null, startTime:null, submitted:false, submittedAt:null, auto:false, tipShown:false}; }
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE)); }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch(e){} }
+let S = load() || fresh(), view = "start", cur = 1, tick = null, saveT = null;
+
+const words = t => (t.match(/[A-Za-zÀ-ỹ0-9]+(?:['’\-][A-Za-zÀ-ỹ0-9]+)*/g) || []).length;
+const fmtMs = ms => { const s = Math.ceil(Math.max(0,ms)/1000); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); };
+
+/* ======================= TABS ======================= */
+function renderTabs(){
+  if(view === "start"){ $("tabs").innerHTML = ""; return; }
+  let h = TASKS.map(t => `<button class="tab${view==="task" && cur===t.id ? " active":""}" data-t="${t.id}">Task ${t.id}<span class="cnt">${words(S.texts[t.id])} từ</span></button>`).join("");
+  h += S.submitted ? `<button class="tab${view==="result"?" active":""}" data-go="result">Bài đã nộp</button>`
+                   : `<button class="tab${view==="summary"?" active":""}" data-go="summary">Kiểm tra &amp; Nộp bài</button>`;
+  $("tabs").innerHTML = h;
+}
+$("tabs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.t) showTask(+b.dataset.t);
+  else if(b.dataset.go === "summary") showSummary();
+  else showResult();
+});
+function show(id){ ["startView","taskView","summaryView","resultView"].forEach(v => $(v).classList.toggle("hidden", v!==id)); }
+
+/* ======================= TASK VIEW ======================= */
+function showTask(id){
+  view = "task"; cur = id; show("taskView");
+  const T = TASKS[id-1];
+  $("promptPanel").innerHTML = T.html; $("promptPanel").scrollTop = 0;
+  $("edTitle").textContent = `Bài viết – Task ${id}`;
+  const ta = $("essay");
+  ta.value = S.texts[id]; ta.readOnly = S.submitted;
+  $("edNext").textContent = id === 1 ? "Sang Task 2 →" : (S.submitted ? "Xem bài đã nộp →" : "Kiểm tra & Nộp bài →");
+  $("savedNote").classList.toggle("hidden", S.submitted);
+  updateWC(); renderTabs(); updateTip();
+}
+function updateWC(){
+  const T = TASKS[cur-1], n = words($("essay").value), ok = n >= T.min;
+  $("wcPill").textContent = `${n} / ${T.min} từ`;
+  $("wcPill").className = "wc-pill " + (ok ? "ok" : "low");
+  $("wcBar").style.width = Math.min(100, n/T.min*100) + "%";
+  $("wcBar").className = ok ? "ok" : "";
+  $("mcnt").textContent = `(${n} từ)`;
+}
+$("essay").addEventListener("input", () => {
+  if(S.submitted) return;
+  S.texts[cur] = $("essay").value; updateWC();
+  clearTimeout(saveT);
+  $("savedNote").innerHTML = `<i style="background:var(--warn)"></i>Đang lưu…`;
+  saveT = setTimeout(() => { save(); $("savedNote").innerHTML = `<i></i>Đã lưu tự động`; renderTabs(); }, 400);
+});
+$("edNext").onclick = () => { if(cur === 1) showTask(2); else S.submitted ? showResult() : showSummary(); };
+$("mswitch").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  $("taskView").dataset.show = b.dataset.show;
+  $("mswitch").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+  if(b.dataset.show === "editor" && !S.submitted) $("essay").focus();
+});
+function updateTip(){
+  const el = $("tipbar");
+  if(S.submitted || !S.startTime){ el.classList.add("hidden"); return; }
+  const mins = (Date.now() - S.startTime)/60000;
+  if(cur === 1 && mins >= 20){ el.textContent = "Bạn đã làm được hơn 20 phút. Thời gian gợi ý cho Task 1 là khoảng 20 phút, nên chuyển sang Task 2."; el.classList.remove("hidden"); }
+  else el.classList.add("hidden");
+}
+
+/* ======================= KIỂM TRA & NỘP ======================= */
+function taskStatus(T){
+  const n = words(S.texts[T.id]);
+  if(n === 0) return {n, cls:"empty", text:"Chưa viết"};
+  if(n < T.min) return {n, cls:"low", text:`Còn thiếu ${T.min - n} từ so với yêu cầu`};
+  return {n, cls:"ok", text:"Đã đủ số từ yêu cầu"};
+}
+function showSummary(){
+  view = "summary"; show("summaryView"); renderTabs();
+  const sums = TASKS.map(T => { const s = taskStatus(T);
+    return `<div class="ts ${s.cls}"><h3>Task ${T.id}</h3><div class="big">${s.n} <small>/ ${T.min} từ</small></div><p>${s.text}</p>
+      <button class="btn sm" style="margin-top:10px" data-t="${T.id}">Mở Task ${T.id}</button></div>`; }).join("");
+  $("summaryView").innerHTML = `<div class="center"><div class="card">
+    <h2>Kiểm tra bài làm trước khi nộp</h2>
+    <div class="task-sum">${sums}</div>
+    <div class="meta-row"><span>Thời gian còn lại: <b id="sumTime">--:--</b></span></div>
+    <div class="actions"><button class="btn" data-t="${cur}">← Quay lại bài viết</button><button class="btn primary big" id="submitBtn">Nộp bài</button></div>
+  </div></div>`;
+  updateTimer();
+  $("summaryView").querySelectorAll("[data-t]").forEach(b => b.onclick = () => showTask(+b.dataset.t));
+  $("submitBtn").onclick = () => {
+    const issues = TASKS.map(T => ({T, s:taskStatus(T)})).filter(x => x.s.cls !== "ok").map(x => `Task ${x.T.id}: ${x.s.n}/${x.T.min} từ`);
+    confirmBox("Nộp bài?", (issues.length ? `Chưa đủ số từ yêu cầu (${issues.join("; ")}). ` : "Cả 2 task đã đủ số từ. ") + "Sau khi nộp sẽ không thể sửa bài.", "Nộp bài", () => submit(false));
+  };
+}
+function submit(auto){
+  if(S.submitted) return;
+  if(view === "task") S.texts[cur] = $("essay").value;
+  S.submitted = true; S.auto = auto; S.submittedAt = Math.min(Date.now(), S.endTime || Date.now());
+  save(); clearInterval(tick); $("timer").classList.add("hidden"); closeModal(); showResult();
+}
+
+/* ======================= BÀI ĐÃ NỘP ======================= */
+const esc = s => s.replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function showResult(){
+  view = "result"; show("resultView"); renderTabs();
+  const used = S.startTime ? S.submittedAt - S.startTime : 0;
+  const blocks = TASKS.map(T => { const s = taskStatus(T), t = S.texts[T.id].trim();
+    return `<h2 style="margin-top:6px">Task ${T.id}</h2>
+      <div class="essay-out${t ? "" : " empty"}">${t ? esc(t) : "(Không có bài viết)"}</div>
+      <div class="meta-row"><span>${s.n} từ · yêu cầu tối thiểu ${T.min} từ</span><span style="color:var(--${s.cls==="ok"?"ok":"warn"});font-weight:600">${s.text}</span></div>`; }).join("");
+  $("resultView").innerHTML = `<div class="center">
+    ${S.auto ? `<div class="banner warn">Hết giờ – bài làm đã được nộp tự động.</div>` : `<div class="banner ok">Bạn đã nộp bài thành công.</div>`}
+    <div class="card">
+      <p class="p-label">VSTEP Writing · Đề 2</p>
+      <h1 style="font-size:26px">${S.name ? esc(S.name) : "Bài làm Writing"}</h1>
+      <div class="meta-row"><span>Thời gian làm bài: ${Math.floor(used/60000)} phút ${Math.floor(used%60000/1000)} giây</span><span>Nộp lúc: ${new Date(S.submittedAt).toLocaleString("vi-VN")}</span></div>
+      ${blocks}
+      <p style="font-size:14px;color:var(--muted);margin:4px 0 8px">Bài viết được giáo viên chấm theo 4 tiêu chí:</p>
+      <div class="criteria"><span>Task Fulfillment</span><span>Organization</span><span>Vocabulary</span><span>Grammar</span></div>
+    </div>
+    <div class="card no-print">
+      <h2>Gửi bài cho giáo viên</h2>
+      <p style="color:var(--muted);margin:0 0 16px">Tải bài làm về máy dưới dạng file văn bản, sao chép để dán vào tin nhắn/email, hoặc in ra / lưu thành PDF.</p>
+      <div class="actions" style="justify-content:flex-start">
+        <button class="btn primary" id="dlBtn">Tải bài làm (.txt)</button>
+        <button class="btn" id="copyBtn">Sao chép bài làm</button>
+        <button class="btn" id="printBtn">In / Lưu PDF</button>
+      </div>
+    </div>
+    <div class="actions no-print"><button class="btn" id="retryBtn">Làm lại từ đầu</button></div>
+  </div>`;
+  $("resultView").scrollTop = 0;
+  $("dlBtn").onclick = download;
+  $("copyBtn").onclick = copyAll;
+  $("printBtn").onclick = () => window.print();
+  $("retryBtn").onclick = () => confirmBox("Làm lại từ đầu?", "Toàn bộ bài viết hiện tại sẽ bị xoá khỏi máy. Hãy tải bài làm về trước nếu cần giữ lại.", "Làm lại", () => {
+    const keepName = S.name; S = fresh(); S.name = keepName; save(); closeModal();
+    view = "start"; show("startView"); renderTabs(); setStart();
+  });
+}
+function plainText(){
+  const used = S.startTime ? S.submittedAt - S.startTime : 0;
+  let s = `VSTEP WRITING TEST – ĐỀ 2\nHọ và tên: ${S.name || "(chưa nhập)"}\nNộp lúc: ${new Date(S.submittedAt).toLocaleString("vi-VN")}\nThời gian làm bài: ${Math.floor(used/60000)} phút ${Math.floor(used%60000/1000)} giây${S.auto ? " (tự động nộp khi hết giờ)" : ""}\n`;
+  TASKS.forEach(T => { s += `\n==============================\nTASK ${T.id} (${words(S.texts[T.id])} từ / tối thiểu ${T.min})\n==============================\n${S.texts[T.id].trim() || "(Không có bài viết)"}\n`; });
+  return s;
+}
+function download(){
+  const slug = (S.name || "bai-lam").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D").replace(/[^A-Za-z0-9]+/g,"_").replace(/^_|_$/g,"");
+  const blob = new Blob(["﻿" + plainText()], {type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `VSTEP_Writing_De2_${slug || "bai_lam"}.txt`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function copyAll(){
+  const t = plainText();
+  const done = () => toast("Đã sao chép bài làm");
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done).catch(fallback); else fallback();
+  function fallback(){ const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(e){} ta.remove(); }
+}
+function toast(msg){ const d = document.createElement("div"); d.className = "toast"; d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.remove(), 1800); }
+
+/* ======================= ĐỒNG HỒ ======================= */
+function updateTimer(){
+  if(!S.endTime || S.submitted) return;
+  const left = S.endTime - Date.now();
+  $("timerText").textContent = fmtMs(left);
+  const st = $("sumTime"); if(st) st.textContent = fmtMs(left);
+  $("timer").classList.toggle("warn", left <= 10*60000 && left > 5*60000);
+  $("timer").classList.toggle("danger", left <= 5*60000);
+  if(view === "task") updateTip();
+  if(left <= 0) submit(true);
+}
+function startTimer(){ $("timer").classList.remove("hidden"); updateTimer(); clearInterval(tick); tick = setInterval(updateTimer, 250); }
+
+/* ======================= MODAL ======================= */
+let modalOk = null;
+function confirmBox(t, txt, ok, fn){ $("mTitle").textContent=t; $("mText").textContent=txt; $("mOk").textContent=ok; modalOk=fn; $("modal").classList.remove("hidden"); $("mOk").focus(); }
+function closeModal(){ $("modal").classList.add("hidden"); modalOk = null; }
+$("mCancel").onclick = closeModal;
+$("mOk").onclick = () => { if(modalOk) modalOk(); };
+
+/* ======================= KHỞI ĐỘNG ======================= */
+function setStart(){
+  $("nameIn").value = S.name || "";
+  $("startBtn").textContent = (S.endTime && !S.submitted) ? `Tiếp tục làm bài (còn ${fmtMs(S.endTime - Date.now())})` : "Bắt đầu làm bài";
+}
+$("startBtn").onclick = () => {
+  S.name = $("nameIn").value.trim();
+  if(!S.endTime){ S.startTime = Date.now(); S.endTime = S.startTime + DURATION; }
+  save(); startTimer(); showTask(1);
+};
+window.addEventListener("beforeunload", () => { if(view === "task" && !S.submitted){ S.texts[cur] = $("essay").value; save(); } });
+
+(function init(){
+  if(S.submitted){ showResult(); return; }
+  if(S.endTime && Date.now() >= S.endTime){ submit(true); return; }
+  if(S.endTime) startTimer();
+  setStart(); renderTabs();
+})();
+</script>
+</body>
+</html>
