@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSTEP READING TEST 2</title>
+<style>
+:root{
+  --bg:#f4f1ea; --surface:#ffffff; --surface-2:#faf8f3; --ink:#1d2433; --muted:#5b6474; --line:#e3ddd0;
+  --accent:#1f4e79; --accent-ink:#ffffff; --accent-soft:#e6eef7;
+  --ok:#1e7b4a; --ok-soft:#e3f3ea; --bad:#b3261e; --bad-soft:#fbe7e5; --warn:#a85f00; --warn-soft:#fff1d6;
+  --ref:#8a5a00; --ref-soft:#fff3d1; --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --surface:#1d2129; --surface-2:#191c23; --ink:#e8e6e1; --muted:#9aa3b2; --line:#2e3440;
+    --accent:#8fb8e8; --accent-ink:#0f1620; --accent-soft:#1f2a3a;
+    --ok:#5cc28a; --ok-soft:#173022; --bad:#f08a80; --bad-soft:#3a1d1b; --warn:#f0b860; --warn-soft:#382a12;
+    --ref:#f0c46a; --ref-soft:#3a2f14; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --surface:#1d2129; --surface-2:#191c23; --ink:#e8e6e1; --muted:#9aa3b2; --line:#2e3440;
+  --accent:#8fb8e8; --accent-ink:#0f1620; --accent-soft:#1f2a3a;
+  --ok:#5cc28a; --ok-soft:#173022; --bad:#f08a80; --bad-soft:#3a1d1b; --warn:#f0b860; --warn-soft:#382a12;
+  --ref:#f0c46a; --ref-soft:#3a2f14; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.5;display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+button{font:inherit;cursor:pointer}
+.hidden{display:none !important}
+
+/* ---------- Header ---------- */
+.top{flex:0 0 auto;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:8px 16px;flex-wrap:wrap}
+.brand{font-weight:700;letter-spacing:.2px;white-space:nowrap}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:12px;letter-spacing:0}
+.tabs{display:flex;gap:4px;overflow-x:auto;flex:1 1 auto;scrollbar-width:none;min-width:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid transparent;background:transparent;color:var(--muted);padding:7px 12px;border-radius:999px;white-space:nowrap;font-size:14px;font-weight:600}
+.tab:hover{background:var(--surface-2);color:var(--ink)}
+.tab.active{background:var(--accent);color:var(--accent-ink)}
+.tab .cnt{font-weight:500;opacity:.8;margin-left:4px;font-size:12px}
+.timer{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums;font-weight:700;font-size:18px;padding:6px 14px;border-radius:10px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.timer svg{width:18px;height:18px}
+.timer.warn{background:var(--warn-soft);color:var(--warn)}
+.timer.danger{background:var(--bad-soft);color:var(--bad);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.6}}
+
+/* ---------- Main ---------- */
+main{flex:1 1 auto;min-height:0;position:relative}
+.view{position:absolute;inset:0;overflow:auto}
+.split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);overflow:hidden}
+.panel{overflow:auto;padding:24px 28px 40px;min-height:0}
+.passage-panel{background:var(--surface);border-right:1px solid var(--line)}
+.q-panel{background:var(--bg)}
+.mobile-switch{display:none}
+
+.p-label{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 6px}
+.passage h2{font-family:Georgia,"Times New Roman",serif;font-size:26px;line-height:1.25;margin:0 0 6px}
+.passage h3{font-family:Georgia,"Times New Roman",serif;font-size:20px;margin:18px 0 4px;font-style:italic;font-weight:600}
+.passage .hint{font-size:13px;color:var(--muted);margin:0 0 18px;padding:8px 12px;background:var(--surface-2);border-radius:8px;border:1px dashed var(--line)}
+.passage p{font-family:Georgia,"Times New Roman",serif;font-size:17.5px;line-height:1.8;margin:0 0 16px;max-width:68ch;text-align:justify;hyphens:auto}
+.passage p.p-label{font-family:"Segoe UI",system-ui,sans-serif;font-size:12px;line-height:1.4;margin:0 0 6px;text-align:left}
+.passage p.hint{font-family:"Segoe UI",system-ui,sans-serif;font-size:13px;line-height:1.5;margin:0 0 18px;text-align:left;max-width:none}
+.ref{background:var(--ref-soft);border-bottom:2px solid var(--ref);padding:0 2px;border-radius:3px;cursor:pointer}
+.ref::after{content:attr(data-q);font-family:"Segoe UI",system-ui,sans-serif;font-size:10px;font-weight:700;color:var(--ref);vertical-align:super;margin-left:2px}
+.ref.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{background:var(--ref);color:var(--surface)}100%{background:var(--ref-soft)}}
+.slot{display:inline-block;font-family:"Segoe UI",system-ui,sans-serif;font-size:13px;font-weight:700;color:var(--accent);border:1.5px solid var(--accent);border-radius:5px;padding:0 6px;margin:0 2px;line-height:1.5}
+
+/* ---------- Questions ---------- */
+.q-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 14px}
+.q-head h2{margin:0;font-size:18px}
+.q-head .muted{color:var(--muted);font-size:14px}
+.review-bar{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);margin:0 0 14px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 14px;box-shadow:var(--shadow);scroll-margin-top:16px}
+.q.focus{outline:2px solid var(--accent);outline-offset:2px}
+.q-top{display:flex;gap:12px;align-items:flex-start}
+.qnum{flex:0 0 auto;width:32px;height:32px;border-radius:9px;background:var(--accent-soft);color:var(--accent);font-weight:700;display:grid;place-items:center;font-size:14px}
+.q.answered .qnum{background:var(--accent);color:var(--accent-ink)}
+.qtext{margin:4px 0 0;font-weight:600;line-height:1.45}
+.quote{margin:10px 0 0 44px;padding:10px 14px;border-left:3px solid var(--accent);background:var(--surface-2);font-family:Georgia,serif;font-style:italic;border-radius:0 8px 8px 0}
+.find{margin:6px 0 0 44px;background:none;border:0;padding:0;color:var(--ref);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.opts{display:flex;flex-direction:column;gap:6px;margin:12px 0 0 44px}
+.opt{position:relative;display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover{border-color:var(--accent)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.letter{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--muted);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--muted);margin-top:1px}
+.opt input:checked + .letter{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opt input:focus-visible + .letter{outline:2px solid var(--accent);outline-offset:2px}
+.reviewing .opt{cursor:default}
+.reviewing .opt:hover{border-color:var(--line)}
+.opt.correct{border-color:var(--ok) !important;background:var(--ok-soft) !important}
+.opt.correct .letter{background:var(--ok) !important;border-color:var(--ok) !important;color:#fff !important}
+.opt.wrong{border-color:var(--bad) !important;background:var(--bad-soft) !important}
+.opt.wrong .letter{background:var(--bad) !important;border-color:var(--bad) !important;color:#fff !important}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;margin-left:8px;vertical-align:middle}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}
+.badge.bad{background:var(--bad-soft);color:var(--bad)}
+.badge.skip{background:var(--warn-soft);color:var(--warn)}
+.exp{margin:12px 0 0 44px;padding:12px 14px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);font-size:15px;line-height:1.6}
+.exp b.key{color:var(--ok)}
+.exp em{font-family:Georgia,serif}
+
+.nav-row{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+.btn{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 18px;border-radius:10px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.big{padding:14px 28px;font-size:17px;border-radius:12px}
+
+/* ---------- Start / Summary / Results ---------- */
+.center{max-width:760px;margin:0 auto;padding:32px 20px 60px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow);margin-bottom:18px}
+.card h1{font-family:Georgia,serif;font-size:32px;margin:0 0 6px;line-height:1.2}
+.card h2{margin:0 0 14px;font-size:20px}
+.lead{color:var(--muted);margin:0 0 20px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 22px}
+.fact{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.fact b{display:block;font-size:26px;color:var(--accent);font-variant-numeric:tabular-nums}
+.fact span{font-size:13px;color:var(--muted)}
+.rules{margin:0 0 24px;padding-left:20px;color:var(--ink)}
+.rules li{margin-bottom:6px}
+.parts-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 22px}
+.parts-list div{padding:10px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);font-size:14px}
+.parts-list b{color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 20px}
+.stat{border-radius:14px;padding:16px;text-align:center;border:1px solid var(--line)}
+.stat b{display:block;font-size:34px;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:13px;font-weight:600}
+.stat.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.stat.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.stat.skip{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.stat.info{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.grid40{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin:6px 0 18px}
+.cell{aspect-ratio:1;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);font-weight:700;font-size:14px;display:grid;place-items:center;padding:0}
+.cell:hover{border-color:var(--accent)}
+.cell.done{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.cell.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.cell.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.cell.skip{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.missing{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:12px 14px;margin:0 0 20px;font-size:15px}
+.missing.all{background:var(--ok-soft);color:var(--ok)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.score-hero{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:22px}
+.ring{width:132px;height:132px;flex:0 0 auto;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.1}
+.ring .num b{font-size:34px;font-variant-numeric:tabular-nums}
+.ring .num span{font-size:13px;color:var(--muted)}
+.score-meta p{margin:4px 0;color:var(--muted)}
+.score-meta .ten{font-size:22px;color:var(--ink);font-weight:700}
+.bars{display:flex;flex-direction:column;gap:10px;margin:0 0 6px}
+.bar-row{display:grid;grid-template-columns:90px 1fr 54px auto;align-items:center;gap:12px;font-size:14px}
+.bar{height:10px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:99px}
+.bar-row .link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13px;padding:0;text-decoration:underline;text-underline-offset:3px}
+.banner{border-radius:12px;padding:12px 14px;margin:0 0 16px;font-weight:600}
+.banner.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* ---------- Modal ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(10,15,25,.5);display:grid;place-items:center;padding:16px;z-index:50}
+.modal{background:var(--surface);border-radius:16px;padding:24px;max-width:440px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal h3{margin:0 0 8px;font-size:20px}
+.modal p{margin:0 0 20px;color:var(--muted)}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 860px){
+  .top{padding:8px 12px;gap:8px}
+  .brand small{display:none}
+  .tabs{order:3;flex-basis:100%}
+  .tab{padding:6px 10px;font-size:13px}
+  .timer{margin-left:auto;font-size:16px;padding:5px 12px}
+  .split{display:flex;flex-direction:column}
+  .mobile-switch{display:flex;gap:6px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--line);flex:0 0 auto}
+  .mobile-switch button{flex:1;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);border-radius:9px;padding:8px;font-weight:600;font-size:14px}
+  .mobile-switch button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .panel{flex:1 1 auto;padding:18px 16px 32px;border-right:0}
+  .split[data-show="passage"] .q-panel{display:none}
+  .split[data-show="questions"] .passage-panel{display:none}
+  .passage p{font-size:17px;text-align:left}
+  .opts,.exp,.find,.quote{margin-left:0}
+  .q{padding:14px}
+  .facts,.stats{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .fact b{font-size:22px}
+  .stat b{font-size:26px}
+  .parts-list{grid-template-columns:1fr}
+  .grid40{grid-template-columns:repeat(8,1fr)}
+  .card{padding:20px 16px}
+  .card h1{font-size:26px}
+  .bar-row{grid-template-columns:70px 1fr 44px;row-gap:2px}
+  .bar-row .link{grid-column:1/-1;justify-self:start}
+  .center{padding:16px 16px 40px}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="brand">VSTEP READING TEST 2<small>4 bài đọc · 40 câu · 60 phút</small></div>
+  <nav class="tabs" id="tabs" aria-label="Các phần"></nav>
+  <div class="timer hidden" id="timer" aria-live="off">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+    <span id="timerText">60:00</span>
+  </div>
+</header>
+
+<main>
+  <!-- Start -->
+  <section class="view" id="startView">
+    <div class="center">
+      <div class="card">
+        <p class="p-label">Reading Comprehension</p>
+        <h1>VSTEP READING TEST 2</h1>
+        <p class="lead">Đọc 4 bài đọc và chọn đáp án đúng nhất (A, B, C hoặc D) cho mỗi câu hỏi.</p>
+        <div class="facts">
+          <div class="fact"><b>4</b><span>bài đọc</span></div>
+          <div class="fact"><b>40</b><span>câu hỏi</span></div>
+          <div class="fact"><b>60'</b><span>thời gian làm bài</span></div>
+        </div>
+        <div class="parts-list">
+          <div><b>Phần 1</b> · The Growth of Urban Gardening · Câu 1–10</div>
+          <div><b>Phần 2</b> · Taking a Gap Year · Câu 11–20</div>
+          <div><b>Phần 3</b> · Plastic in the Oceans · Câu 21–30</div>
+          <div><b>Phần 4</b> · How Birds Find Their Way · Câu 31–40</div>
+        </div>
+        <ul class="rules">
+          <li>Đồng hồ <b>60 phút</b> tính chung cho cả 4 bài và bắt đầu chạy khi bạn bấm “Bắt đầu làm bài”.</li>
+          <li>Bạn có thể chuyển qua lại giữa các phần bất cứ lúc nào.</li>
+          <li>Từ/cụm từ được hỏi đã được <span class="ref" data-q="#" style="cursor:default">gạch chân</span> trong bài đọc, kèm số câu hỏi.</li>
+          <li>Hết giờ, bài sẽ được <b>tự động nộp</b>. Sau khi nộp, bạn sẽ thấy điểm và giải thích đáp án.</li>
+        </ul>
+        <div class="actions">
+          <button class="btn primary big" id="startBtn">Bắt đầu làm bài</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Part (passage + questions) -->
+  <section class="view split hidden" id="partView" data-show="passage">
+    <div class="mobile-switch" id="mswitch">
+      <button data-show="passage" class="on">Bài đọc</button>
+      <button data-show="questions">Câu hỏi <span id="mcnt"></span></button>
+    </div>
+    <article class="panel passage-panel passage" id="passagePanel"></article>
+    <section class="panel q-panel" id="qPanel"></section>
+  </section>
+
+  <!-- Summary -->
+  <section class="view hidden" id="summaryView"></section>
+
+  <!-- Results -->
+  <section class="view hidden" id="resultsView"></section>
+</main>
+
+<div class="modal-bg hidden" id="modal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h3 id="mTitle"></h3>
+    <p id="mText"></p>
+    <div class="actions">
+      <button class="btn" id="mCancel">Quay lại</button>
+      <button class="btn primary" id="mOk">Đồng ý</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DỮ LIỆU BÀI ĐỌC
+   ========================================================= */
+const PARTS = [
+{ id:1, label:"Passage 1", title:"The Growth of Urban Gardening", from:1, to:10, html:`
+<p>In cities around the world, empty rooftops, abandoned lots and even small balconies are being transformed into green spaces where residents grow their own food. This movement, known as urban gardening, has expanded rapidly over the past two decades. It is driven by rising food prices, concern for the environment and a desire among city <span class="ref" data-q="2">dwellers</span> to reconnect with nature.</p>
+<p>For individuals, urban gardening offers several clear benefits. The most obvious is access to fresh, affordable vegetables and herbs that have not travelled hundreds of kilometres to reach the table. In addition, gardening is a form of gentle exercise, and research suggests that spending time among plants can reduce stress and improve mood. Many gardeners also say the activity gives them a sense of achievement that their office jobs rarely provide.</p>
+<p><span class="ref" data-q="4">Nevertheless</span>, growing food in a city is not always easy. Space is limited and often expensive, so gardeners must be creative, using vertical shelves, hanging pots and shared plots. Soil in former industrial areas may be <span class="ref" data-q="6">contaminated</span> with harmful chemicals, which means it must be tested or replaced before anything edible is planted. Water supply can also be a problem, especially during long, dry summers.</p>
+<p>For communities, the impact of urban gardens can be significant. Shared gardens bring together neighbours who might otherwise never meet, and <span class="ref" data-q="10">they</span> often become places where older residents <span class="ref" data-q="7">pass on their knowledge</span> to younger ones. Local authorities have noticed these advantages, and some now offer free seeds, training and land to residents who wish to start a garden. As cities continue to grow, urban gardening may become an important part of how people live, eat and connect with one another.</p>
+`},
+{ id:2, label:"Passage 2", title:"", from:11, to:20, html:`
+<p>Every summer, thousands of school leavers face the same decision: go straight to university or take a year off first. For a growing number, the answer is the latter. The so-called gap year, once seen as a luxury for the wealthy, has become a mainstream option, and universities report that the number of students deferring their places has risen steadily over the past decade. <span class="slot">A</span></p>
+<p>“Almost every student who comes to me imagines a year of backpacking through beautiful places with no responsibilities,” said Laura Bennett, a careers adviser who has worked with school leavers for over fifteen years. “They all want the adventure they have seen on social media.”</p>
+<p>The first surprise for many is the cost. A structured volunteering programme abroad can easily cost between £3,000 and £7,000 for three months, not including flights, insurance and vaccinations. Even a simple year of independent travel around Southeast Asia is likely to require savings of at least £8,000. <span class="slot">B</span></p>
+<p>Ms Bennett said that when she explains these figures to students, some are so <span class="ref" data-q="13">disheartened</span> that “they decide the whole idea is a fantasy and simply enrol at university in September without really thinking it through.”</p>
+<p>Others adjust their plans. They <span class="ref" data-q="16">grudgingly agree</span> to work for six months before travelling, choose a cheaper destination, or look for programmes that provide free accommodation in exchange for work. “Those who plan carefully usually end up having the most rewarding experiences,” Ms Bennett said.</p>
+<p>The thousands of young people who take a gap year each year will soon discover that a successful year out requires as much organisation as a university application. <span class="slot">C</span></p>
+<p>The second surprise is how a gap year is viewed by others. While many universities welcome students who have gained maturity and independence, <span class="ref" data-q="19">they</span> expect applicants to explain what the year has taught them. A year spent mostly relaxing at home is unlikely to impress an admissions tutor. The most convincing applicants, tutors say, are those who can explain how their experiences have shaped their choice of course.</p>
+<p><span class="slot">D</span> To begin with, many universities ask students who defer to confirm their place by a fixed deadline, and some courses, particularly in medicine, do not allow deferral at all. In one survey of 2,000 gap-year students, nearly 40 per cent said they had underestimated the paperwork involved, and around one in ten said they had almost lost their university place because they missed a deadline.</p>
+<p>Students who travel alone also need to think about safety. Parents often insist on regular contact, and many programmes require participants to have comprehensive travel insurance, which can cost several hundred pounds. Add the cost of a visa and vaccinations, and a student planning a three-month trip may spend over a thousand pounds before even leaving home.</p>
+`},
+{ id:3, label:"Passage 3", title:"", from:21, to:30, html:`
+<p>The boat had barely touched the sand when our guide turned to us. “Before you take any photos,” she said, “look down at your feet. Nobody lives on this island, yet this is what we find every single morning.” I looked down, expecting the soft white sand shown in the travel brochures. Instead, I saw a carpet of bottle caps, toothbrushes, fishing nets and shredded plastic bags, washed up from places thousands of kilometres away. The island was beautiful, but it had become a dumping ground for the rest of the world.</p>
+<p>What I witnessed on that small beach in the Indian Ocean reflects a pattern documented by scientists across the globe. Researchers estimate that millions of tonnes of plastic enter the oceans every year, and one widely quoted report has warned that, if current trends continue, there could be more plastic than fish in the sea, by weight, by the middle of this century. Much of this waste is carried to the sea by rivers flowing through densely populated regions where rubbish collection is limited, while abandoned fishing gear makes up a large share of the bigger pieces floating far from land.</p>
+<p>The problem is made worse by the fact that plastic never truly disappears. Exposed to sunlight and waves, it breaks down into tiny fragments known as microplastics, which are swallowed by fish, seabirds and turtles. Scientists have found these particles in seafood, in tap water and even in the snow of remote mountains. <span class="slot">A</span> Because the effects of microplastics on human health are still uncertain, many consumers and manufacturers seem content to carry on as before. Cheap, light and convenient, plastic remains <span class="ref" data-q="23">deeply embedded</span> in modern life, and companies that depend on it have little incentive to change. <span class="slot">B</span></p>
+<p>Some governments, however, have decided not to wait for scientific certainty. Faced with growing public anger, a number of countries have banned single-use plastic bags, straws and cutlery, while others have introduced deposit schemes that pay consumers to return bottles. The European Union has gone further, requiring manufacturers of certain products to help pay for cleaning up the waste those products create. Supporters hope that <span class="ref" data-q="25">such measures</span> will push businesses to design packaging that can be reused or easily recycled. Of course, enforcement remains a challenge. Small shopkeepers complain that alternatives are more expensive, and in many developing countries there is simply no system to collect and process waste. As one environmental official put it, “Banning a straw is easy. Building a recycling industry that works for millions of people is the real test.” <span class="slot">C</span></p>
+<p>The real test may come at international level. Negotiators from more than 170 countries have been working towards a global treaty on plastic pollution, which could set binding rules on production as well as on waste management. Many countries support strict limits on how much new plastic is made, while others, particularly those that produce oil and plastics, would prefer to focus on recycling. <span class="slot">D</span> Meanwhile, the tide will keep bringing its unwanted <span class="ref" data-q="28">cargo</span> to the shores of islands where no one lives, a silent reminder of the habits of people who live far away.</p>
+`},
+{ id:4, label:"Passage 4", title:"", from:31, to:40, html:`
+<p>Every autumn, billions of birds leave their breeding grounds and travel thousands of kilometres to warmer regions, often returning the following spring to the very same tree or nest. The bar-tailed godwit, a wading bird, holds the record for the longest non-stop flight of any land bird, crossing the Pacific Ocean from Alaska to Australia and New Zealand in about eleven days without stopping to eat or rest. Remarkable as these journeys are, the greater mystery is not how birds find the strength to make them, but how they find their way.</p>
+<p>For centuries, people assumed that birds simply followed familiar landmarks such as coastlines, rivers and mountain ranges. While landmarks undoubtedly play a role, <span class="ref" data-q="31">they</span> cannot explain how young birds, making their first journey alone and often at night, manage to reach destinations that are completely unknown to them.</p>
+<p>One of the earliest scientific explanations was that birds use the sun as a compass. Experiments in the 1950s showed that caged starlings oriented themselves in a consistent direction when they could see the sun, and changed direction when mirrors were used to shift its apparent position. Night-flying species, it was later discovered, rely instead on the stars, learning the pattern of the night sky as it rotates around the Pole Star.</p>
+<p>Yet such cues are useless on cloudy nights, and this led researchers to a more surprising idea: that birds can sense the Earth’s magnetic field. Today, most scientists accept that many species possess some form of magnetic sense, although the mechanism behind it is still <span class="ref" data-q="33">hotly debated</span>. One theory holds that tiny particles of iron in the bird’s beak act like a compass needle. Another, more radical, proposes that a protein in the bird’s eye allows it to literally see magnetic field lines, perhaps as a pattern of light and shade laid over its normal vision.</p>
+<p>“The idea that a bird might be using quantum physics in its eye sounded like science fiction twenty years ago,” said Dr. Marcus Hale, a biologist who studies animal navigation. “Now it is one of the most serious hypotheses we have.”</p>
+<p>Not everyone is convinced that the answer lies in light or magnetism. Some researchers argue that smell plays a central role, at least for seabirds. In experiments, shearwaters whose sense of smell had been temporarily blocked struggled to find their way home across open water, while birds carrying small magnets that disturbed their magnetic sense navigated normally.</p>
+<p>Rather than searching for a single explanation, many scientists now believe that birds combine several systems, switching between them depending on the weather, the landscape and the stage of the journey. “It is a bit like a pilot who has GPS, a map and a view out of the window,” Hale said. “If one fails, the others take over. The real puzzle is how such a small brain manages to put all of that information together.”</p>
+`}
+];
+
+const QS = [
+// ---------- PASSAGE 1 ----------
+{n:1, q:`According to paragraph 1, which of the following is a reason for the growth of urban gardening?`,
+ o:[`Cheaper land in city centres`,`Rising food prices`,`New government regulations`,`A shortage of supermarkets`], a:"B",
+ e:`Đoạn 1: <em>“It is driven by rising food prices, concern for the environment and a desire among city dwellers to reconnect with nature.”</em> → giá thực phẩm tăng là một nguyên nhân. Đất rẻ, quy định mới hay thiếu siêu thị đều không được nhắc đến.`},
+{n:2, q:`The word “dwellers” in paragraph 1 is closest in meaning to ________.`,
+ o:[`residents`,`visitors`,`workers`,`planners`], a:"A",
+ e:`<em>City dwellers</em> = những người sống ở thành phố → dweller = <b>resident</b> (cư dân). Cả bài nói về <em>residents</em> tự trồng rau, không phải khách tham quan hay người quy hoạch.`},
+{n:3, q:`Which of the following is <u>not</u> listed as a benefit of urban gardening for individuals?`,
+ o:[`Higher income`,`Access to fresh food`,`Physical exercise`,`Lower stress levels`], a:"A",
+ e:`Đoạn 2 liệt kê lợi ích cho cá nhân: rau tươi giá rẻ, vận động nhẹ nhàng, giảm căng thẳng và cảm giác thành tựu. Bài <b>không</b> nói trồng rau giúp tăng thu nhập.`},
+{n:4, q:`The word “Nevertheless” in paragraph 3 can best be replaced by ________.`,
+ o:[`Therefore`,`Moreover`,`For example`,`However`], a:"D",
+ e:`<em>Nevertheless</em> = tuy nhiên → <b>However</b>. Đoạn 2 nói về lợi ích, đoạn 3 chuyển sang khó khăn nên cần từ nối chỉ sự đối lập. Therefore = vì vậy; Moreover = hơn nữa; For example = ví dụ.`},
+{n:5, q:`Why must soil in former industrial areas be tested or replaced?`,
+ o:[`It may contain harmful chemicals.`,`It is too dry for most plants.`,`It is too expensive to buy.`,`It lacks enough nutrients.`], a:"A",
+ e:`Đoạn 3: <em>“Soil in former industrial areas may be contaminated with harmful chemicals, which means it must be tested or replaced…”</em> → đất có thể chứa hóa chất độc hại.`},
+{n:6, q:`The word “contaminated” in paragraph 3 is closest in meaning to ________.`,
+ o:[`covered`,`mixed`,`polluted`,`dried`], a:"C",
+ e:`<em>Contaminated with harmful chemicals</em> = bị nhiễm hóa chất độc hại → contaminated = <b>polluted</b> (ô nhiễm).`},
+{n:7, q:`The phrase “pass on their knowledge” in paragraph 4 refers to ________.`,
+ o:[`forgetting what they have learned`,`sharing what they know with others`,`selling their gardening products`,`learning new skills from young people`], a:"B",
+ e:`<em>Older residents pass on their knowledge to younger ones</em> → người lớn tuổi <b>truyền lại</b> kiến thức của mình cho người trẻ, tức là chia sẻ điều họ biết. Phương án “học kỹ năng từ người trẻ” đảo ngược chiều.`},
+{n:8, q:`How have some local authorities responded to urban gardening?`,
+ o:[`By banning gardens on rooftops`,`By charging residents for water`,`By building new industrial areas`,`By offering seeds, training and land`], a:"D",
+ e:`Đoạn 4: <em>“some now offer free seeds, training and land to residents who wish to start a garden.”</em>`},
+{n:9, q:`The main purpose of this passage is to ________.`,
+ o:[`persuade readers to give up their office jobs.`,`describe the benefits and difficulties of urban gardening.`,`explain how to grow vegetables on a balcony.`,`criticise local authorities for ignoring residents.`], a:"B",
+ e:`Bài lần lượt trình bày: nguyên nhân phát triển (đoạn 1) → lợi ích cá nhân (đoạn 2) → khó khăn (đoạn 3) → lợi ích cộng đồng (đoạn 4). Vậy mục đích là <b>mô tả lợi ích và khó khăn</b> của việc trồng rau đô thị.`},
+{n:10, q:`The word “they” in paragraph 4 refers to ________.`,
+ o:[`neighbours`,`older residents`,`shared gardens`,`local authorities`], a:"C",
+ e:`<em>“Shared gardens bring together neighbours who might otherwise never meet, and <b>they</b> often become places where…”</em> → thứ “trở thành nơi” người già truyền kiến thức chỉ có thể là <b>shared gardens</b>, không phải neighbours.`},
+// ---------- PASSAGE 2 ----------
+{n:11, q:`Which of the following would be the best title for this article?`,
+ o:[`How to Plan the Perfect Gap Year Abroad`,`The Gap Year – A Luxury for the Wealthy`,`Why Universities Reject Gap-Year Students`,`The Hidden Realities of Taking a Gap Year`], a:"D",
+ e:`Bài nói về những “cú sốc” (chi phí, cách người khác nhìn nhận, thủ tục) mà học sinh gặp khi chọn gap year → <b>The Hidden Realities of Taking a Gap Year</b>. “A Luxury for the Wealthy” là quan niệm cũ, đoạn 1 nói nay đã trở nên phổ biến.`},
+{n:12, q:`According to the passage, how much might a three-month volunteering programme abroad cost?`,
+ o:[`Less than £3,000 in total`,`At least £8,000`,`Between £3,000 and £7,000, excluding some extra costs`,`About £1,000, including flights`], a:"C",
+ e:`Đoạn 3: <em>“between £3,000 and £7,000 for three months, not including flights, insurance and vaccinations”</em> → từ 3.000 đến 7.000 bảng, <b>chưa gồm</b> một số chi phí khác. £8,000 là chi phí cho một năm tự du lịch.`},
+{n:13, q:`Which of the following words can best replace the word “disheartened” in paragraph 4?`,
+ o:[`Confused`,`Annoyed`,`Discouraged`,`Embarrassed`], a:"C",
+ e:`<em>Disheartened</em> = nản lòng, mất tinh thần → <b>Discouraged</b>. Ngữ cảnh: nghe con số chi phí xong, họ cho rằng ý tưởng chỉ là “a fantasy” và bỏ cuộc.`},
+{n:14, q:`Which of the following is <u>not</u> mentioned as a way students adjust their gap-year plans?`,
+ o:[`Working before they travel`,`Borrowing money from their parents`,`Choosing a less expensive destination`,`Exchanging work for free accommodation`], a:"B",
+ e:`Đoạn 5 nêu ba cách điều chỉnh: đi làm 6 tháng trước (working before they travel), chọn nơi rẻ hơn, tìm chương trình đổi công việc lấy chỗ ở. Bài <b>không</b> nhắc đến việc vay tiền bố mẹ.`},
+{n:15, q:`According to Ms Bennett, what do most students who come to her expect from a gap year?`,
+ o:[`A chance to earn money before university`,`Adventure without responsibilities`,`An easier way to get into university`,`Free volunteering opportunities`], a:"B",
+ e:`Đoạn 2: <em>“imagines a year of backpacking through beautiful places with <b>no responsibilities</b>… They all want the adventure”</em> → phiêu lưu mà không phải lo trách nhiệm.`},
+{n:16, q:`Which of the following would best describe the attitude of students who “grudgingly agree” to work before travelling?`,
+ o:[`Reluctant`,`Hopeful`,`Eager`,`Satisfied`], a:"A",
+ e:`<em>Grudgingly</em> = miễn cưỡng, không vui lòng → thái độ <b>Reluctant</b>. Eager (háo hức) và Satisfied (hài lòng) trái nghĩa.`},
+{n:17, q:`In which space (marked A, B, C and D in the passage) will the following sentence fit?`,
+ quote:`Apart from money and reputation, the practical requirements of taking a year out can also turn an exciting plan into a stressful one.`,
+ o:[`A`,`B`,`C`,`D`], a:"D",
+ e:`Câu cần chèn vừa <i>tổng kết</i> hai cú sốc trước (tiền – “money”, cách nhìn nhận – “reputation”), vừa <i>giới thiệu</i> ý mới: yêu cầu thực tế. Ngay sau [D] là <em>“To begin with, many universities ask students who defer to confirm their place by a fixed deadline…”</em>, bắt đầu liệt kê các yêu cầu đó → [D].`},
+{n:18, q:`Why did the writer mention the survey of 2,000 gap-year students?`,
+ o:[`To prove that most gap-year students lose their university places`,`To show that the administrative side of a gap year is often underestimated`,`To suggest that universities should stop allowing students to defer`,`To demonstrate that gap-year students are generally poorly organised`], a:"B",
+ e:`Khảo sát cho thấy gần 40% <em>“underestimated the paperwork involved”</em> và khoảng 1/10 suýt mất chỗ học vì lỡ hạn → minh họa rằng <b>phần thủ tục hành chính</b> của gap year thường bị xem nhẹ. Bài không nói “phần lớn” mất chỗ.`},
+{n:19, q:`What does the word “they” in paragraph 7 refer to?`,
+ o:[`Universities`,`Students`,`Applicants`,`Admissions tutors`], a:"A",
+ e:`<em>“While many universities welcome students who have gained maturity and independence, <b>they</b> expect applicants to explain…”</em> → chủ thể “mong đợi người nộp đơn” là <b>universities</b>.`},
+{n:20, q:`Which of the following sentences would best complete the last paragraph?`,
+ o:[`Most students who return from a gap year say they would recommend the experience to their friends.`,`So you had better forget about travelling and go straight to university.`,`In other words, the real cost of a gap year begins long before the adventure does.`,`On top of that, universities usually prefer applicants who have travelled alone.`], a:"C",
+ e:`Đoạn cuối liệt kê các khoản tốn kém <i>trước khi khởi hành</i> (bảo hiểm, visa, tiêm phòng, có thể hơn 1.000 bảng) → câu tổng kết hợp lý: chi phí thật của gap year bắt đầu từ lâu trước chuyến đi. Câu “forget about travelling” quá cực đoan, hai câu còn lại lạc đề.`},
+// ---------- PASSAGE 3 ----------
+{n:21, q:`In paragraph 1, what does the guide mean by saying, “Nobody lives on this island, yet this is what we find every single morning”?`,
+ o:[`The island is too dirty for anyone to live there.`,`Tourists are responsible for most of the rubbish.`,`The rubbish is collected by local people every morning.`,`The rubbish is not produced by people living on the island.`], a:"D",
+ e:`Hòn đảo <em>không có ai sống</em> nhưng sáng nào cũng đầy rác → rác <b>không phải do người trên đảo</b> thải ra. Tác giả nói rõ: <em>“washed up from places thousands of kilometres away”</em>.`},
+{n:22, q:`What is the author’s purpose when describing the scene on the beach?`,
+ o:[`To persuade readers to visit remote islands`,`To criticise travel brochures for being dishonest`,`To introduce the issue of ocean plastic through a personal experience`,`To show that the guide exaggerated the problem`], a:"C",
+ e:`Cảnh bãi biển đầy rác là phần mở bài theo trải nghiệm cá nhân, dẫn vào đoạn 2: <em>“What I witnessed… reflects a pattern documented by scientists across the globe”</em> → giới thiệu vấn đề rác nhựa đại dương.`},
+{n:23, q:`What is “deeply embedded” in paragraph 3 closest in meaning to?`,
+ o:[`Firmly established`,`Hidden underground`,`Rarely noticed`,`Carefully protected`], a:"A",
+ e:`<em>Plastic remains deeply embedded in modern life</em> = nhựa đã ăn sâu, bám rễ vững chắc trong đời sống → <b>firmly established</b>.`},
+{n:24, q:`What is the main idea of paragraph 3?`,
+ o:[`Microplastics have been found in many unexpected places.`,`Plastic is cheap, light and convenient for manufacturers.`,`Plastic pollution is spreading, but uncertainty about its effects discourages change.`,`Scientists have proved that microplastics seriously harm human health.`], a:"C",
+ e:`Đoạn 3: nhựa phân rã thành vi nhựa và lan khắp nơi, <em>“Because the effects… are still uncertain, many consumers and manufacturers seem content to carry on as before”</em> → ô nhiễm lan rộng nhưng sự chưa chắc chắn khiến người ta không thay đổi. “Scientists have proved…” trái với “still uncertain”.`},
+{n:25, q:`What does “such measures” in paragraph 4 refer to?`,
+ o:[`Scientific studies on microplastics`,`Bans, deposit schemes and payments by manufacturers`,`Recycling systems in developing countries`,`International negotiations on plastic`], a:"B",
+ e:`Trước <em>“such measures”</em> là các biện pháp: cấm túi, ống hút, dao nĩa nhựa dùng một lần; chương trình hoàn tiền khi trả chai; EU yêu cầu nhà sản xuất góp tiền dọn rác → <b>bans, deposit schemes and payments by manufacturers</b>.`},
+{n:26, q:`In which space (marked A, B, C and D in the passage) will the following sentence fit?`,
+ quote:`Yet these discoveries have done surprisingly little to change the way people shop.`,
+ o:[`A`,`B`,`C`,`D`], a:"A",
+ e:`Câu cần chèn: <em>“Yet these discoveries have done surprisingly little to change the way people shop.”</em> “These discoveries” chỉ việc tìm thấy vi nhựa trong hải sản, nước máy, tuyết (câu ngay trước [A]). Câu sau [A] giải thích lý do: <em>“Because the effects… are still uncertain…”</em> → [A].`},
+{n:27, q:`According to paragraph 4, the author’s attitude toward the governments’ actions can be best described as`,
+ o:[`critical`,`cautiously positive`,`indifferent`,`enthusiastic`], a:"B",
+ e:`Tác giả khen các chính phủ <em>“have decided not to wait for scientific certainty”</em> và nêu kỳ vọng của người ủng hộ, nhưng ngay sau đó thừa nhận <em>“Of course, enforcement remains a challenge”</em> → <b>tích cực nhưng thận trọng</b>, không “enthusiastic”.`},
+{n:28, q:`What can the word “cargo” in paragraph 5 be best replaced by?`,
+ o:[`ship`,`message`,`wave`,`load`], a:"D",
+ e:`<em>“the tide will keep bringing its unwanted cargo to the shores”</em> → thứ thủy triều mang đến là rác, tức “hàng hóa”, “thứ chở theo” → <b>load</b>.`},
+{n:29, q:`Which of the following best describes the tone of the author in this passage?`,
+ o:[`humorous`,`optimistic`,`indifferent`,`concerned`], a:"D",
+ e:`Tác giả mô tả cảnh đảo thành bãi rác, cảnh báo ô nhiễm lan rộng và kết bằng hình ảnh “a silent reminder” → giọng văn <b>lo ngại</b> (concerned). Không hài hước, cũng không lạc quan.`},
+{n:30, q:`Which of the following could best describe the message that the author wants to pass to readers?`,
+ o:[`Plastic should be completely banned in all countries.`,`Microplastics are the most serious threat to human health.`,`Tackling plastic pollution requires coordinated action beyond national bans.`,`Remote islands should be closed to tourists.`], a:"C",
+ e:`Bài chỉ ra lệnh cấm từng nước khó thực thi (<em>“Banning a straw is easy… the real test”</em>) và nhấn mạnh <em>“The real test may come at international level”</em> → cần <b>hành động phối hợp</b>, vượt ra ngoài các lệnh cấm trong từng nước.`},
+// ---------- PASSAGE 4 ----------
+{n:31, q:`The word “they” in paragraph 2 refers to`,
+ o:[`people`,`young birds`,`landmarks`,`destinations`], a:"C",
+ e:`<em>“While landmarks undoubtedly play a role, <b>they</b> cannot explain how young birds… manage to reach destinations”</em> → thứ “không giải thích được” là <b>landmarks</b> (các mốc địa hình).`},
+{n:32, q:`According to the passage, what did the experiments with starlings in the 1950s show?`,
+ o:[`Starlings follow coastlines and rivers.`,`Starlings learn the pattern of the stars.`,`Starlings can detect magnetic fields.`,`Starlings use the sun to find direction.`], a:"D",
+ e:`Đoạn 3: chim sáo trong lồng định hướng ổn định khi thấy mặt trời và đổi hướng khi dùng gương thay đổi vị trí mặt trời → chúng <b>dùng mặt trời để định hướng</b>. Việc học vị trí các vì sao là của loài bay đêm.`},
+{n:33, q:`The phrase “hotly debated” in paragraph 4 is closest in meaning to`,
+ o:[`strongly disputed`,`widely accepted`,`rarely discussed`,`clearly explained`], a:"A",
+ e:`<em>Hotly debated</em> = đang được tranh cãi sôi nổi → <b>strongly disputed</b>. Ngữ cảnh: các nhà khoa học chấp nhận có giác quan từ tính, <em>“although”</em> cơ chế vẫn còn bàn cãi.`},
+{n:34, q:`According to the passage, what is <u>not</u> true about the magnetic sense of birds?`,
+ o:[`Most scientists accept that many species have it.`,`It may help birds when the sky is cloudy.`,`Scientists agree on exactly how it works.`,`It might involve a protein in the bird’s eye.`], a:"C",
+ e:`Bài nói cơ chế của giác quan từ tính <em>“is still hotly debated”</em> → nói rằng các nhà khoa học đã <b>thống nhất</b> cách nó hoạt động là <b>sai</b>. Ba phương án còn lại đều có trong đoạn 4.`},
+{n:35, q:`What does Dr. Hale mean when he says, “The idea that a bird might be using quantum physics in its eye sounded like science fiction twenty years ago”?`,
+ o:[`Scientists have always believed that birds use quantum physics.`,`The theory is still regarded as science fiction by most biologists.`,`Birds’ eyes are more advanced than any human technology.`,`The theory was once considered unrealistic but is now taken seriously.`], a:"D",
+ e:`“Nghe như khoa học viễn tưởng 20 năm trước”, nhưng <em>“Now it is one of the most serious hypotheses we have”</em> → giả thuyết <b>từng bị xem là phi thực tế, nay được coi trọng</b>.`},
+{n:36, q:`Which of the following statements would the researchers who studied shearwaters most probably support?`,
+ o:[`For some seabirds, smell may matter more than magnetism in finding their way.`,`Magnetic sense is the most important navigation tool for all birds.`,`Shearwaters are unable to navigate across open water.`,`Smell is useless for birds that fly over land.`], a:"A",
+ e:`Thí nghiệm: chim bị chặn khứu giác thì lạc đường, còn chim bị gắn nam châm vẫn bay đúng → với một số loài chim biển, <b>khứu giác có thể quan trọng hơn từ tính</b>. Các phương án khác quá tuyệt đối hoặc không có trong bài.`},
+{n:37, q:`According to the passage, which is most likely supported by Dr. Hale?`,
+ o:[`Birds rely on one main navigation system.`,`Birds can use several navigation systems and switch between them.`,`Landmarks are the most reliable navigation aid.`,`A bird’s brain is too small to process navigational information.`], a:"B",
+ e:`Ông so sánh chim với phi công có GPS, bản đồ và cửa sổ: <em>“If one fails, the others take over”</em> → chim dùng <b>nhiều hệ thống</b> và chuyển đổi giữa chúng. Câu “how such a small brain manages…” là thắc mắc, không phải nói não chim không xử lý được.`},
+{n:38, q:`Which of the following is <u>not</u> mentioned as a possible means of bird navigation?`,
+ o:[`The sound of ocean waves`,`The position of the sun`,`Particles of iron in the beak`,`A sense of smell`], a:"A",
+ e:`Bài nhắc đến: mốc địa hình, mặt trời, các vì sao, từ trường (hạt sắt ở mỏ, protein ở mắt) và khứu giác. <b>Tiếng sóng biển</b> không được nhắc đến.`},
+{n:39, q:`Which of the following conclusions can be drawn from this passage?`,
+ o:[`The question of how birds navigate has finally been answered.`,`The magnetic theory has been proved wrong by experiments on smell.`,`Bird navigation probably involves several mechanisms, and much remains unclear.`,`Young birds learn their routes by following older birds.`], a:"C",
+ e:`Đoạn cuối: <em>“many scientists now believe that birds combine several systems”</em> và <em>“The real puzzle is how…”</em> → điều hướng có lẽ dùng <b>nhiều cơ chế</b>, và vẫn còn nhiều điều chưa rõ. Câu hỏi chưa được giải đáp hoàn toàn, thuyết từ tính cũng không bị bác bỏ.`},
+{n:40, q:`Which of the following best describes the organization of this passage?`,
+ o:[`A problem is described, followed by a single solution proven by experiments.`,`A question is raised, several explanations are presented, and a combined view is suggested.`,`Two opposing theories are compared and one of them is rejected.`,`A historical account of bird studies is followed by predictions for the future.`], a:"B",
+ e:`Bài nêu câu hỏi (chim tìm đường bằng cách nào) → trình bày lần lượt các giải thích (mốc địa hình, mặt trời và sao, từ trường, khứu giác) → kết bằng quan điểm <b>kết hợp</b> nhiều hệ thống.`},
+];
+
+/* =========================================================
+   TRẠNG THÁI
+   ========================================================= */
+const TOTAL = QS.length, DURATION = 60*60*1000, STORE = "reading-test-2-v1";
+const QMAP = {}; QS.forEach(q => QMAP[q.n] = q);
+const partOf = n => PARTS.find(p => n >= p.from && n <= p.to).id;
+
+let S = load() || fresh();
+let view = "start", curPart = 1, onlyWrong = false, tick = null;
+
+function fresh(){ return {answers:{}, endTime:null, submitted:false, submittedAt:null, auto:false}; }
+function load(){ try{ return JSON.parse(localStorage.getItem(STORE)); }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch(e){} }
+
+const $ = id => document.getElementById(id);
+const answeredCount = (from=1,to=TOTAL) => { let c=0; for(let i=from;i<=to;i++) if(S.answers[i]) c++; return c; };
+
+/* =========================================================
+   TABS
+   ========================================================= */
+function renderTabs(){
+  if(view === "start"){ $("tabs").innerHTML = ""; return; }
+  let h = PARTS.map(p => {
+    const c = S.submitted ? scorePart(p).ok : answeredCount(p.from,p.to);
+    const active = (view==="part" && curPart===p.id) ? " active" : "";
+    return `<button class="tab${active}" data-part="${p.id}">Phần ${p.id}<span class="cnt">${c}/10${S.submitted?" đúng":""}</span></button>`;
+  }).join("");
+  if(S.submitted) h += `<button class="tab${view==="results"?" active":""}" data-go="results">Kết quả</button>`;
+  else h += `<button class="tab${view==="summary"?" active":""}" data-go="summary">Kiểm tra &amp; Nộp bài</button>`;
+  $("tabs").innerHTML = h;
+}
+$("tabs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.part) showPart(+b.dataset.part);
+  else if(b.dataset.go === "summary") showSummary();
+  else if(b.dataset.go === "results") showResults();
+});
+
+function show(id){
+  ["startView","partView","summaryView","resultsView"].forEach(v => $(v).classList.toggle("hidden", v!==id));
+}
+
+/* =========================================================
+   PART VIEW
+   ========================================================= */
+function showPart(p, focusQ){
+  view = "part"; curPart = p; show("partView");
+  const P = PARTS[p-1];
+  $("passagePanel").innerHTML =
+    `<p class="p-label">${P.label} · Questions ${P.from}–${P.to}</p>` +
+    (P.title ? `<h2>${P.title}</h2>` : `<h2>${P.label}</h2>`) +
+    `<p class="hint">Từ/cụm từ được hỏi được gạch chân, số nhỏ bên cạnh là số câu hỏi. Bấm vào để xem câu hỏi tương ứng.</p>` +
+    P.html;
+  $("passagePanel").scrollTop = 0;
+  renderQuestions();
+  renderTabs(); updateMobileCount();
+  if(focusQ){ setMobile("questions"); setTimeout(()=>focusQuestion(focusQ), 30); }
+}
+
+function renderQuestions(){
+  const P = PARTS[curPart-1], review = S.submitted;
+  let h = `<div class="q-head"><h2>Questions ${P.from}–${P.to}</h2>` +
+          (review ? "" : `<span class="muted" id="partCount">Đã làm ${answeredCount(P.from,P.to)}/10</span>`) + `</div>`;
+  if(review){
+    h += `<label class="review-bar"><input type="checkbox" id="onlyWrong" ${onlyWrong?"checked":""}> Chỉ hiện câu sai và câu chưa làm</label>`;
+  }
+  for(let n=P.from;n<=P.to;n++){
+    const q = QMAP[n], mine = S.answers[n];
+    const hasRef = P.html.includes(`data-q="${n}"`);
+    let badge = "", cls = "q" + (mine ? " answered" : "");
+    if(review){
+      if(!mine){ badge = `<span class="badge skip">Chưa làm</span>`; }
+      else if(mine === q.a){ badge = `<span class="badge ok">Đúng</span>`; }
+      else { badge = `<span class="badge bad">Sai</span>`; }
+      if(onlyWrong && mine === q.a) cls += " hidden";
+    }
+    h += `<div class="${cls}" id="q${n}"><div class="q-top"><div class="qnum">${n}</div><p class="qtext">${q.q}${badge}</p></div>`;
+    if(q.quote) h += `<div class="quote">${q.quote}</div>`;
+    if(hasRef) h += `<button class="find" data-find="${n}">Tìm trong bài đọc</button>`;
+    h += `<div class="opts${review?" reviewing":""}" role="radiogroup" aria-label="Câu ${n}">`;
+    ["A","B","C","D"].forEach((L,i) => {
+      let oc = "opt";
+      if(review){ if(L===q.a) oc += " correct"; else if(L===mine) oc += " wrong"; }
+      h += `<label class="${oc}"><input type="radio" name="q${n}" value="${L}" ${mine===L?"checked":""} ${review?"disabled":""}><span class="letter">${L}</span><span>${q.o[i]}</span></label>`;
+    });
+    h += `</div>`;
+    if(review){
+      h += `<div class="exp"><b class="key">Đáp án: ${q.a}.</b> ${mine && mine!==q.a ? `Bạn chọn ${mine}. ` : (!mine ? "Bạn chưa chọn đáp án. " : "")}${q.e}</div>`;
+    }
+    h += `</div>`;
+  }
+  h += `<div class="nav-row">`;
+  h += curPart>1 ? `<button class="btn" data-nav="prev">← Phần ${curPart-1}</button>` : `<span></span>`;
+  if(curPart<4) h += `<button class="btn primary" data-nav="next">Phần ${curPart+1} →</button>`;
+  else h += review ? `<button class="btn primary" data-nav="results">Xem kết quả →</button>`
+                   : `<button class="btn primary" data-nav="summary">Kiểm tra &amp; Nộp bài →</button>`;
+  h += `</div>`;
+  $("qPanel").innerHTML = h;
+  $("qPanel").scrollTop = 0;
+}
+
+$("qPanel").addEventListener("change", e => {
+  if(e.target.id === "onlyWrong"){ onlyWrong = e.target.checked; renderQuestions(); return; }
+  if(e.target.type !== "radio" || S.submitted) return;
+  const n = +e.target.name.slice(1);
+  S.answers[n] = e.target.value; save();
+  $("q"+n).classList.add("answered");
+  const P = PARTS[curPart-1];
+  const pc = $("partCount"); if(pc) pc.textContent = `Đã làm ${answeredCount(P.from,P.to)}/10`;
+  renderTabs(); updateMobileCount();
+});
+$("qPanel").addEventListener("click", e => {
+  const f = e.target.closest("[data-find]");
+  if(f){
+    setMobile("passage");
+    const r = $("passagePanel").querySelector(`.ref[data-q="${f.dataset.find}"]`);
+    if(r){ r.scrollIntoView({behavior:"smooth",block:"center"}); r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash"); }
+    return;
+  }
+  const nav = e.target.closest("[data-nav]"); if(!nav) return;
+  const d = nav.dataset.nav;
+  if(d==="prev") showPart(curPart-1);
+  else if(d==="next") showPart(curPart+1);
+  else if(d==="summary") showSummary();
+  else if(d==="results") showResults();
+});
+$("passagePanel").addEventListener("click", e => {
+  const r = e.target.closest(".ref"); if(!r) return;
+  setMobile("questions"); focusQuestion(+r.dataset.q);
+});
+
+function focusQuestion(n){
+  const el = $("q"+n); if(!el) return;
+  el.classList.remove("hidden");
+  el.scrollIntoView({behavior:"smooth",block:"start"});
+  el.classList.add("focus"); setTimeout(()=>el.classList.remove("focus"), 1600);
+}
+
+/* Mobile switch */
+function setMobile(which){
+  $("partView").dataset.show = which;
+  $("mswitch").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.show===which));
+}
+$("mswitch").addEventListener("click", e => { const b = e.target.closest("button"); if(b) setMobile(b.dataset.show); });
+function updateMobileCount(){
+  const P = PARTS[curPart-1];
+  $("mcnt").textContent = S.submitted ? `(${scorePart(P).ok}/10 đúng)` : `(${answeredCount(P.from,P.to)}/10)`;
+}
+
+/* =========================================================
+   SUMMARY (trước khi nộp)
+   ========================================================= */
+function showSummary(){
+  view = "summary"; show("summaryView"); renderTabs();
+  const done = answeredCount(), left = TOTAL - done;
+  const missing = QS.filter(q => !S.answers[q.n]).map(q => q.n);
+  let cells = QS.map(q => `<button class="cell${S.answers[q.n]?" done":""}" data-q="${q.n}" title="Câu ${q.n}">${q.n}</button>`).join("");
+  let perPart = PARTS.map(p => `<div><b>Phần ${p.id}</b> · đã làm ${answeredCount(p.from,p.to)}/10</div>`).join("");
+  $("summaryView").innerHTML = `
+  <div class="center">
+    <div class="card">
+      <h2>Kiểm tra bài làm trước khi nộp</h2>
+      <div class="stats">
+        <div class="stat info"><b>${done}</b><span>câu đã hoàn thành</span></div>
+        <div class="stat skip"><b>${left}</b><span>câu chưa hoàn thành</span></div>
+        <div class="stat info"><b id="sumTime">--:--</b><span>thời gian còn lại</span></div>
+      </div>
+      ${left ? `<div class="missing">Bạn còn <b>${left}</b> câu chưa làm: ${missing.map(n=>`<a href="#" data-q="${n}" style="color:inherit;font-weight:700">${n}</a>`).join(", ")}. Bấm vào số câu để quay lại làm.</div>`
+             : `<div class="missing all">Bạn đã hoàn thành tất cả 40 câu. Bạn có thể xem lại hoặc nộp bài ngay.</div>`}
+      <div class="legend"><span><i style="background:var(--accent)"></i>Đã làm</span><span><i style="border:1.5px solid var(--line);background:var(--surface)"></i>Chưa làm</span></div>
+      <div class="grid40" id="grid">${cells}</div>
+      <div class="parts-list">${perPart}</div>
+      <div class="actions">
+        <button class="btn" id="backBtn">← Quay lại Phần 4</button>
+        <button class="btn primary big" id="submitBtn">Nộp bài</button>
+      </div>
+    </div>
+  </div>`;
+  updateTimer();
+  $("summaryView").scrollTop = 0;
+  $("summaryView").querySelectorAll("[data-q]").forEach(el => el.addEventListener("click", ev => {
+    ev.preventDefault(); const n = +el.dataset.q; showPart(partOf(n), n);
+  }));
+  $("backBtn").onclick = () => showPart(4);
+  $("submitBtn").onclick = () => {
+    const l = TOTAL - answeredCount();
+    confirmBox(
+      "Nộp bài?",
+      l ? `Bạn còn ${l} câu chưa hoàn thành. Sau khi nộp sẽ không thể sửa đáp án. Bạn có chắc muốn nộp bài?`
+        : "Bạn đã làm đủ 40 câu. Sau khi nộp sẽ không thể sửa đáp án.",
+      "Nộp bài", () => submit(false)
+    );
+  };
+}
+
+/* =========================================================
+   NỘP BÀI & KẾT QUẢ
+   ========================================================= */
+function submit(auto){
+  if(S.submitted) return;
+  S.submitted = true; S.auto = auto; S.submittedAt = Math.min(Date.now(), S.endTime || Date.now());
+  save(); stopTimer(); $("timer").classList.add("hidden");
+  onlyWrong = false; closeModal(); showResults();
+}
+
+function scorePart(p){
+  let ok=0, bad=0, skip=0;
+  for(let n=p.from;n<=p.to;n++){ const m=S.answers[n]; if(!m) skip++; else if(m===QMAP[n].a) ok++; else bad++; }
+  return {ok,bad,skip};
+}
+
+function showResults(){
+  view = "results"; show("resultsView"); renderTabs();
+  let ok=0,bad=0,skip=0;
+  PARTS.forEach(p => { const s=scorePart(p); ok+=s.ok; bad+=s.bad; skip+=s.skip; });
+  const pct = Math.round(ok/TOTAL*100), ten = (ok/TOTAL*10).toFixed(2).replace(/\.?0+$/,"");
+  const used = S.endTime ? Math.max(0, S.submittedAt - (S.endTime - DURATION)) : 0;
+  const um = Math.floor(used/60000), us = Math.floor(used%60000/1000);
+  const C = 2*Math.PI*54, dash = C*ok/TOTAL;
+  const cells = QS.map(q => { const m=S.answers[q.n]; const c = !m ? "skip" : (m===q.a ? "ok" : "bad");
+    return `<button class="cell ${c}" data-q="${q.n}" title="Câu ${q.n}">${q.n}</button>`; }).join("");
+  const bars = PARTS.map(p => { const s=scorePart(p);
+    return `<div class="bar-row"><b>Phần ${p.id}</b><div class="bar"><i style="width:${s.ok*10}%"></i></div><span>${s.ok}/10</span><button class="link" data-part="${p.id}">Xem đáp án</button></div>`; }).join("");
+  $("resultsView").innerHTML = `
+  <div class="center">
+    ${S.auto ? `<div class="banner warn">Hết giờ – bài làm đã được nộp tự động.</div>` : ""}
+    <div class="card">
+      <h2>Kết quả bài làm</h2>
+      <div class="score-hero">
+        <div class="ring">
+          <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--line)" stroke-width="10"/>
+          <circle cx="60" cy="60" r="54" fill="none" stroke="var(--ok)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${dash} ${C}"/></svg>
+          <div class="num"><div><b>${ok}</b><span>/40 câu đúng</span></div></div>
+        </div>
+        <div class="score-meta">
+          <p class="ten">Điểm hệ 10: ${ten}</p>
+          <p>Tỉ lệ đúng: ${pct}%</p>
+          <p>Thời gian làm bài: ${um} phút ${us} giây</p>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat ok"><b>${ok}</b><span>Đúng</span></div>
+        <div class="stat bad"><b>${bad}</b><span>Sai</span></div>
+        <div class="stat skip"><b>${skip}</b><span>Chưa làm</span></div>
+      </div>
+      <div class="bars">${bars}</div>
+    </div>
+    <div class="card">
+      <h2>Bảng câu trả lời</h2>
+      <div class="legend"><span><i style="background:var(--ok)"></i>Đúng</span><span><i style="background:var(--bad)"></i>Sai</span><span><i style="background:var(--warn-soft);border:1.5px solid var(--warn)"></i>Chưa làm</span></div>
+      <div class="grid40">${cells}</div>
+      <p style="color:var(--muted);font-size:14px;margin:0 0 18px">Bấm vào số câu để xem đáp án đúng và giải thích chi tiết.</p>
+      <div class="actions">
+        <button class="btn" id="retryBtn">Làm lại từ đầu</button>
+        <button class="btn primary" data-part="1">Xem giải thích đáp án →</button>
+      </div>
+    </div>
+  </div>`;
+  $("resultsView").scrollTop = 0;
+  $("resultsView").querySelectorAll("[data-part]").forEach(b => b.onclick = () => showPart(+b.dataset.part));
+  $("resultsView").querySelectorAll(".cell").forEach(b => b.onclick = () => { const n=+b.dataset.q; showPart(partOf(n), n); });
+  $("retryBtn").onclick = () => confirmBox("Làm lại từ đầu?", "Toàn bộ đáp án và kết quả hiện tại sẽ bị xoá.", "Làm lại", () => {
+    S = fresh(); save(); closeModal(); onlyWrong=false; view="start"; show("startView"); renderTabs(); setStartBtn();
+  });
+}
+
+/* =========================================================
+   ĐỒNG HỒ
+   ========================================================= */
+function fmt(ms){ ms=Math.max(0,ms); const t=Math.ceil(ms/1000), m=Math.floor(t/60), s=t%60; return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0"); }
+function updateTimer(){
+  if(!S.endTime || S.submitted) return;
+  const left = S.endTime - Date.now();
+  $("timerText").textContent = fmt(left);
+  const st = $("sumTime"); if(st) st.textContent = fmt(left);
+  $("timer").classList.toggle("warn", left <= 10*60000 && left > 5*60000);
+  $("timer").classList.toggle("danger", left <= 5*60000);
+  if(left <= 0) submit(true);
+}
+function startTimer(){ $("timer").classList.remove("hidden"); updateTimer(); stopTimer(); tick = setInterval(updateTimer, 250); }
+function stopTimer(){ if(tick){ clearInterval(tick); tick=null; } }
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+let modalOk = null;
+function confirmBox(title, text, okLabel, onOk){
+  $("mTitle").textContent = title; $("mText").textContent = text; $("mOk").textContent = okLabel;
+  modalOk = onOk; $("modal").classList.remove("hidden"); $("mOk").focus();
+}
+function closeModal(){ $("modal").classList.add("hidden"); modalOk = null; }
+$("mCancel").onclick = closeModal;
+$("mOk").onclick = () => { if(modalOk) modalOk(); };
+$("modal").addEventListener("click", e => { if(e.target.id==="modal") closeModal(); });
+document.addEventListener("keydown", e => { if(e.key==="Escape" && !$("modal").classList.contains("hidden")) closeModal(); });
+
+/* =========================================================
+   KHỞI ĐỘNG
+   ========================================================= */
+function setStartBtn(){
+  const b = $("startBtn");
+  if(S.endTime && !S.submitted) b.textContent = `Tiếp tục làm bài (còn ${fmt(S.endTime-Date.now())})`;
+  else b.textContent = "Bắt đầu làm bài";
+}
+$("startBtn").onclick = () => {
+  if(!S.endTime){ S.endTime = Date.now() + DURATION; save(); }
+  startTimer(); setMobile("passage"); showPart(1);
+};
+
+(function init(){
+  if(S.submitted){ showResults(); return; }
+  if(S.endTime && Date.now() >= S.endTime){ submit(true); return; }
+  if(S.endTime){ startTimer(); }
+  setStartBtn(); renderTabs();
+})();
+</script>
+</body>
+</html>
